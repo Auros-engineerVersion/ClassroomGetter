@@ -1,10 +1,9 @@
-from selenium.webdriver.common.by import By
-from time import sleep
+import settings
 from src.controls import Controls
-from src import settings
 
 def main():
-    controls = Controls(settings.profile_path, settings.profile_name)
+    print("run")
+    controls = Controls(settings.PROFILE_PATH, settings.PROFILE_NAME)
     controls.move('https://classroom.google.com/u/0/h')
     
 try:
@@ -13,3 +12,5 @@ except BaseException as e:
     print('\033[31m')
     print(e)
     print('\033[0m')
+finally:
+    settings.back_origin_enviroment()

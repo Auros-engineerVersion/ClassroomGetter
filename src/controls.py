@@ -1,12 +1,12 @@
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from factory import create_driver
+from .factory import create_driver
 
 class Controls:
     def __init__(self, profile_path: str, profile_name: str) -> None:
         self._driver = create_driver(profile_path, profile_name)
-        self._wait = WebDriverWait(self.driver, 30)
+        self._wait = WebDriverWait(self._driver, 30)
         pass
     
     def move(self, url: str):
@@ -20,3 +20,4 @@ class Controls:
     def lesson_links(self, class_name: str = 'onkcGd ZmqAt Vx8Sxd'):
         base_url = self._driver.find_element(By.__name__, 'base')
         print(base_url)
+        
