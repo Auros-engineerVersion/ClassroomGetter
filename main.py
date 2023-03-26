@@ -1,12 +1,10 @@
 from selenium.webdriver.common.by import By
 from time import sleep
-from controls import Controls
+from src.controls import Controls
+from src import settings
 
 def main():
-    profile_path = r'C:\Users\kkyan\Documents\Code\Projects\Application\Classroom\chromeData'
-    profile_name = 'Profile 1'
-    controls = Controls(profile_path, profile_name)
-    
+    controls = Controls(settings.profile_path, settings.profile_name)
     controls.move('https://classroom.google.com/u/0/h')
     
 try:
