@@ -1,9 +1,5 @@
-from selenium import webdriver
-from selenium.common import exceptions
 from selenium.webdriver.common.by import By
 from time import sleep
-import factory
-import browser_control
 from controls import Controls
 
 def main():
