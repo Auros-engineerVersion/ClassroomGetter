@@ -1,10 +1,8 @@
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from bs4 import BeautifulSoup as bs
 from .factory import create_driver
-from urllib.parse import urljoin
-import time
+import re
 
 class Controls:
     def __init__(self, profile_path: str, profile_name: str) -> None:
@@ -17,24 +15,22 @@ class Controls:
         self._driver.quit()
         del self._driver
         pass
-        
-# private
-    def _set_current_data(self):
-        self._current_html = self._driver.page_source.encode('utf-8')
-        self._soupObj = bs(self._current_html, 'html.parser')
     
 # public
     def move(self, url: str):
         try:
             self._driver.get(url)
-            time.sleep(2)
-            self._set_current_data()
         finally:
             return self # Linqライクにするため
         
     def hrefs(self, class_name: str):
-        hrefs = [value['href'] for value in self._soupObj.find_all('a', class_=class_name)]
-        return hrefs
-    
-    def get_base(self):
-        return self._soupObj.find('base')['href']
+        elems = self._wait.until(EC.presence_of_all_elements_located((By.TAG_NAME, 'a')))
+        links = set()
+        for elem in elems:
+            link = elem.get_attribute("href")
+            #文字列を含むなら
+            if ('https://classroom.google.com/u/0/c/' in link):
+                if not ('/sp/' in link):
+                    links.add(link)
+                
+        return links
