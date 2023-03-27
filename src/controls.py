@@ -39,3 +39,8 @@ class Controls:
         links = [urljoin(base_url, value['href']) for value in lessons]
         
         return links
+    
+    # 科目に投稿されたものを取得する
+    def sections(self, class_name: str):
+        links = self._soupObj.find_all('a', class_=class_name)
+        return links

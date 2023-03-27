@@ -25,6 +25,14 @@ class TestControls(unittest.TestCase):
         self.controls.move(cfg.TARGET_URL)
         self.controls.lesson_links(cfg.LESSON_CLASS_NAME)
         self.assertTrue(True)
+        
+    def test_get_file(self):
+        self.controls.move(cfg.TARGET_URL)
+        links = self.controls.sections(cfg.SECTION_CLASS_NAME)
+        for link in links:
+            print(link)
+        self.assertTrue(True)
+        
                 
 try:
     if __name__ == '__main__':

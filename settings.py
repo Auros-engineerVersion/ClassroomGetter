@@ -10,6 +10,7 @@ PROFILE_PATH = os.environ.get('PROFILE_PATH')
 PROFILE_NAME = os.environ.get('PROFILE_NAME')
 TARGET_URL = os.environ.get('TARGET_URL')
 LESSON_CLASS_NAME = os.environ.get('LESSON_CLASS_NAME')
+SECTION_CLASS_NAME = os.environ.get('SECTION_CLASS_NAME')
 
 def back_origin_enviroment():
     for v in getmembers():
