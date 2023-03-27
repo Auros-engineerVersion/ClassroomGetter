@@ -32,15 +32,9 @@ class Controls:
         finally:
             return self # Linqライクにするため
         
-    # classroomに入った時点に表示される科目のurlを取得する
-    def lesson_links(self, class_name: str):
-        base_url = self._soupObj.find('base')['href']
-        lessons = self._soupObj.find_all('a', class_=class_name) #aタグを検索
-        links = [urljoin(base_url, value['href']) for value in lessons]
-        
-        return links
+    def hrefs(self, class_name: str):
+        hrefs = [value['href'] for value in self._soupObj.find_all('a', class_=class_name)]
+        return hrefs
     
-    # 科目に投稿されたものを取得する
-    def sections(self, class_name: str):
-        links = self._soupObj.find_all('a', class_=class_name)
-        return links
+    def get_base(self):
+        return self._soupObj.find('base')['href']
