@@ -1,10 +1,17 @@
-from selenium import webdriver
+from time import sleep
 
-#WebDriverWait用のCustumCondition
-class IsLoaded:
-    def __call__(self, driver: webdriver) -> bool:
-        value = driver.driver.execute_script('return document.readyState')
-        if value == 'complete':
-            return True
-        else:
-            return False
+def document_state_is(condition: str, locator):
+    #WebDriverWait用のCustumCondition
+    #ドキュメントのreadyStateをチェックし続け、
+    #指定の条件になったら探す
+    def _predicate(driver):
+        value = None
+        #目的のコンディションになるまで繰り返す
+        while (value != condition):
+            value = driver.driver.execute_script('return document.readyState')
+            if (value == condition): break
+            sleep(0.1)
+            
+        driver.find_elements(*locator)
+    
+    return _predicate
