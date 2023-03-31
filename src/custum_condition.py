@@ -1,17 +1,16 @@
 from time import sleep
+from selenium.webdriver.support import expected_conditions as EC
 
-def document_state_is(condition: str, locator):
-    #WebDriverWait用のCustumCondition
-    #ドキュメントのreadyStateをチェックし続け、
-    #指定の条件になったら探す
-    def _predicate(driver):
-        value = None
-        #目的のコンディションになるまで繰り返す
-        while (value != condition):
-            value = driver.driver.execute_script('return document.readyState')
-            if (value == condition): break
-            sleep(0.1)
-            
-        driver.find_elements(*locator)
+class document_state_is(object):
+    def __init__(self, locator, condition) -> None:
+        self.__locator = locator
+        self.__condition = condition
+        pass
     
-    return _predicate
+    def __call__(self, driver):
+        value = driver.execute_script('return document.readyState')
+        if (value == self.__condition):
+            return driver.find_elements(*self.__locator)
+        else:
+            sleep(0.1) #インターバルをおく
+            return False
