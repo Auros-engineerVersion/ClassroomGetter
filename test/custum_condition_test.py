@@ -5,17 +5,12 @@ sys.path.append(os.path.abspath('.'))
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
-from selenium.webdriver.remote.webelement import WebElement
-from selenium.webdriver.support import expected_conditions as EC
 #endregion
 
 import unittest
-from unittest.mock import patch, Mock, MagicMock
-import time
+from unittest.mock import patch, Mock
 
 from src import custum_condition as MyEC
-import settings as cfg
-from src.factory import create_driver
 
 class CustomConditionTest(unittest.TestCase):
     #docment.readyStateは以下の三つの状態をとる
