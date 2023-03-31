@@ -1,5 +1,4 @@
 from time import sleep
-from selenium.webdriver.support import expected_conditions as EC
 
 class document_state_is(object):
     def __init__(self, locator, condition) -> None:
