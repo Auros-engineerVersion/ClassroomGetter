@@ -27,9 +27,10 @@ class Controls:
         finally:
             #暗黙的な待機を疑似的に再現したもの
             sleep(wait_time)
-        
-    def hrefs(self, *conditions: str):
-        def __containe(target: str, *conditions: str):
+    
+    @staticmethod
+    def hrefs(wait:WebDriverWait, *conditions):
+        def __containe(target: str, *conditions):
             is_containe = []
             for condition in conditions:
                 is_containe.append(target in condition)
@@ -38,8 +39,12 @@ class Controls:
             #条件の長さと条件に合致した回数が同じなら
             if (len(condition) == len(is_containe)):
                 return target
+                        
+        elems = wait.until(MyEC.document_state_is((By.TAG_NAME, 'a'), 'complete'))
+        #aタグ内のhrefを取得する        
+        unique_links = set()
+        for elem in elems:
+            link = elem.get_attribute('href')
+            unique_links.add(__containe(link, *conditions))
             
-        elems = self.__wait.until(MyEC.document_state_is((By.TAG_NAME, 'a'), 'complete'))
-        #aタグ内のhrefを取得する
-        #そののち、conditonに合致したlinksを返す
-        return map(__containe, map(lambda link : link['href'], elems), conditions)
+        return unique_links

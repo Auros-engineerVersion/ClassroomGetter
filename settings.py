@@ -12,6 +12,8 @@ TARGET_URL = os.environ.get('TARGET_URL')
 LESSON_CLASS_NAME = os.environ.get('LESSON_CLASS_NAME')
 SECTION_CLASS_NAME = os.environ.get('SECTION_CLASS_NAME')
 
+WEBDRIVER_WAITTIME = os.environ.get('WEBDRIVER_WAITTIME')
+
 def back_origin_enviroment():
     for v in getmembers():
         path.remove(v)
