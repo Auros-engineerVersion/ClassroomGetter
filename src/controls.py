@@ -3,25 +3,26 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import InvalidArgumentException
 from time import sleep
+import re
 
 from . import custum_condition as MyEC
 from .factory import create_driver
 
 class Controls:
     def __init__(self, profile_path: str, profile_name: str) -> None:
-        self.__driver = create_driver(profile_path, profile_name)
-        self.__wait = WebDriverWait(self.__driver, 30, poll_frequency=3)
+        self.driver = create_driver(profile_path, profile_name)
+        self.wait = WebDriverWait(self.driver, 30, poll_frequency=3)
         pass
     
     def __del__(self):
-        del self.__wait
-        self.__driver.quit()
-        del self.__driver
+        del self.wait
+        self.driver.quit()
+        del self.driver
         pass
     
     def move(self, url: str, wait_time: int = 0):
         try:
-            self.__driver.get(url)
+            self.driver.get(url)
         except InvalidArgumentException as e:
             raise e
         finally:
@@ -31,20 +32,25 @@ class Controls:
     @staticmethod
     def hrefs(wait:WebDriverWait, *conditions):
         def __containe(target: str, *conditions):
-            is_containe = []
+            containe_count = 0
             for condition in conditions:
-                is_containe.append(target in condition)
+                if (condition in target):
+                    containe_count += 1 #条件に合致したなら1増やす
             
             #もし全ての条件に合致するなら
             #条件の長さと条件に合致した回数が同じなら
-            if (len(condition) == len(is_containe)):
+            if (len(conditions) == containe_count):
                 return target
                         
+        if (wait == None):
+            return
+        
         elems = wait.until(MyEC.document_state_is((By.TAG_NAME, 'a'), 'complete'))
-        #aタグ内のhrefを取得する        
-        unique_links = set()
+        unique_links = set() #重複処理のため
+
         for elem in elems:
-            link = elem.get_attribute('href')
-            unique_links.add(__containe(link, *conditions))
+            link = __containe(elem.get_attribute('href'), *conditions)
+            if (link != None):
+                unique_links.add(link)
             
         return unique_links
