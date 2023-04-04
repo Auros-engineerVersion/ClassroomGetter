@@ -5,7 +5,9 @@ from src.controls import Controls
 try:
     controls = Controls(cfg.PROFILE_PATH, cfg.PROFILE_NAME)
     controls.move(url=cfg.TARGET_URL, wait_time=10)
-    hrefs = controls.hrefs('/u/0/c/')
+    #文字列の範囲を10からにすると、/archivedというpathも含まれてしまう
+    #11にすれば大丈夫
+    hrefs = controls.hrefs(controls.wait, '^.+/0/.{11,20}$')
     
     print(len(hrefs))
     for href in hrefs:
@@ -17,4 +19,3 @@ except Exception as e:
     
 finally:
     print('\033[0m')
-    cfg.back_origin_enviroment()

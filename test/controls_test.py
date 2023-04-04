@@ -28,11 +28,11 @@ class ControlsTest(unittest.TestCase):
     
     def test_get_current_hrefs(self):
         #添え字が大きくなるほど、linkに該当する条件が増えていく
-        conditions = [['example'], ['com'], ['']]
+        patterns = ['example', 'com', '']
         
         for i in range(0, 2):
             with self.subTest():
-                hrefs = Controls.hrefs(self.__wait_mock, *conditions[i])
+                hrefs = Controls.hrefs(self.__wait_mock, patterns[i])
                 self.assertEqual(len(hrefs), i + 1)
                 
 if __name__ == '__main__':
