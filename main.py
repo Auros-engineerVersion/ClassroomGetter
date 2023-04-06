@@ -1,6 +1,6 @@
 import settings as cfg
-from selenium.webdriver.common.by import By
-from src.controls import Controls
+from src.browser.controls import Controls
+from src import path_converter
 
 try:
     controls = Controls(cfg.PROFILE_PATH, cfg.PROFILE_NAME)
@@ -11,11 +11,12 @@ try:
     
     #授業タブへのリンクへと整形
     #それぞれのlinkに移動する
-    for link in list(map(lambda href : (str(href).replace('/u/0/c/', '/w/') + '/t/all'), hrefs)):
+    for link in list(map(path_converter.to_tab_path, hrefs)):
         controls.move(link)
         #asideのtabリンクを全て取得し、移動する
         for href in controls.hrefs(controls.wait, '.*tc.{10,20}$'):
             controls.move(href, wait_time=2)
+            controls.title()
             #pdf, 動画, docなどのパスを取得
             files = controls.hrefs(controls.wait, '.*file/d/.*')
             for file in files:

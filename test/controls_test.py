@@ -8,8 +8,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.remote.webelement import WebElement
 
-import settings as cfg
-from src.controls import Controls
+from src.browser.controls import Controls
 
 class ControlsTest(unittest.TestCase):
     def setUp(self) -> None:

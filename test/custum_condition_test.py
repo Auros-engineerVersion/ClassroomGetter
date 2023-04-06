@@ -10,7 +10,7 @@ from selenium.webdriver.common.by import By
 import unittest
 from unittest.mock import patch, Mock
 
-from src import custum_condition as MyEC
+from src.browser import custum_condition as MyEC
 
 class CustomConditionTest(unittest.TestCase):
     #docment.readyStateは以下の三つの状態をとる
