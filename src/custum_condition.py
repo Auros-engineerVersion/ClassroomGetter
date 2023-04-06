@@ -11,4 +11,5 @@ class document_state_is(object):
         if (value == self.__condition):
             return driver.find_elements(*self.__locator)
         else:
+            sleep(0.5)
             return False

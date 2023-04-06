@@ -2,6 +2,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import InvalidArgumentException
+from selenium.webdriver.support import expected_conditions as EC
 from time import sleep
 from re import search
 
@@ -11,7 +12,8 @@ from .factory import create_driver
 class Controls:
     def __init__(self, profile_path: str, profile_name: str) -> None:
         self.driver = create_driver(profile_path, profile_name)
-        self.wait = WebDriverWait(self.driver, 30, poll_frequency=3)
+        self.driver.implicitly_wait(10)
+        self.wait = WebDriverWait(self.driver, 30)
         pass
     
     def __del__(self):
@@ -20,7 +22,7 @@ class Controls:
         del self.driver
         pass
     
-    def move(self, url: str, wait_time: int = 0):
+    def move(self, url: str, wait_time: int = 1):
         try:
             self.driver.get(url)
         except InvalidArgumentException as e:
@@ -30,7 +32,7 @@ class Controls:
             sleep(wait_time)
     
     @staticmethod
-    def hrefs(wait:WebDriverWait, pattern: str):
+    def hrefs(wait:WebDriverWait, pattern: str = ''):
         elems = wait.until(MyEC.document_state_is((By.TAG_NAME, 'a'), 'complete'))
         unique_links = set() #重複処理のため
 

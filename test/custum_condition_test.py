@@ -17,7 +17,7 @@ class CustomConditionTest(unittest.TestCase):
     #loading: この文書 (document) はまだ読み込み中
     #interactive: 文書の読み込みが完了したが、スクリプトなどのサブリソースはまだ読み込み中である。
     #complete: 文書とすべてのサブリソースの読み込みが完了した
-    def test_document_state_is_can_wait(self):
+    def test_document_state_is(self):
         driver_mock = Mock(spec=webdriver.Chrome)
         mock_list = ['loading','loading','loading','interactive','interactive','interactive', 'complete']
         
@@ -25,4 +25,4 @@ class CustomConditionTest(unittest.TestCase):
             wait = WebDriverWait(driver_mock, 30)
             wait.until(MyEC.document_state_is((By.TAG_NAME, 'a'), 'complete'))
             
-            self.assertEqual(script_call.call_count, len(mock_list))          
+            self.assertEqual(script_call.call_count, len(mock_list))
