@@ -2,7 +2,7 @@ import sys, os
 sys.path.append(os.path.abspath('.'))
 
 import unittest
-from src.file_node import FNode
+from src.nodes import FNode
 
 class CustomConditionTest(unittest.TestCase):
     def test_return_current_path(self):

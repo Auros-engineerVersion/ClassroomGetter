@@ -1,8 +1,16 @@
+from pydrive2.auth import GoogleAuth
+from selenium.common.exceptions import NoSuchWindowException
+
 import settings as cfg
-from src.browser.controls import Controls
+from src.controls import Controls
 from src import path_converter
 
 try:
+    #最初の認証
+    gauth = GoogleAuth()
+    gauth.LocalWebserverAuth()
+    
+    print('Hello')
     controls = Controls(cfg.PROFILE_PATH, cfg.PROFILE_NAME)
     controls.move(url=cfg.TARGET_URL)
     #文字列の範囲を10からにすると、/archivedというpathも含まれてしまう
@@ -15,12 +23,14 @@ try:
         controls.move(link)
         #asideのtabリンクを全て取得し、移動する
         for href in controls.hrefs(controls.wait, '.*tc.{10,20}$'):
-            controls.move(href, wait_time=2)
-            controls.title()
+            controls.move(href, wait_time=3)
             #pdf, 動画, docなどのパスを取得
             files = controls.hrefs(controls.wait, '.*file/d/.*')
             for file in files:
                 print(file)
+                
+except NoSuchWindowException as e:
+    print('Process has finished by Hand')
         
 except Exception as e:
     print('\033[31m')
@@ -29,3 +39,4 @@ except Exception as e:
     
 finally:
     print('\033[0m')
+    del controls

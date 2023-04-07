@@ -7,7 +7,7 @@ from time import sleep
 from re import search
 
 from . import custum_condition as MyEC
-from .factory import create_driver
+from src.factory import create_driver
 
 class Controls:
     def __init__(self, profile_path: str, profile_name: str) -> None:
@@ -27,7 +27,7 @@ class Controls:
         title_xpath = '//*[@id="yDmH0d"]/c-wiz[1]/div/div/div[5]/div[1]/div/div[2]/h1'
         title = self.wait.until(EC.visibility_of_element_located((By.XPATH, title_xpath))).text
         re_tuple = search('（.*?）', title).span()
-        return title[:re_tuple[0]]
+        return title[:re_tuple[0]]    
     
     def move(self, url: str, wait_time: int = 1):
         try:
@@ -49,7 +49,7 @@ class Controls:
         unique_links = set() #重複処理のため
 
         for elem in elems:
-            link = elem.get_attribute('href')
+            link = str(elem.get_attribute('href'))
             #文字列が見つかれば
             if (search(pattern=pattern, string=link) != None):
                 unique_links.add(link)
