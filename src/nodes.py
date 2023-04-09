@@ -55,7 +55,15 @@ class Node:
             hrefs = Node.BrowserControl.hrefs(Node.BrowserControl.wait, Node.Patterns[parent.tree_height])
             stack: list[Node] = []
             for href in hrefs:
-                link = my_util.to_all_tab_path(href)
+                #HACK: 条件分岐が汚い
+                link = None
+                if (parent.tree_height == 0):
+                    link = my_util.to_all_tab_path(href)
+                elif (parent.tree_height == 1):
+                    link = my_util.to_tab_path(href)
+                else:
+                    link = href
+                
                 child = Node(link, parent.tree_height + 1)
                 parent.edges(add_value=child)
                 Node.Nodes.append(child)
@@ -69,17 +77,4 @@ if __name__ == '__main__':
     Node.InitializeTree(root, Node.BrowserControl)
     Node.ShowTree(root)
     
-    
-#   https://classroom.google.com/w/NjAyMzgxOTE0MDk0/t/all     
-#       https://classroom.google.com/w/NjAyMzgxOTE0MDk0/tc/NTE4MjgyNDQwNTE0/t/all
-#
-#上のurlは作られたもの
-#下は実際のもの
-#   https://classroom.google.com/w/NjAyMzgxOTE0MDk0/t/all
-#       https://classroom.google.com/w/NjAyMzgxOTE0MDk0/tc/NTE4MjgyNDQwNTE0
-#
-#並べてみてみる
-#https://classroom.google.com/w/NjAyMzgxOTE0MDk0/tc/NTE4MjgyNDQwNTE0/t/all
-#https://classroom.google.com/w/NjAyMzgxOTE0MDk0/tc/NTE4MjgyNDQwNTE0
-
-#/t/allが余分である
+#TODO: ファイルのurlが取得できない
