@@ -1,5 +1,5 @@
 /chromeData
-/.venv
+/venv
 /.env
 __pycache__/
 client_secrets.json

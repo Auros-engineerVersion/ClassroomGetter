@@ -5,6 +5,7 @@ sys.path.append(os.path.abspath('.'))
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.remote.webelement import WebElement
 
 import settings as cfg
 from src.controls import Controls
@@ -39,19 +40,20 @@ class Node:
         
         return self.__edges
     
-    def next_links(self, setup = lambda none : none, *xpathes: str):
+    def next_links(self, *xpathes: str):
         c = self.BrowserControl
         c.move(self.key)
-        if ('/t/all' in c.driver.current_url):
-            setup
-        
+
         try:
-            sections = []
-            links = c.hrefs((By.XPATH, xpathes[self.tree_height]))
-            sections.extend(map(my_util.link_filter, links))
-            return sections
-        except TimeoutException:
-            return sections
+            xpath = xpathes[self.tree_height]
+            elems = c.wait.until(EC.presence_of_all_elements_located, ((By.XPATH, xpath)))
+            if ('/u/1/c/' in c.driver.current_url): #授業のページだったら
+                return list(map(c.link_copy_button_click, elems))
+            else:
+                return list(map(lambda d : d.get_attribute('href'), elems))
+        except TimeoutError:
+            return []
+            
     
     def create_childs(self, *keys: str):
         for key in keys:
@@ -78,28 +80,20 @@ class Node:
                 
     #幅優先探索
     @staticmethod
-    def InitializeTree(parent: Node):
-        def __expand_sections(c: Controls):
-            def __expand():
-                xpath = "//div[@class='SFCE1b']"
-                sections = c.wait.until(EC.presence_of_all_elements_located((By.XPATH, xpath)))
-                for section in sections:
-                    section.move_to_element().click()
-                    
-            return __expand
-            
+    def InitializeTree(parent: Node):            
         stack: list[Node] = [parent]
+        #1行目:授業へのxpath
+        #2行目:各授業セクションへのxpath
+        #3行目:ファイルへのxpath
         xpathes = (\
-            "//a[@class='onkcGd eDfb1d YVvGBb Vx8Sxd']",\
-            "//a[@class='u2mfde hN1OOc EZrbnd J1raN S6Vdac']",\
-            "//li[contains(@jscontroller,'XZzUb')]",\
-            "//a[@class='VkhHKd e7EEH ']",\
-            ''
+            "//a[@class='onkcGd ZmqAt Vx8Sxd']",\
+            "//div[@jsmodel='PTCFbe']",\
+            "//a[@class='VkhHKd e7EEH ']"\
         )
                 
         while (len(stack) > 0):
             value = stack.pop()
-            links = value.next_links(__expand_sections(Node.BrowserControl), *xpathes)
+            links = value.next_links(*xpathes)
             value.create_childs(*links)
             #"//li[contains(@class,'onkcGd eDfb1d YVvGBb Vx8Sxd') or contains(@jscontroller,'XZzUb')]"
             for child in value.edges():
