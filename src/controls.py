@@ -1,7 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.common.exceptions import InvalidArgumentException
+from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as EC
 from time import sleep
 from re import search
@@ -29,20 +29,23 @@ class Controls:
         re_tuple = search('（.*?）', title).span()
         return title[:re_tuple[0]]    
     
-    def move(self, url: str, wait_time: int = 1):
+    def link_copy_button(self) -> WebElement:
+        if ('/t/all' not in self.driver.current_url):
+            return None
+        
+        xpath = "//div[@class='SFCE1b']"
+        sections = self.wait.until(EC.presence_of_all_elements_located((By.XPATH, xpath)))
+    
+    def move(self, url: str):
         try:
             self.driver.get(url)
         except InvalidArgumentException as e:
             raise e
-        finally:
-            #暗黙的な待機を疑似的に再現したもの
-            sleep(wait_time)
     
-    @staticmethod
-    def hrefs(wait:WebDriverWait, pattern: str = ''):
+    def hrefs(self, locator, pattern: str = ''):
         elems = None
         try:
-            elems = wait.until(MyEC.document_state_is((By.TAG_NAME, 'a'), 'complete'))
+            elems = self.wait.until(EC.presence_of_all_elements_located(locator))
         except TimeoutError as e:
             raise e
         

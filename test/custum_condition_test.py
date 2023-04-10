@@ -10,7 +10,7 @@ from selenium.webdriver.common.by import By
 import unittest
 from unittest.mock import patch, Mock
 
-from src.browser import custum_condition as MyEC
+from src import custum_condition as MyEC
 
 class CustomConditionTest(unittest.TestCase):
     #docment.readyStateは以下の三つの状態をとる
@@ -23,6 +23,6 @@ class CustomConditionTest(unittest.TestCase):
         
         with patch.object(driver_mock, 'execute_script', side_effect=mock_list) as script_call:
             wait = WebDriverWait(driver_mock, 30)
-            wait.until(MyEC.document_state_is((By.TAG_NAME, 'a'), 'complete'))
+            wait.until(MyEC.document_state_is((By.TAG_NAME, 'a')))
             
             self.assertEqual(script_call.call_count, len(mock_list))
