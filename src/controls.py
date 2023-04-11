@@ -5,7 +5,7 @@ from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as EC
 from time import sleep
 from re import search
-from pyperclip import paste
+import pyperclip
 
 from . import custum_condition as MyEC
 from src.factory import create_driver
@@ -26,21 +26,16 @@ class Controls:
     def move(self, url: str):
         self.driver.get(url)
     
-    def link_copy_button_click(self, elem: WebElement) -> str:
+    def click_all_sections(self):
         def __move_and_click(elem: WebElement):
             self.driver.execute_script("arguments[0].scrollIntoView(true);", elem)
             self.driver.execute_script('arguments[0].click()', elem)
 
-        three_point_xpath = "//div[@class='U26fgb JRtysb WzwrXb I12f0b K2mXPb']"
-        three_point_button = elem.find_element(By.XPATH, three_point_xpath)
-        __move_and_click(three_point_button)
-        
-        link_copy_xpath = "//div[@class='uyYuVb oJeWuf']"
-        link_copy_button = elem.find_element(By.XPATH, link_copy_xpath)
-        __move_and_click(link_copy_button)
-        
-        #コピーされたものを返す
-        return paste()
+        #一つめは3点ボタン、2つめは「リンクをコピー」へのxpath
+        xpathes = ["//div[@class='SFCE1b']"]
+        buttons = self.wait.until(EC.presence_of_all_elements_located((By.XPATH, xpathes[0])))
+        for button in buttons:
+            __move_and_click(button)
         
     def hrefs(self, locator, pattern: str = ''):
         elems = None

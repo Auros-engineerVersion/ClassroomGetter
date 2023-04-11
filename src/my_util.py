@@ -36,20 +36,8 @@ def link_filter(url: str):
     if (result > 0):
         return url
     
-def __to_tab_link(url: str):
+def to_tab_link(url: str):
     return str(url).replace('/u/0/c/', '/w/')
 
-def __to_all_tab_link(url: str):
-    return __to_tab_link(url) + '/t/all'
-
-#tree_heightにより正しいurlを返す
-def current_link(url: str, tree_height: int) -> str:
-    link = None
-    if (tree_height == 0):
-        link = __to_all_tab_link(url)
-    elif (tree_height == 1):
-        link = __to_tab_link(url)
-    else:
-        link = url
-        
-    return link
+def to_all_tab_link(url: str):
+    return to_tab_link(url) + '/t/all'

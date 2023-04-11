@@ -6,6 +6,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.remote.webelement import WebElement
+from re import search
 
 import settings as cfg
 from src.controls import Controls
@@ -40,21 +41,34 @@ class Node:
         
         return self.__edges
     
-    def next_links(self, *xpathes: str):
+    def next_links(self) -> list[str]:
         c = self.BrowserControl
         c.move(self.key)
 
         try:
-            xpath = xpathes[self.tree_height]
-            elems = c.wait.until(EC.presence_of_all_elements_located, ((By.XPATH, xpath)))
-            if ('/u/1/c/' in c.driver.current_url): #授業のページだったら
-                return list(map(c.link_copy_button_click, elems))
+            #ホームなら
+            if ('/u/0/h' in self.key):
+                locator = (By.XPATH, "//a[@class='onkcGd ZmqAt Vx8Sxd']")
+                pattern = '^.*/u/0/./{12, 18}$'
+                return c.hrefs(locator, pattern)
+            #授業のタブなら
+            elif ('/u/0/c' in self.key):
+                return [my_util.to_all_tab_link(self.key)]
+            
+            #「全てのトピック」なら
+            elif ('/t/all' in self.key):
+                c.click_all_sections()
+                locator = (By.XPATH, "//a[@class='VkhHKd e7EEH ']")
+                pattern = '^.*/file/d/.*$'
+                return c.hrefs(locator, pattern)
+            
+            #ファイルのurlなら
             else:
-                return list(map(lambda d : d.get_attribute('href'), elems))
+                return []
+                
         except TimeoutError:
             return []
             
-    
     def create_childs(self, *keys: str):
         for key in keys:
             child = Node(key, self.tree_height + 1)
@@ -81,20 +95,14 @@ class Node:
     #幅優先探索
     @staticmethod
     def InitializeTree(parent: Node):            
-        stack: list[Node] = [parent]
-        #1行目:授業へのxpath
-        #2行目:各授業セクションへのxpath
-        #3行目:ファイルへのxpath
-        xpathes = (\
-            "//a[@class='onkcGd ZmqAt Vx8Sxd']",\
-            "//div[@jsmodel='PTCFbe']",\
-            "//a[@class='VkhHKd e7EEH ']"\
-        )
+        queue: list[Node] = [parent]
                 
-        while (len(stack) > 0):
-            value = stack.pop()
-            links = value.next_links(*xpathes)
-            value.create_childs(*links)
-            #"//li[contains(@class,'onkcGd eDfb1d YVvGBb Vx8Sxd') or contains(@jscontroller,'XZzUb')]"
+        while (len(queue) > 0):
+            value = queue.pop()
+            links = value.next_links()
+            
+            if (len(links) > 0):
+                value.create_childs(*links)
+                
             for child in value.edges():
-                stack.append(child)
+                queue.append(child)
