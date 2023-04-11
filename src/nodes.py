@@ -1,17 +1,13 @@
 from __future__ import annotations
-from time import sleep
 import sys, os
 sys.path.append(os.path.abspath('.'))
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.remote.webelement import WebElement
-from re import search
 
 import settings as cfg
 from src.controls import Controls
 from src import my_util
-from src import custum_condition as MyEC
 
 class Node:
     BrowserControl = None
@@ -43,30 +39,26 @@ class Node:
     
     def next_links(self) -> list[str]:
         c = self.BrowserControl
-        c.move(self.key)
 
-        try:
-            #ホームなら
-            if ('/u/0/h' in self.key):
-                locator = (By.XPATH, "//a[@class='onkcGd ZmqAt Vx8Sxd']")
-                pattern = '^.*/u/0/./{12, 18}$'
-                return c.hrefs(locator, pattern)
-            #授業のタブなら
-            elif ('/u/0/c' in self.key):
-                return [my_util.to_all_tab_link(self.key)]
-            
-            #「全てのトピック」なら
-            elif ('/t/all' in self.key):
-                c.click_all_sections()
-                locator = (By.XPATH, "//a[@class='VkhHKd e7EEH ']")
-                pattern = '^.*/file/d/.*$'
-                return c.hrefs(locator, pattern)
-            
-            #ファイルのurlなら
-            else:
-                return []
-                
-        except TimeoutError:
+        #ホームなら
+        if (self.tree_height == 0):
+            c.move(self.key)
+            locator = (By.XPATH, "//a[@class='onkcGd ZmqAt Vx8Sxd']")
+            pattern = '^.*/u/./c/.{16}$'
+            return c.hrefs()(locator, pattern)
+        #授業のタブなら
+        elif ('/u/0/c' in self.key):
+            return [my_util.to_all_tab_link(self.key)]
+        
+        #「全てのトピック」なら
+        elif ('/t/all' in self.key):
+            c.move(self.key)
+            locator = (By.XPATH, "//a[@class='VkhHKd e7EEH ']")
+            pattern = '^.*/file/d/.*$'
+            return c.click_all_sections(c.hrefs, (locator, pattern))
+        
+        #ファイルのurlなら
+        else:
             return []
             
     def create_childs(self, *keys: str):
