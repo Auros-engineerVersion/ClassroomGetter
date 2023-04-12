@@ -3,7 +3,6 @@ import sys, os
 sys.path.append(os.path.abspath('.'))
 from selenium.webdriver.common.by import By
 
-import settings as cfg
 from src import my_util
 from src.browser_controls import BrowserControls as bc
 from abc import ABCMeta, abstractmethod
