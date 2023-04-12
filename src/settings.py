@@ -2,32 +2,24 @@ import os
 from sys import path
 from dotenv import load_dotenv
 from inspect import getmembers
-from dataclasses import dataclass
+from src.setting_data import SettingData
 import pickle
 
-@dataclass(frozen=True)
 class Settings:
-    save_file_path: str
-    
-    def __post_init__(self):
-        if (not '.dat' in self.save_file_path):
-            raise ValueError('Path is incorrect. File extension must be .dat')
-        
-        Settings.Load(self.save_file_path)
+    def __init__(self, data: SettingData):
+        if ('.json' in self.save_file_path):
+            raise ValueError('Path is incorrect. File extension must be .json')
+        self.setting_data: SettingData = data
         
     @staticmethod
     def Save(file_path: str, *values):
-        binaries = map(pickle.dumps, values)
-        with open(file_path, 'wb') as f:
-            f.writelines(binaries)
+        with open(file_path, 'ab') as f:
+            pickle.dump([*values], f)
     
     @staticmethod
     def Load(path: str):
-        try:
-            line = open(path, 'rb').readlines()
-        finally:
-            file.close()
-        pass
+        with open(path, 'rb') as f:
+            return pickle.load(f)
     
 # この書き方をする場合、環境変数は「.env」という名前のファイルで、pythonコードと同階層、もしくは親階層に存在していること
 load_dotenv()

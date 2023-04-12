@@ -6,10 +6,12 @@ from selenium.webdriver.support import expected_conditions as EC
 from re import search
 
 from src.factory import create_driver
+from src.setting_data import SettingData
 
 class BrowserControls:
-    def __init__(self, profile_path: str, profile_name: str) -> None:
-        self.driver = create_driver(profile_path, profile_name)
+    def __init__(self, setting: SettingData) -> None:
+        self.__settings = setting
+        self.driver = create_driver(*setting.profile)
         self.wait = WebDriverWait(self.driver, 3)
         pass
     
@@ -21,6 +23,9 @@ class BrowserControls:
     
     def move(self, url: str):
         self.driver.get(url)
+        
+    def serch(self, xpath: str) -> WebElement:
+        return self.wait.until(EC.presence_of_element_located((By.XPATH, xpath)))
     
     def click_all_sections(self, func, locator_and_pattern: tuple):
         def __move_and_click(elem: WebElement):
@@ -61,3 +66,45 @@ class BrowserControls:
             return unique_links
         
         return __get_hrefs
+    
+    def profile_check(self, setting_data: SettingData):
+        #profileが何も記入されていないのなら新しく入力する
+        if (setting_data.profile_path == None or setting_data.profile_name == None):
+            self.move('chrome://version/')
+            path = self.serch("//td[@id='profile_path']").text
+
+            profile_name = path[search('(?<=User Data.).*', path).span()[0]:]
+            profile_path = path.replace(profile_name, '')[:-1] #最後のバックスラッシュを削除している
+            
+            setting_data.profile_path = profile_path
+            setting_data.profile_name = profile_name
+
+    
+    def login_college_form(self, email: str, user_password: str):
+        befor_at_index = email.find('@')
+        user_name = email[:befor_at_index]
+        
+        #1:emailの@以前をユーザー名に送る
+        #2:passwordを送る
+        #3:ログインボタンを押す
+        self.serch("//input[@id='j_username']").send_keys(user_name)
+        self.serch("//input[@id='j_password']").send_keys(user_password)
+        self.serch("//button[@type='submit']").click()
+    
+    def login_google(self, email: str, user_password: str):
+        #1:emailを入力する
+        #2:続行を押す
+        #3:大学のフォームにログイン
+        #4:続行を押す
+        self.serch("//input[@type='email']")        .send_keys(email)
+        self.serch("//div[@id='identifierNext']")   .click()
+        self.login_college_form(email, user_password)
+        self.serch("//div[@jsname='Njthtb']")       .click()
+        
+    def login_classroom(self, email: str, user_password: str):
+        #1:「Classroomにログイン」のボタンを押す
+        #2:Googleにログインする
+        #3:プロファイルを設定する
+        self.serch("//a[@class='gfe-button gfe-button--medium-emphasis gfe-button--middle-align']").click
+        self.login_google(email, user_password)
+        self.profile_check(self.__settings)
