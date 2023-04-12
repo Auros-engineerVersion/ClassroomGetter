@@ -8,27 +8,23 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.remote.webelement import WebElement
 
-from src.controls import Controls
+from src.browser_controls import BrowserControls
 
 class ControlsTest(unittest.TestCase):
-    def setUp(self) -> None:
-        element_mock1 = Mock(spec=WebElement)
-        element_mock2 = Mock(spec=WebElement)
-        element_mock3 = Mock(spec=WebElement)
+    def setUp(sel, driver_mock) -> None:
+        test_urls = ['http://www.example.com', 'https://www.1234567890.com', 'http://www.!"#$%&()=~|{`*}*?_?>+`}.net/test+3']
+        element_mocks = []
+        for i in range(3):
+            elem_mock = Mock(spec=WebElement)
+            elem_mock.return_value = test_urls[i]
+            element_mocks.append(elem_mock)
 
-        element_mock1.get_attribute.return_value = 'http://www.example.com'
-        element_mock2.get_attribute.return_value = 'https://www.1234567890.com'
-        element_mock3.get_attribute.return_value = 'http://www.!"#$%&()=~|{`*}*?_?>+`}.net/test+3'
+        self.__element_mocks = element_mocks
+        self.__bc = BrowserControls()
 
-        element_mocks = [element_mock1, element_mock2, element_mock3]
-
-        wait_mock = Mock(spec=WebDriverWait)
-        wait_mock.until.return_value = element_mocks
-        self.__wait_mock = wait_mock
-    
-    def test_get_current_hrefs(self):
-        #添え字が大きくなるほど、linkに該当する条件が増えていく
-        patterns = ['example', 'com', '']
+    @patch.object(WebDriverWait, 'until')
+    def test_get_current_hrefs(self, wait_mock):
+        wait_mock.return_value = self.___element_mocks
         
         for i in range(0, 2):
             with self.subTest():
