@@ -2,38 +2,57 @@ from __future__ import annotations
 import sys, os
 sys.path.append(os.path.abspath('.'))
 from selenium.webdriver.common.by import By
-from selenium.common.exceptions import TimeoutException
-from selenium.webdriver.remote.webelement import WebElement
 
 import settings as cfg
-from src.controls import Controls
 from src import my_util
+from src.browser_controls import BrowserControls as bc
+from abc import ABCMeta, abstractmethod
 
-class Node:
-    BrowserControl = None
-    Nodes = [] #全てのノードを列挙する
+class INode(metaclass=ABCMeta):
+    @abstractmethod
+    def edges(self, add_value: Node = None) -> list[INode]:
+        raise NotImplementedError
+    
+    @abstractmethod
+    def __str__(self) -> str:
+        raise NotImplementedError
+
+    @staticmethod
+    def Dispose(target: INode) -> None:
+        raise NotImplementedError
+    
+    @staticmethod
+    @abstractmethod
+    def ShowTree(parent: INode) -> None:
+        raise NotImplementedError
+
+class Node(INode):
+    #クラス変数の宣言と同時に定義を行わないのは、変数が勝手に起動してしまうため
+    #つまり、BrowserControlはWebDrivreを有しているため、Chromeが勝手に起動してしまう
+    BrowserControl: bc = None
+    Nodes: set[INode] = set() #全てのノードの集合
 
     def __init__(self, key: str, tree_height: int) -> None:
-        self.__edges: list[Node] = []
-        self.key = key
-        self.tree_height = tree_height
-            
-        #クラス変数の宣言と同時に定義を行わないのは、変数が勝手に起動してしまうため
-        #つまり、BrowserControlはWebDrivreを有しているため、Chromeが勝手に起動してしまう
-        if (Node.BrowserControl == None):
-            Node.BrowserControl = Controls(cfg.PROFILE_PATH, cfg.PROFILE_NAME)
-            
-        Node.Nodes.append(self)
+        if Node.BrowserControl is None:
+            raise TypeError('BrowserControl is None')
+        
+        self.__edges: list[INode] = []
+        self.key = key 
+        self.tree_height = abs(tree_height) #負の値が入れられないように
+        Node.Nodes.add(self)
         pass
     
     def __del__(self):
-        Node.Nodes.remove(self)
+        Node.Dispose(self)
+    
+    def __str__(self) -> str:
+        return str.format('{0}:{1}', self.tree_height, self.key)
     
     #getter/setterを兼ねたもの
-    def edges(self, add_value: Node = None):
+    def edges(self, add_value: INode = None) -> list[INode]:
         if (add_value != None):
             self.__edges.append(add_value)
-            Node.Nodes.append(add_value)
+            Node.Nodes.add(add_value)
         
         return self.__edges
     
@@ -67,30 +86,42 @@ class Node:
             self.edges(child)
             
         return self
+    
+    #HACK: インスタンスメソッドにした方が簡潔
+    @staticmethod
+    def Dispose(target: INode):
+        #全体の集合から削除
+        if (target in Node.Nodes):
+            Node.Nodes.remove(target)
+            
+        #それぞれのedgeから削除
+        for node in Node.Nodes:
+            if (target in node.edges()):
+                node.edges().remove(target)
 
     @staticmethod
-    def ShowTree(parent: Node):
+    def ShowTree(parent: INode):
         def __indent(indent_size: int):
             result: str = ''
-            for i in range(0, indent_size):
+            for i in range(indent_size):
                 result += '    ' #半角スペース4つはpythonと同じインデントである
             return result
         
         if (parent == None):
             return
-            
-        offset = parent.tree_height
-        print(__indent(offset) + parent.key)
+        
+        print(__indent(parent.tree_height) + str(parent))
+        
         for node in parent.edges():
             Node.ShowTree(node)
                 
     #幅優先探索
     @staticmethod
-    def InitializeTree(parent: Node):            
+    def InitializeTree(parent: INode):            
         queue: list[Node] = [parent]
                 
         while (len(queue) > 0):
-            value = queue.pop()
+            value = queue.pop(0)
             links = value.next_links()
             
             if (len(links) > 0):
