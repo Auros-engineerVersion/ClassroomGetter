@@ -1,6 +1,7 @@
-from selenium.webdriver.common.by import By
+from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.remote.webelement import WebElement
+from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support import expected_conditions as EC
 from re import search
@@ -9,23 +10,38 @@ from src.factory import create_driver
 from src.setting_data import SettingData
 
 class BrowserControls:
-    def __init__(self, setting: SettingData) -> None:
+    def __init__(self, driver: webdriver, wait: WebDriverWait, setting: SettingData) -> None:        
+        self.driver = driver if (driver != None) else create_driver(*setting.profile)
+        self.wait =   wait   if (wait   != None) else WebDriverWait(self.driver, setting.loading_wait_time)
         self.__settings = setting
-        self.driver = create_driver(*setting.profile)
-        self.wait = WebDriverWait(self.driver, 3)
-        pass
     
     def __del__(self):
         del self.wait
         self.driver.quit()
         del self.driver
-        pass
     
     def move(self, url: str):
         self.driver.get(url)
         
     def serch(self, xpath: str) -> WebElement:
         return self.wait.until(EC.presence_of_element_located((By.XPATH, xpath)))
+        
+    def hrefs(self):
+        def __get_hrefs(locator, pattern: str = ''):
+            unique_links = set() #重複処理のため
+            try:
+                elems = self.wait.until(EC.presence_of_all_elements_located(locator))
+            except TimeoutException:
+                return unique_links
+            
+            for elem in elems:
+                link = str(elem.get_attribute('href'))
+                #文字列が見つかれば
+                if (search(pattern, string=link) != None):
+                    unique_links.add(link)
+            return unique_links
+        
+        return __get_hrefs
     
     def click_all_sections(self, func, locator_and_pattern: tuple):
         def __move_and_click(elem: WebElement):
@@ -49,23 +65,6 @@ class BrowserControls:
             
         self.wait._timeout *= 10 #元に戻す
         return links
-        
-    def hrefs(self):
-        def __get_hrefs(locator, pattern: str = ''):
-            unique_links = set() #重複処理のため
-            try:
-                elems = self.wait.until(EC.presence_of_all_elements_located(locator))
-            except TimeoutException:
-                return unique_links
-            
-            for elem in elems:
-                link = str(elem.get_attribute('href'))
-                #文字列が見つかれば
-                if (search(pattern, string=link) != None):
-                    unique_links.add(link)
-            return unique_links
-        
-        return __get_hrefs
     
     def profile_check(self, setting_data: SettingData):
         #profileが何も記入されていないのなら新しく入力する
@@ -76,10 +75,8 @@ class BrowserControls:
             profile_name = path[search('(?<=User Data.).*', path).span()[0]:]
             profile_path = path.replace(profile_name, '')[:-1] #最後のバックスラッシュを削除している
             
-            setting_data.profile_path = profile_path
-            setting_data.profile_name = profile_name
-
-    
+            return (profile_path, profile_name)
+ 
     def login_college_form(self, email: str, user_password: str):
         befor_at_index = email.find('@')
         user_name = email[:befor_at_index]
@@ -107,4 +104,4 @@ class BrowserControls:
         #3:プロファイルを設定する
         self.serch("//a[@class='gfe-button gfe-button--medium-emphasis gfe-button--middle-align']").click
         self.login_google(email, user_password)
-        self.profile_check(self.__settings)
+        profile = self.profile_check(self.__settings)

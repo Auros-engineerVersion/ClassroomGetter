@@ -10,16 +10,18 @@ class SettingData:
     user_email: str
     user_password: str
     
-    #ログインしたままの状態で起動をするのならここに値をいれる
-    profile_path: str
-    profile_name: str
-    profile: tuple = (profile_path, profile_name)
-    
+    #webdriverに関する設定
     loading_wait_time: int
     
-    node_list: list[INode]
+    node_list: list[INode] = None
     
-    def to_json(self):
-        nodes_byte = pickle.dumps(self.node_list)
-        json.dumps(self)
+    #ログインしたままの状態で起動をするのならここに値をいれる
+    profile_path: str = None
+    profile_name: str = None
         
+    def profile(self, change_profile_path: str = None, change_profile_name: str = None):
+        if (change_profile_path != None or change_profile_name != None):
+            self.profile_path = change_profile_path
+            self.profile_name = change_profile_name
+        
+        return (self.profile_path, self.profile_name)

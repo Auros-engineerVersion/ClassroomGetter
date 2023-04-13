@@ -12,12 +12,12 @@ class Settings:
         self.setting_data: SettingData = data
         
     @staticmethod
-    def Save(file_path: str, *values):
+    def Save(file_path: str, *values) -> None:
         with open(file_path, 'ab') as f:
             pickle.dump([*values], f)
     
     @staticmethod
-    def Load(path: str):
+    def Load(path: str) -> SettingData:
         with open(path, 'rb') as f:
             return pickle.load(f)
     
