@@ -4,26 +4,8 @@ sys.path.append(os.path.abspath('.'))
 from selenium.webdriver.common.by import By
 
 from src import my_util
+from src.interface.i_node import INode
 from src.browser_controls import BrowserControls as bc
-from abc import ABCMeta, abstractmethod
-
-class INode(metaclass=ABCMeta):
-    @abstractmethod
-    def edges(self, add_value: Node = None) -> list[INode]:
-        raise NotImplementedError
-    
-    @abstractmethod
-    def __str__(self) -> str:
-        raise NotImplementedError
-
-    @staticmethod
-    def Dispose(target: INode) -> None:
-        raise NotImplementedError
-    
-    @staticmethod
-    @abstractmethod
-    def ShowTree(parent: INode) -> None:
-        raise NotImplementedError
 
 class Node(INode):
     #クラス変数の宣言と同時に定義を行わないのは、変数が勝手に起動してしまうため
