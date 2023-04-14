@@ -1,29 +1,45 @@
 import tkinter as tk
 from tkinter import ttk
 
-class WindowData(tk.Frame):
-    def __init__(self, master = None) -> None:
-        super().__init__(master)
+class Window(tk.Frame):
+    @staticmethod
+    def InputForm(func = None, *args, master: tk.Misc = None):
+        def __function_is_not_null(func = None, *args):
+            if (func != None):
+                return func(*args)
+                
+        if (master == None):
+            master = tk.Tk()
         
-        self.master.geometry('256x256')
+        master.title('title')
+        master.resizable(0, 0) #windowのサイズ変更を許可しない
         
-        email = self.InputBox(self.master, 30, 1, 'email')
-        password = self.InputBox(self.master, 10, 1, 'password')
+        padx_size = (5, 10)
+        width      = 30
+        
+        email = Window.InputBox(master, width, padx_size, 'email')
+        password = Window.InputBox(master, width, padx_size, 'password')
+        complete_button = tk.Button(master, text='完了', command=lambda:__function_is_not_null(func, *args))
 
         # ウィジェットの配置
-        email.pack(side=tk.TOP, anchor=tk.W)
-        password.pack(side=tk.TOP, anchor=tk.W)
-    
-    @staticmethod
-    def InputBox(master: tk.Misc, width: int, height: int, text = '') -> tk.Frame:
-        frame = tk.Frame(master)
-        label = tk.Label(frame, text=text)
-        t_box = tk.Text(frame, width=width, height=height)
+        email.pack(side=tk.TOP, anchor=tk.W, fill=tk.X)
+        password.pack(side=tk.TOP, anchor=tk.W, fill=tk.X)
+        complete_button.pack(side=tk.BOTTOM, anchor=tk.E, padx=5, pady=5)
         
-        label.pack(anchor=tk.W, ipadx=1)
-        t_box.pack(anchor=tk.E, ipadx= 1)
+        master.mainloop()
+        
+        complete_button.
+            
+    @staticmethod
+    def InputBox(master: tk.Misc, width: int, padx: int, title = '') -> tk.Frame:
+        frame = tk.Frame(master)
+        label = tk.Label(frame, text=title)
+        t_box = tk.Entry(frame, width=width)
+        
+        label.pack(side=tk.LEFT, anchor=tk.W, ipadx=1, padx=padx)
+        t_box.pack(side=tk.RIGHT, anchor=tk.E, ipadx= 1, padx=padx[:-1]) #tupleを反転させる
         
         return frame
     
 if __name__ == '__main__':
-    WindowData(master=tk.Tk()).mainloop()
+    Window.InputForm()
