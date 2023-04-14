@@ -1,5 +1,4 @@
 import tkinter as tk
-from tkinter import ttk
 
 class Window(tk.Frame):
     @staticmethod
@@ -46,7 +45,3 @@ class Window(tk.Frame):
         t_box.pack(side=tk.RIGHT, anchor=tk.E, ipadx= 1, padx=padx[:-1]) #tupleを反転させる
                 
         return frame
-
-if __name__ == '__main__':
-    for value in Window.InputForm():
-        print(value)
