@@ -1,8 +1,4 @@
 import dataclasses
-import json
-import pickle
-
-from src.nodes import INode
 
 @dataclasses.dataclass
 class SettingData:
@@ -13,7 +9,7 @@ class SettingData:
     #webdriverに関する設定
     loading_wait_time: int
     
-    node_list: list[INode] = None
+    node_list: list = None
     
     #ログインしたままの状態で起動をするのならここに値をいれる
     profile_path: str = None

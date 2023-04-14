@@ -1,7 +1,7 @@
 from pydrive2.auth import GoogleAuth
 from selenium.common.exceptions import NoSuchWindowException
 
-import src.settings as cfg
+from src.settings import Settings
 from src.nodes import Node
 from src.browser_controls import BrowserControls
 
@@ -9,7 +9,9 @@ try:
     #最初の認証
     #gauth = GoogleAuth()
     #gauth.LocalWebserverAuth()
-    Node.BrowserControl = BrowserControls(*cfg.PROFILE)
+    data = Settings.Load()
+    
+    Node.BrowserControl = BrowserControls()
     
     root = Node(cfg.TARGET_URL, 0)
     Node.InitializeTree(root)

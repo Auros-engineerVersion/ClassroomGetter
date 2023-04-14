@@ -4,8 +4,8 @@ sys.path.append(os.path.abspath('.'))
 from selenium.webdriver.common.by import By
 
 from src import my_util
-from src.interface.i_node import INode
-from src.browser_controls import BrowserControls as bc
+from interface.i_node import INode
+from browser_controls import BrowserControls as bc
 
 class Node(INode):
     #クラス変数の宣言と同時に定義を行わないのは、変数が勝手に起動してしまうため

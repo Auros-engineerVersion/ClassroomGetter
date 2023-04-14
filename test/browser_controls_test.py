@@ -34,7 +34,7 @@ class NormalTest(unittest.TestCase):
         
         elems = self.__bc.hrefs()((By.XPATH, 'Hoge'), 'example.com')
         
-        self.assertEqual(elems[0], self.__element_mocks[0])
+        self.assertEqual(elems.pop(), self.__element_mocks[0])
                 
     #ファイルのpath, .com/*/にfileと書かれている
     #https://drive.google.com/file/d/10Rj5zc75hsisZi5hme363_Emc1B_4QGG/view?usp=drive_web&authuser=0

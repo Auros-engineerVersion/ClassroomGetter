@@ -54,7 +54,6 @@ class BrowserControls:
         
         try:
             buttons = self.wait.until(EC.presence_of_all_elements_located((By.XPATH, xpathes[0])))
-            
         except TimeoutException:
             return []
         
@@ -105,3 +104,8 @@ class BrowserControls:
         self.serch("//a[@class='gfe-button gfe-button--medium-emphasis gfe-button--middle-align']").click
         self.login_google(email, user_password)
         profile = self.profile_check(self.__settings)
+        
+        #簡易化のため
+        s = self.__settings
+        #profileを書き換える
+        self.__settings = SettingData(s.target_url, s.user_email, s.user_password, s.loading_wait_time, profile_path=profile[0], profile_name=profile[1])
