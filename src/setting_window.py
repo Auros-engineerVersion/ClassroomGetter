@@ -18,7 +18,7 @@ class Window(tk.Frame):
         padx_size = (5, 10)
         width = 30
         
-        email = Window.InputBox(master, width, padx_size, 'email')
+        email    = Window.InputBox(master, width, padx_size, 'email')
         password = Window.InputBox(master, width, padx_size, 'password')
         complete_button = tk.Button(master, text='完了', command=master.quit)
 
@@ -30,8 +30,8 @@ class Window(tk.Frame):
         master.mainloop()
                 
         #入力された値を取得して返す
-        email_info = Window.__GetData(email)
-        password_info = Window.__GetData(password)
+        email_info     = Window.__GetData(email)
+        password_info  = Window.__GetData(password)
         master.destroy() #値を取得できたらフォームを解放する
         return (email_info, password_info)
             

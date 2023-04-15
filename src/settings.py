@@ -1,22 +1,36 @@
-from setting_data import SettingData
+import os
 import pickle
+from pathlib import Path
+
+from src.setting_data import SettingData
+from src.setting_window import Window
 
 class Settings:
-    def __init__(self, data: SettingData):
-        if ('.json' in self.save_file_path):
-            raise ValueError('Path is incorrect. File extension must be .json')
-        self.setting_data: SettingData = data
-        
-    @staticmethod
-    def Save(file_path: str, data: SettingData) -> None:
-        with open(file_path, 'ab') as f:
-            pickle.dump(data, f)
+    DefaultSaveFolderPath = Path('./Save')
     
     @staticmethod
-    def Load(file_path: str) -> SettingData:
-        with open(file_path, 'rb') as f:
-            return pickle.load(f)
+    def Save(data: SettingData) -> None:
+        #directoryが存在していれば
+        if (data.save_folder_path.exists()):
+            file_name = 'save.pkl'
+            with open(data.save_folder_path.joinpath(file_name), 'wb') as f:
+                pickle.dump(data, f)
+        else:
+            data.save_folder_path.mkdir(parents=True, exist_ok=True)
+            Settings.Save(data) #Directoryが無ければもう一度行う
+    
+    @staticmethod
+    def Load(folder_path: Path) -> SettingData:
+        file_path = list(folder_path.glob('save.pkl')).pop()
+        if (file_path.exists()):
+            with open(file_path, 'rb') as f:
+                return pickle.load(f)
+        else:
+            data = Settings.NewData()
+            Settings.Save(data)
+            return data
         
     @staticmethod
-    def SetData(window) -> SettingData:
-        
+    def NewData() -> SettingData:
+        user_info = Window.InputForm()
+        return SettingData(*user_info)

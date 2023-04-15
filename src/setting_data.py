@@ -1,23 +1,31 @@
+from __future__ import annotations
+from os import sep
+from pathlib import Path
 import dataclasses
 
 @dataclasses.dataclass
 class SettingData:
-    target_url: str
     user_email: str
     user_password: str
+
+    #セーブフォルダの場所
+    save_folder_path: Path = Path('./Save')
     
     #webdriverに関する設定
-    loading_wait_time: int
+    loading_wait_time: int = 5
     
     node_list: list = None
-    
-    #ログインしたままの状態で起動をするのならここに値をいれる
-    profile_path: str = None
-    profile_name: str = None
         
-    def profile(self, change_profile_path: str = None, change_profile_name: str = None):
-        if (change_profile_path != None or change_profile_name != None):
-            self.profile_path = change_profile_path
-            self.profile_name = change_profile_name
+    def _add_(self: SettingData, other: SettingData) -> SettingData:
+        args = list(
+            map(
+                lambda value_1, value_2:
+                    value_1 or value_2,
+                vars(self).values(), vars(other).values()
+            )
+        )
         
-        return (self.profile_path, self.profile_name)
+        return SettingData(*args)
+        
+    def profile(self) -> Path:
+        return Path(self.save_folder_path).absolute().joinpath('./ProfileData/Profile 1')
