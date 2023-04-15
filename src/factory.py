@@ -2,14 +2,12 @@ from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
+from pathlib import Path
 
-def create_driver(profile_path: str, account_name: str) -> webdriver.Chrome:
+def create_driver(profile: Path) -> webdriver.Chrome:
     options = webdriver.ChromeOptions()
-    if (profile_path != None):
-        options.add_argument(f'--user-data-dir={profile_path}')
-        
-    if (account_name != None):
-        options.add_argument(f'--profile-directory={account_name}')
+    options.add_argument(f'--user-data-dir={profile.parent}')
+    options.add_argument(f'--profile-directory={profile.name}')
         
     service = Service(ChromeDriverManager().install())
     

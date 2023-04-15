@@ -37,7 +37,7 @@ def link_filter(url: str):
         return url
     
 def to_tab_link(url: str):
-    return str(url).replace('/u/0/c/', '/w/')
+    return str(url).replace('/c/', '/w/')
 
 def to_all_tab_link(url: str):
     return to_tab_link(url) + '/t/all'

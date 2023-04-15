@@ -1,11 +1,10 @@
 from __future__ import annotations
-import sys, os
-sys.path.append(os.path.abspath('.'))
 from selenium.webdriver.common.by import By
+from re import search
 
 from src import my_util
-from interface.i_node import INode
-from browser_controls import BrowserControls as bc
+from src.interface.i_node import INode
+from src.browser_controls import BrowserControls as bc
 
 class Node(INode):
     #クラス変数の宣言と同時に定義を行わないのは、変数が勝手に起動してしまうため
@@ -44,10 +43,11 @@ class Node(INode):
         if (self.tree_height == 0):
             c.move(self.key)
             locator = (By.XPATH, "//a[@class='onkcGd ZmqAt Vx8Sxd']")
-            pattern = '^.*/u/./c/.{16}$'
+            pattern = '^.*/c/.{16}$'
             return c.hrefs()(locator, pattern)
         #授業のタブなら
-        elif ('/u/0/c' in self.key):
+        #https://classroom.google.com/c/NjAyMTUwMTQyNzk1
+        elif (self.tree_height == 1):
             return [my_util.to_all_tab_link(self.key)]
         
         #「全てのトピック」なら
