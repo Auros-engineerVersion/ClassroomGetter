@@ -2,7 +2,7 @@ from __future__ import annotations
 import pickle
 from pathlib import Path
 
-from setting_data import SettingData
+from src.setting.setting_data import SettingData
 from src.gui.window import Window
 
 class Settings:
@@ -24,7 +24,7 @@ class Settings:
     
     @staticmethod
     def Load(folder_path: Path) -> SettingData:
-        file_path = list(folder_path.glob('save.pkl')).pop()
+        file_path = folder_path.joinpath('save.pkl')
         if (file_path.exists()):
             with open(file_path, 'rb') as f:
                 return pickle.load(f)

@@ -1,5 +1,6 @@
 from functools import wraps
 from re import search
+import inspect
 
 #末尾再帰の最適化
 def tail_recursion(func):
@@ -41,3 +42,11 @@ def to_tab_link(url: str):
 
 def to_all_tab_link(url: str):
     return to_tab_link(url) + '/t/all'
+
+def has_curretn_args(func, type):
+    sig = inspect.signature(func)
+    for param in sig.parameters:
+        if sig.parameters[param].annotation == type:
+            return True
+        
+    return False
