@@ -1,13 +1,13 @@
 import tkinter as tk
 
 class ScrollableFrame(tk.Frame):
-    def __init__(self, master: tk.Misc, bar_x = False, bar_y = True):
+    def __init__(self, master: tk.Misc, width: int, height: int, bar_x = True, bar_y = True):
         tk.Frame.__init__(self, master)
         self.canvas = tk.Canvas(self)
-        self.scrollable_frame = tk.Frame(self.canvas)
+        self.scrollable_frame = tk.Frame(self.canvas, width=width, height=height)
         self.scrollable_frame.bind(
             "<Configure>",
-            lambda: self.canvas.configure(
+            lambda e: self.canvas.configure(
                 scrollregion=self.canvas.bbox(tk.ALL)
             )
         )
@@ -35,8 +35,8 @@ class InputBox(tk.Frame):
             
 class NodeBox(tk.Frame):
     def __init__(self, master: tk.Misc, node):
-        tk.Frame.__init__(self, master, padx=(node.tree_height*10, 0)) #tree_heightに応じてインデントする
-        height_label = tk.Label(self, text=str(node.tree_height))
+        tk.Frame.__init__(self, master) #tree_heightに応じてインデントする
+        height_label = tk.Label(self, text=str(node.tree_height) + ':')
         url_label = tk.Label(self, text=str(node.key))
         
         height_label.pack(side=tk.LEFT)
