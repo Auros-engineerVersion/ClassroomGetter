@@ -1,6 +1,6 @@
 from __future__ import annotations
-from os import sep
 from pathlib import Path
+from pickle import dumps, loads
 import dataclasses
 
 @dataclasses.dataclass
@@ -14,7 +14,7 @@ class SettingData:
     #webdriverに関する設定
     loading_wait_time: int = 5
     
-    node_list: list = None
+    node_list: set = None
         
     def _add_(self: SettingData, other: SettingData) -> SettingData:
         args = list(
@@ -26,6 +26,9 @@ class SettingData:
         )
         
         return SettingData(*args)
+        
+    def to_bytes(self):
+        return dumps(self)
         
     def profile(self) -> Path:
         return Path(self.save_folder_path).absolute().joinpath('./ProfileData/Profile 1')

@@ -4,7 +4,7 @@ from re import search
 
 from src import my_util
 from src.interface.i_node import INode
-from src.browser_controls import BrowserControls as bc
+from src.browser.browser_controls import BrowserControls as bc
 
 class Node(INode):
     #クラス変数の宣言と同時に定義を行わないのは、変数が勝手に起動してしまうため

@@ -1,12 +1,15 @@
-import os
+from __future__ import annotations
 import pickle
 from pathlib import Path
 
-from src.setting_data import SettingData
-from src.setting_window import Window
+from setting_data import SettingData
+from src.gui.window import Window
 
 class Settings:
     DefaultSaveFolderPath = Path('./Save')
+    
+    def encryption(self) -> Settings:
+        return self
     
     @staticmethod
     def Save(data: SettingData) -> None:

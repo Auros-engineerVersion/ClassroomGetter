@@ -4,8 +4,8 @@ sys.path.append(os.path.abspath('.'))
 import unittest
 from unittest.mock import patch, Mock
 
-from src.nodes import Node
-from src.browser_controls import BrowserControls
+from src.browser.nodes import Node
+from src.browser.browser_controls import BrowserControls
 
 class NormalTest(unittest.TestCase):
     def setUp(self) -> None:

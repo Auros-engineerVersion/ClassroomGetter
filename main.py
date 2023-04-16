@@ -2,9 +2,9 @@ import os
 from pydrive2.auth import GoogleAuth
 from selenium.common.exceptions import NoSuchWindowException
 
-from src.settings import Settings
-from src.nodes import Node
-from src.browser_controls import BrowserControls
+from src.setting.settings import Settings
+from src.browser.nodes import Node
+from src.browser.browser_controls import BrowserControls
 
 try:
     target_url = 'https://classroom.google.com/' #固定値
@@ -22,7 +22,6 @@ try:
         bc.login_classroom(cfg)
     
     Node.BrowserControl = bc
-    
     root = Node(target_url, 0)
     Node.InitializeTree(root)
     Node.ShowTree(root)
