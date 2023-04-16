@@ -33,9 +33,9 @@ class InputBox(tk.Frame):
         label.pack(side=tk.LEFT, anchor=tk.W, ipadx=1, padx=padx)
         t_box.pack(side=tk.RIGHT, anchor=tk.E, ipadx= 1, padx=padx[:-1]) #tupleを反転させる
             
-class NodeBox(tk.Frame):
+class NodeBox(tk.Button):
     def __init__(self, master: tk.Misc, node):
-        tk.Frame.__init__(self, master) #tree_heightに応じてインデントする
+        tk.Button.__init__(self, master) #tree_heightに応じてインデントする
         height_label = tk.Label(self, text=str(node.tree_height) + ':')
         url_label = tk.Label(self, text=str(node.key))
         
