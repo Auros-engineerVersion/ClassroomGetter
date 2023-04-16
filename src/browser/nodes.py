@@ -1,8 +1,8 @@
 from __future__ import annotations
 from selenium.webdriver.common.by import By
-from re import search
+from inspect import signature
 
-from src import my_util
+import my_util
 from src.interface.i_node import INode
 from src.browser.browser_controls import BrowserControls as bc
 
@@ -22,19 +22,46 @@ class Node(INode):
         Node.Nodes.add(self)
         pass
     
-    def __del__(self):
-        Node.Dispose(self)
-    
     def __str__(self) -> str:
         return str.format('{0}:{1}', self.tree_height, self.key)
     
+    def __lt__(self, other) -> bool:
+        return self.tree_height < other.tree_height
+    
+    def __eq__(self, other) -> bool:
+        if (other == None):
+            return False
+        else:
+            return \
+                self.tree_height == other.tree_height and\
+                self.key         == other.key         and\
+                self.edges()     == other.edges()
+    
+    def __hash__(self) -> int:
+        height_hash = hash(self.tree_height)
+        key_hash    = hash(self.key)
+        
+        return hash(height_hash + key_hash)
+    
+    def __del__(self) -> None:
+        if (self in Node.Nodes):
+            Node.Nodes.remove(self)
+            
+        #それぞれのedgeから削除
+        for node in Node.Nodes:
+            if (self is node):
+                continue
+            
+            if (self in node.edges()):
+                node.edges().remove(self)
+    
     #getter/setterを兼ねたもの
     def edges(self, add_value: INode = None) -> list[INode]:
-        if (add_value != None):
+        if add_value == None:
+            return self.__edges
+        else:
             self.__edges.append(add_value)
             Node.Nodes.add(add_value)
-        
-        return self.__edges
     
     def next_links(self) -> list[str]:
         c = self.BrowserControl
@@ -63,22 +90,11 @@ class Node(INode):
             
     def create_childs(self, *keys: str):
         for key in keys:
-            child = Node(key, self.tree_height + 1)
-            self.edges(child)
+            self.edges(
+                add_value=Node(key, self.tree_height + 1)
+            )
             
         return self
-    
-    #HACK: インスタンスメソッドにした方が簡潔
-    @staticmethod
-    def Dispose(target: INode):
-        #全体の集合から削除
-        if (target in Node.Nodes):
-            Node.Nodes.remove(target)
-            
-        #それぞれのedgeから削除
-        for node in Node.Nodes:
-            if (target in node.edges()):
-                node.edges().remove(target)
 
     @staticmethod
     def ShowTree(parent: INode):
@@ -96,9 +112,27 @@ class Node(INode):
         for node in parent.edges():
             Node.ShowTree(node)
                 
+    #深さ優先探索
+    @staticmethod
+    def Serch(entry: INode) -> INode:
+        def __do_serch(func):
+            #if not my_util.has_curretn_args(func, Node):
+            #    raise ValueError('func arguments invailed')
+            
+            stack: list[INode] = [entry]
+            
+            while(len(stack) > 0):
+                value = stack.pop()
+                func(value)
+
+                for child in value.edges():
+                    stack.append(child)
+                    
+        return __do_serch
+                
     #幅優先探索
     @staticmethod
-    def InitializeTree(parent: INode):            
+    def InitializeTree(parent: INode):
         queue: list[Node] = [parent]
                 
         while (len(queue) > 0):
