@@ -1,5 +1,5 @@
 from functools import wraps
-from re import search
+from re import search, sub
 import inspect
 
 #末尾再帰の最適化
@@ -36,6 +36,26 @@ def link_filter(url: str):
         
     if (result > 0):
         return url
+    
+def text_filter(value: str) -> str:
+    def __remove(value: str, patterns: list[str], pattern_count: int = 0) -> str:
+        if pattern_count == len(patterns):
+            return value
+        
+        removeed_value = sub(patterns[pattern_count], '', value)
+        return __remove(removeed_value, patterns, pattern_count + 1)
+        
+    brackets_pattern = '[\(（].+?[\)）]' #括弧とその中のものが指定される
+    year_pattern = '[A-Z一-龠]?.*[0-9一二三四五六七八九十]' #HogeHoge令和五年度HogeHogeでは、令和五のみ指定される
+    nendo_pattern = '[年度]'
+    space_pattern = '[\s　]' #半角全角スペースが指定される
+    
+    all_pattern = [brackets_pattern, year_pattern, nendo_pattern, space_pattern]
+    
+    if any([x in value for x in ['.pdf', '.mp3', '.mp4', '.jpg', '.png', '.mov']]):
+        return value
+    else:
+        return __remove(value, all_pattern)
     
 def to_tab_link(url: str):
     return str(url).replace('/c/', '/w/')
