@@ -16,7 +16,7 @@ class SettingData:
     
     node_list: set = None
         
-    def _add_(self: SettingData, other: SettingData) -> SettingData:
+    def __add__(self: SettingData, other: SettingData) -> SettingData:
         args = list(
             map(
                 lambda value_1, value_2:
