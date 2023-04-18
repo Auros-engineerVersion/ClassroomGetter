@@ -6,8 +6,8 @@ from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support import expected_conditions as EC
 from re import search
 
-from factory import create_driver
-from ..setting.setting_data import SettingData
+from src.browser.factory import create_driver
+from src.setting.setting_data import SettingData
 
 class BrowserControls:
     def __init__(self, setting: SettingData, driver: webdriver = None, wait: WebDriverWait = None) -> None:        
@@ -27,8 +27,8 @@ class BrowserControls:
     def serch(self, xpath: str) -> WebElement:
         return self.wait.until(EC.presence_of_element_located((By.XPATH, xpath)))
         
-    def hrefs(self):
-        def __get_hrefs(locator, pattern: str = ''):
+    def elements(self, locator, pattern: str = ''):
+        def __get_hrefs(filter: callable):
             unique_links = set() #重複処理のため
             try:
                 elems = self.wait.until(EC.presence_of_all_elements_located(locator))
@@ -36,7 +36,7 @@ class BrowserControls:
                 return unique_links
             
             for elem in elems:
-                link = str(elem.get_attribute('href'))
+                link = str(filter(elem))
                 #文字列が見つかれば
                 if (search(pattern, string=link) != None):
                     unique_links.add(link)
@@ -44,7 +44,7 @@ class BrowserControls:
         
         return __get_hrefs
     
-    def click_all_sections(self, func, locator_and_pattern: tuple):
+    def click_all_sections(self, func: callable, arg):
         def __move_and_click(elem: WebElement):
             self.driver.execute_script("arguments[0].scrollIntoView(true);", elem)
             self.driver.execute_script('arguments[0].click()', elem)
@@ -61,7 +61,7 @@ class BrowserControls:
         self.wait._timeout /= 10 #ファイルの読み込みは早いため
         for button in buttons:
             __move_and_click(button)
-            links.extend(func()(*locator_and_pattern))
+            links.extend(func(arg))
             
         self.wait._timeout *= 10 #元に戻す
         return links

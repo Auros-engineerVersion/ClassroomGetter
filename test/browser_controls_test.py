@@ -32,7 +32,7 @@ class NormalTest(unittest.TestCase):
     def test_get_current_hrefs(self, wait_mock):
         wait_mock.return_value = self.__element_mocks
         
-        elems = self.__bc.hrefs()((By.XPATH, 'Hoge'), 'example.com')
+        elems = self.__bc.elements()((By.XPATH, 'Hoge'), 'example.com')
         
         self.assertEqual(elems.pop(), self.__element_mocks[0])
                 
