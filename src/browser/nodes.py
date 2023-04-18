@@ -96,13 +96,15 @@ class Node(INode):
             c.move(self.url)
             file_locator = (By.XPATH, "//a[@class='VkhHKd e7EEH ']")
             file_pattern = '^.*/file/d/.*$'
-            files = c.click_all_sections(c.elements(file_locator, file_pattern), lambda elem: elem.get_attribute('href'))
-            
             name_locator = (By.XPATH, "//div[@class='lIHx8b YVvGBb asQXV ']")
-            name_pattern = ''
-            names = c.elements(name_locator, name_pattern)(lambda elem: elem.text)
             
-            return my_util.convert_to_tuple(names, files)
+            file_tuples = c.click_all_sections(
+                my_util.convert_to_tuple,
+                lambda:c.elements(name_locator, '')(lambda elem: elem.text),
+                lambda:c.elements(file_locator, file_pattern)(lambda elem: elem.get_attribute('href')) 
+            )
+                        
+            return file_tuples
         
         #ファイルのurlなら
         else:

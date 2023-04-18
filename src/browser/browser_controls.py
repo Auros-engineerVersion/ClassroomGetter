@@ -30,6 +30,7 @@ class BrowserControls:
     def elements(self, locator, pattern: str = ''):
         def __get_hrefs(filter: callable):
             unique_links = set() #重複処理のため
+            elems = []
             try:
                 elems = self.wait.until(EC.presence_of_all_elements_located(locator))
             except TimeoutException:
@@ -44,7 +45,7 @@ class BrowserControls:
         
         return __get_hrefs
     
-    def click_all_sections(self, func: callable, arg):
+    def click_all_sections(self, func: callable, *callable_args):
         def __move_and_click(elem: WebElement):
             self.driver.execute_script("arguments[0].scrollIntoView(true);", elem)
             self.driver.execute_script('arguments[0].click()', elem)
@@ -58,12 +59,16 @@ class BrowserControls:
         except TimeoutException:
             return []
         
-        self.wait._timeout /= 10 #ファイルの読み込みは早いため
         for button in buttons:
             __move_and_click(button)
-            links.extend(func(arg))
+            links.extend(
+                func(
+                    *list(
+                        map(lambda arg: arg(), callable_args)
+                    )
+                )
+            )
             
-        self.wait._timeout *= 10 #元に戻す
         return links
  
     def login_college_form(self, setting: SettingData):
