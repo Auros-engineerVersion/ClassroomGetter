@@ -29,19 +29,18 @@ class BrowserControls:
         
     def elements(self, locator, pattern: str = ''):
         def __get_hrefs(filter: callable):
-            unique_links = set() #重複処理のため
+            links = []
             elems = []
             try:
                 elems = self.wait.until(EC.presence_of_all_elements_located(locator))
             except TimeoutException:
-                return unique_links
-            
+                return links
             for elem in elems:
                 link = str(filter(elem))
                 #文字列が見つかれば
                 if (search(pattern, string=link) != None):
-                    unique_links.add(link)
-            return unique_links
+                    links.append(link)
+            return links
         
         return __get_hrefs
     

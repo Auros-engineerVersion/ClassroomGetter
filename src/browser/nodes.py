@@ -87,7 +87,7 @@ class Node(INode):
             return my_util.convert_to_tuple(titles, links)
                 
         #授業のタブなら
-        #https://classroom.google.com/c/NjAyMTUwMTQyNzk1
+        #https://drive.google.com/file/d/1DoNp1Z69OSnyp0LnZY-Z6d6ion7Bum1b/view?usp=drive_web&authuser=0
         elif (self.tree_height == 1):
             return [(self.key + '_授業タブ', my_util.to_all_tab_link(self.url))]
         
@@ -100,7 +100,7 @@ class Node(INode):
             
             file_tuples = c.click_all_sections(
                 my_util.convert_to_tuple,
-                lambda:c.elements(name_locator, '')(lambda elem: elem.text),
+                lambda:c.elements(name_locator, '.+')(lambda elem: elem.text),
                 lambda:c.elements(file_locator, file_pattern)(lambda elem: elem.get_attribute('href')) 
             )
                         
