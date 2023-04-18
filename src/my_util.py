@@ -1,5 +1,6 @@
 from functools import wraps
 from re import search, sub
+from typing import Iterable
 import inspect
 
 #末尾再帰の最適化
@@ -70,3 +71,11 @@ def has_curretn_args(func, type):
             return True
         
     return False
+
+def convert_to_tuple(list_1: Iterable, list_2: Iterable) -> list[tuple]:
+    return list(
+        map(
+            lambda x, y: (x, y),
+            list_1, list_2
+        )
+    )
