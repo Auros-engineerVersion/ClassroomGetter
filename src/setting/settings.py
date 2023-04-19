@@ -12,7 +12,7 @@ class Settings:
         return self
     
     @staticmethod
-    def Save(data: SettingData) -> None:
+    def save(data: SettingData) -> None:
         #directoryが存在していれば
         if (data.save_folder_path.exists()):
             file_name = 'save.pkl'
@@ -20,20 +20,27 @@ class Settings:
                 pickle.dump(data, f)
         else:
             data.save_folder_path.mkdir(parents=True, exist_ok=True)
-            Settings.Save(data) #Directoryが無ければもう一度行う
+            Settings.save(data) #Directoryが無ければもう一度行う
     
     @staticmethod
-    def Load(folder_path: Path) -> SettingData:
+    def load(folder_path: Path) -> SettingData:
+        def __create_and_save() -> SettingData:
+            data = Settings.new_data()
+            Settings.save(data)
+            return data
+            
+        data = None
         file_path = folder_path.joinpath('save.pkl')
-        if (file_path.exists()):
+        if file_path.exists():
             with open(file_path, 'rb') as f:
-                return pickle.load(f)
+                data = pickle.load(f)
+                
+        if data == None or type(data) != SettingData:
+            return __create_and_save()
         else:
-            data = Settings.NewData()
-            Settings.Save(data)
             return data
         
     @staticmethod
-    def NewData() -> SettingData:
+    def new_data() -> SettingData:
         user_info = Window.InputForm()
         return SettingData(*user_info)

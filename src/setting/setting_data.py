@@ -27,8 +27,14 @@ class SettingData:
         
         return SettingData(*args)
         
-    def to_bytes(self):
-        return dumps(self)
+    def is_current_data(self):
+        return\
+            self.node_list != None         and\
+            len(self.node_list) > 1             and\
+            '@' in self.user_email         and\
+            len(self.user_password) > 0    and\
+            self.loading_wait_time >= 0    and\
+            self.save_folder_path.exists()
         
     def profile(self) -> Path:
         return Path(self.save_folder_path).absolute().joinpath('./ProfileData/Profile 1')
