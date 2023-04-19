@@ -136,7 +136,7 @@ class Node(INode):
                 
     #深さ優先探索
     @staticmethod
-    def Serch(entry: INode) -> INode:
+    def Serach(entry: INode) -> INode:
         def __do_serch(func):
             #if not my_util.has_curretn_args(func, Node):
             #    raise ValueError('func arguments invailed')

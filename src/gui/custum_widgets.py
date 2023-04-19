@@ -4,6 +4,8 @@ import tkinter as tk
 
 from src.interface.i_node import INode
 
+BUTTON_PRESS = "<ButtonPress>"
+
 class ScrollableFrame(tk.Frame):
     def __init__(self, master: tk.Misc, width: int, height: int, bar_x = True, bar_y = True):
         tk.Frame.__init__(self, master)
@@ -39,7 +41,7 @@ class InputBox(tk.Frame):
             
 class NodeBox(tk.Frame):
     def __init__(self, master: tk.Misc, node: INode, parent: NodeBox = None):
-        tk.Frame.__init__(self, master) #tree_heightに応じてインデントする
+        tk.Frame.__init__(self, master)
         drop_button = tk.Button(self, command=self.expand, width=self.winfo_height())
         height_label = tk.Label(self, text=str(node.tree_height) + ':')
         key_label = tk.Label(self, text=str(node.key))
@@ -49,6 +51,10 @@ class NodeBox(tk.Frame):
         height_label.pack(side=tk.LEFT)
         key_label.pack(side=tk.LEFT)
         url_label.pack(side=tk.LEFT)
+        
+        height_label.bind(BUTTON_PRESS, self.on_frame_click)        
+        key_label.bind(BUTTON_PRESS, self.on_frame_click)
+        url_label.bind(BUTTON_PRESS, self.on_frame_click)
                 
         self.__master = master
         self.__is_expand: bool = False
@@ -57,7 +63,10 @@ class NodeBox(tk.Frame):
         self.__nextboxes: list[NodeBox] = []
         
         self.pack(anchor=tk.W, padx=(node.tree_height*20, 1), after=self.__parent_box)
-                    
+
+    def on_frame_click(self, event):
+        print(event)
+
     def dispose(self):
         stack: list[NodeBox] = [self]
         

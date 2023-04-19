@@ -28,5 +28,10 @@ class INode(metaclass=ABCMeta):
     
     @staticmethod
     @abstractmethod
+    def Serach(entry: INode) -> INode:
+        raise NotImplementedError
+    
+    @staticmethod
+    @abstractmethod
     def ShowTree(parent: INode) -> None:
         raise NotImplementedError

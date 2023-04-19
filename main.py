@@ -16,7 +16,7 @@ try:
     cfg = Settings.Load(Settings.DefaultSaveFolderPath)
     
     #node_listが何も設定されていないのなら値を取りに行く
-    if len(cfg.node_list) <= 0:
+    if cfg.node_list == None or len(cfg.node_list) <= 1:
         bc = BrowserControls(setting=cfg)
         #プロファイルが指定されているかどうか
         #されていなければログインして指定する
@@ -25,13 +25,14 @@ try:
             bc.login_classroom(cfg)
 
         Node.BrowserControl = bc
-        root = Node(target_url, 0)
+        root = Node('Classroom', target_url, 0)
         Node.InitializeTree(root)
     
         cfg.node_list = Node.Nodes
         Settings.Save(cfg)
         
-    Window.RunWindow(nodes=cfg.node_list)
+    root = min(cfg.node_list)
+    Window.RunWindow(root)
                 
 except NoSuchWindowException as e:
     print('\nProcess has finished by Hand')

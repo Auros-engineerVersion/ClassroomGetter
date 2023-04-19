@@ -1,7 +1,7 @@
 import tkinter as tk
 
-import custum_widgets as mytk
-from browser.nodes import Node
+from src.gui import custum_widgets as mytk
+from src.browser.nodes import Node
 
 class Window(tk.Frame):
     @staticmethod
@@ -43,7 +43,7 @@ class Window(tk.Frame):
         return (email_info, password_info)
             
     @staticmethod
-    def RunWindow(master: tk.Misc = None, width: int = 600, height: int = 300, nodes: list = []):        
+    def RunWindow(root_node, master: tk.Misc = None, width: int = 600, height: int = 300):        
         if master is None:
             master = tk.Tk()
         
@@ -52,13 +52,8 @@ class Window(tk.Frame):
         master.resizable(0, 0) #windowのサイズ変更を許可しない
         #アスペクト比を維持したまま小さいサイズにする
         node_canvas = mytk.ScrollableFrame(master, width=width/5, height=height/5)
+        mytk.NodeBox(node_canvas.scrollable_frame, root_node)
         
-        root_node = min(nodes)
-        Node.Serch(root_node)(lambda node:
-            mytk.NodeBox(node_canvas.scrollable_frame, node).
-            pack(side=tk.TOP, anchor=tk.W, padx=(node.tree_height*10, 0))
-        )
-        
-        node_canvas.pack(side=tk.LEFT, fill=tk.Y)
+        node_canvas.pack(side=tk.TOP, anchor=tk.W, fill=tk.Y)
 
         master.mainloop()
