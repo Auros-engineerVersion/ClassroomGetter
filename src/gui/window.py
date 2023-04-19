@@ -1,7 +1,7 @@
 import tkinter as tk
 
 from src.gui import custum_widgets as mytk
-from src.browser.nodes import Node
+from src.setting.setting_data import SettingData
 
 class Window(tk.Frame):
     @staticmethod
@@ -51,9 +51,13 @@ class Window(tk.Frame):
         master.geometry(Window.__size(width, height))
         master.resizable(0, 0) #windowのサイズ変更を許可しない
         #アスペクト比を維持したまま小さいサイズにする
-        node_canvas = mytk.ScrollableFrame(master, width=width/5, height=height/5)
-        mytk.NodeBox(node_canvas.scrollable_frame, root_node)
+        node_canvas = mytk.ScrollableFrame(master, tk.SUNKEN, width=width/5, height=height/5, padx=1, pady=1)
         
-        node_canvas.pack(side=tk.TOP, anchor=tk.W, fill=tk.Y)
+        root_box = mytk.NodeBox(node_canvas.scrollable_frame, root_node) #最初の頂点を初期化
+        node_info = mytk.NodeInfoFrame(master, root_box)
+        mytk.NodeBox.node_info_box = node_info
+        
+        node_canvas.pack(side=tk.LEFT, anchor=tk.W, fill=tk.Y)
+        node_info.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
 
         master.mainloop()

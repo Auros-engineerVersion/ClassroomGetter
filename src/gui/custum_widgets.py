@@ -1,16 +1,16 @@
 from __future__ import annotations
 import gc
 import tkinter as tk
-
 from src.interface.i_node import INode
+from src.setting.setting_data import SettingData
 
 BUTTON_PRESS = "<ButtonPress>"
 
 class ScrollableFrame(tk.Frame):
-    def __init__(self, master: tk.Misc, width: int, height: int, bar_x = True, bar_y = True):
-        tk.Frame.__init__(self, master)
-        self.canvas = tk.Canvas(self)
-        self.scrollable_frame = tk.Frame(self.canvas, width=width, height=height)
+    def __init__(self, master: tk.Misc, relief: str, width: int, height: int, padx: int, pady: int, bar_x = True, bar_y = True):
+        tk.Frame.__init__(self, master, width=width, height=height, padx=padx, pady=pady, background='red')
+        self.canvas = tk.Canvas(self, relief=relief, borderwidth=1)
+        self.scrollable_frame = tk.Frame(self.canvas)
         self.scrollable_frame.bind(
             "<Configure>",
             lambda e: self.canvas.configure(
@@ -40,6 +40,7 @@ class InputBox(tk.Frame):
         t_box.pack(side=tk.RIGHT, anchor=tk.E, ipadx= 1, padx=padx[:-1]) #tupleを反転させる
             
 class NodeBox(tk.Frame):
+    node_info_box: NodeInfoFrame = None
     def __init__(self, master: tk.Misc, node: INode, parent: NodeBox = None):
         tk.Frame.__init__(self, master)
         drop_button = tk.Button(self, command=self.expand, width=self.winfo_height())
@@ -56,16 +57,16 @@ class NodeBox(tk.Frame):
         key_label.bind(BUTTON_PRESS, self.on_frame_click)
         url_label.bind(BUTTON_PRESS, self.on_frame_click)
                 
+        self.node = node
+        self.is_expand: bool = False
         self.__master = master
-        self.__is_expand: bool = False
-        self.__node = node
         self.__parent_box = parent
         self.__nextboxes: list[NodeBox] = []
         
         self.pack(anchor=tk.W, padx=(node.tree_height*20, 1), after=self.__parent_box)
 
     def on_frame_click(self, event):
-        print(event)
+        self.node_info_box.update_text(self)
 
     def dispose(self):
         stack: list[NodeBox] = [self]
@@ -77,21 +78,43 @@ class NodeBox(tk.Frame):
                 stack.append(box)
 
             value.destroy()
-        
+                    
     def expand(self):
         #反転する
-        self.__is_expand = not self.__is_expand
-
-        if (self.__is_expand):
+        self.is_expand = not self.is_expand
+        
+        #子を初期化する
+        for next in self.__nextboxes:
+            next.dispose()
+        self.__nextboxes.clear()
+        gc.collect()
+        
+        if self.is_expand:
             self.pack(anchor=tk.W)
-            list(
-                map(
-                    lambda node: self.__nextboxes.append(NodeBox(self.__master, node, self)),
-                    self.__node.edges()
-                )
-            )
-        else:
-            for box in self.__nextboxes:
-                box.dispose()
-                
-            gc.collect()
+            for node in self.node.edges():
+                self.__nextboxes.append(NodeBox(self.__master, node, self))
+
+            
+class NodeInfoFrame(tk.Frame):
+    def __init__(self, master: tk.Misc, watching_box: NodeBox = None):
+        tk.Frame.__init__(self, master, background='green')
+        
+        self.__watching_box = watching_box
+        self.__node_name_label = tk.Label(self, text=watching_box.node.key if watching_box.node != None else 'No Data')
+        #ボタンが押されたら、監視中のNodeからinitialize_treeを実行する
+        initialize_button = tk.Button(self, text='実行', 
+            command=lambda: self.do_initialize_tree(self.__watching_box))
+        
+        self.__node_name_label.pack(side=tk.TOP, anchor=tk.CENTER, padx=5, pady=5)
+        initialize_button.pack(side=tk.BOTTOM, fill=tk.X)
+        
+    def update_text(self, target_box: NodeBox):
+        self.__watching_box = target_box
+        self.__node_name_label['text'] = target_box.node.key
+        
+    @staticmethod
+    def do_initialize_tree(box: NodeBox):
+        #子を初期化する
+        box.node.edges().clear()
+        box.node.initialize_tree(box.node)
+        box.is_expand = False
