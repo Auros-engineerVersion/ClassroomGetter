@@ -9,7 +9,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.remote.webelement import WebElement
 
 from src.setting.setting_data import SettingData
-from src.browser.browser_controls import BrowserControls
+from src.browser.browser_controls import BrowserControl
 
 class NormalTest(unittest.TestCase):
     def setUp(self) -> None:
@@ -26,7 +26,7 @@ class NormalTest(unittest.TestCase):
         driver_mock = MagicMock()
         wait_mock = MagicMock()
         settings = SettingData('http://www.example.com', 'hogehoge@example.com', 'admin', 1)
-        self.__bc = BrowserControls(driver_mock, wait_mock, settings)
+        self.__bc = BrowserControl(driver_mock, wait_mock, settings)
 
     @patch.object(WebDriverWait, 'until')
     def test_get_current_hrefs(self, wait_mock):

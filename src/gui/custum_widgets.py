@@ -56,17 +56,23 @@ class NodeBox(tk.Frame):
         height_label.bind(BUTTON_PRESS, self.on_frame_click)        
         key_label.bind(BUTTON_PRESS, self.on_frame_click)
         url_label.bind(BUTTON_PRESS, self.on_frame_click)
-                
-        self.node = node
-        self.is_expand: bool = False
+            
+        self.text = key_label['text']
         self.__master = master
         self.__parent_box = parent
+        self.__node = node
+        self.__is_expand: bool = False
         self.__nextboxes: list[NodeBox] = []
         
         self.pack(anchor=tk.W, padx=(node.tree_height*20, 1), after=self.__parent_box)
 
     def on_frame_click(self, event):
         self.node_info_box.update_text(self)
+        
+    def initialize(self):
+        self.__node.edges().clear()
+        self.__node.initialize_tree(self.__node)
+        self.__is_expand = False
 
     def dispose(self):
         stack: list[NodeBox] = [self]
@@ -81,7 +87,7 @@ class NodeBox(tk.Frame):
                     
     def expand(self):
         #反転する
-        self.is_expand = not self.is_expand
+        self.__is_expand = not self.__is_expand
         
         #子を初期化する
         for next in self.__nextboxes:
@@ -89,10 +95,11 @@ class NodeBox(tk.Frame):
         self.__nextboxes.clear()
         gc.collect()
         
-        if self.is_expand:
+        if self.__is_expand:
             self.pack(anchor=tk.W)
-            for node in self.node.edges():
-                self.__nextboxes.append(NodeBox(self.__master, node, self))
+            for node in self.__node.edges():
+                new_box = NodeBox(self.__master, node, self)
+                self.__nextboxes.append(new_box)
 
             
 class NodeInfoFrame(tk.Frame):
@@ -100,21 +107,14 @@ class NodeInfoFrame(tk.Frame):
         tk.Frame.__init__(self, master, background='green')
         
         self.__watching_box = watching_box
-        self.__node_name_label = tk.Label(self, text=watching_box.node.key if watching_box.node != None else 'No Data')
+        self.__node_name_label = tk.Label(self, text=watching_box.text if watching_box.text != None else 'No Data')
         #ボタンが押されたら、監視中のNodeからinitialize_treeを実行する
         initialize_button = tk.Button(self, text='実行', 
-            command=lambda: self.do_initialize_tree(self.__watching_box))
+            command=lambda: self.__watching_box.initialize())
         
         self.__node_name_label.pack(side=tk.TOP, anchor=tk.CENTER, padx=5, pady=5)
         initialize_button.pack(side=tk.BOTTOM, fill=tk.X)
         
     def update_text(self, target_box: NodeBox):
         self.__watching_box = target_box
-        self.__node_name_label['text'] = target_box.node.key
-        
-    @staticmethod
-    def do_initialize_tree(box: NodeBox):
-        #子を初期化する
-        box.node.edges().clear()
-        box.node.initialize_tree(box.node)
-        box.is_expand = False
+        self.__node_name_label['text'] = target_box.text

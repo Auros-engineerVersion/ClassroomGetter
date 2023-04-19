@@ -9,7 +9,16 @@ from re import search
 from src.browser.factory import create_driver
 from src.setting.setting_data import SettingData
 
-class BrowserControls:
+class BrowserControl:
+
+    serch_parameter_container = [
+        [
+            "//a[@class='onkcGd ZmqAt Vx8Sxd']",
+            
+                
+        ],
+    ]
+    
     def __init__(self, setting: SettingData, driver: webdriver = None, wait: WebDriverWait = None) -> None:        
         self.driver = driver if (driver != None) else create_driver(setting.profile())
         self.wait   = wait   if (wait   != None) else WebDriverWait(self.driver, setting.loading_wait_time)
@@ -20,31 +29,32 @@ class BrowserControls:
         del self.wait
         self.driver.quit()
         del self.driver
-    
+        
     def move(self, url: str):
         self.driver.get(url)
         
     def serch(self, xpath: str) -> WebElement:
         return self.wait.until(EC.presence_of_element_located((By.XPATH, xpath)))
         
-    def elements(self, locator, pattern: str = ''):
+    def elements(self, xpath: str, pattern: str = ''):
         def __get_hrefs(filter: callable):
             links = []
             elems = []
             try:
-                elems = self.wait.until(EC.presence_of_all_elements_located(locator))
+                elems = self.wait.until(EC.presence_of_all_elements_located(By.XPATH, xpath))
             except TimeoutException:
                 return links
+            
             for elem in elems:
-                link = str(filter(elem))
+                link = filter(elem)
                 #文字列が見つかれば
-                if (search(pattern, string=link) != None):
+                if (search(pattern, string=str(link)) != None):
                     links.append(link)
             return links
         
         return __get_hrefs
     
-    def click_all_sections(self, func: callable, *callable_args):
+    def click_all_sections(self):
         def __move_and_click(elem: WebElement):
             self.driver.execute_script("arguments[0].scrollIntoView(true);", elem)
             self.driver.execute_script('arguments[0].click()', elem)
@@ -60,15 +70,6 @@ class BrowserControls:
         
         for button in buttons:
             __move_and_click(button)
-            links.extend(
-                func(
-                    *list(
-                        map(lambda arg: arg(), callable_args)
-                    )
-                )
-            )
-            
-        return links
  
     def login_college_form(self, setting: SettingData):
         befor_at_index = setting.user_email.find('@')
@@ -97,3 +98,5 @@ class BrowserControls:
         #3:プロファイルを設定する
         self.move(self.serch("//a[@class='gfe-button gfe-button--medium-emphasis gfe-button--middle-align']").get_attribute('href'))
         self.login_google(setting)
+        
+class SerchParrameterContainer

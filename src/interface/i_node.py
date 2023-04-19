@@ -3,7 +3,7 @@ from abc import ABCMeta, abstractmethod
 
 class INode(metaclass=ABCMeta):
     @abstractmethod
-    def edges(self, add_value: INode = None) -> list[INode]:
+    def edges(self, add_value: INode = None) -> set[INode]:
         raise NotImplementedError
     
     @abstractmethod
@@ -28,10 +28,15 @@ class INode(metaclass=ABCMeta):
     
     @staticmethod
     @abstractmethod
-    def Serach(entry: INode) -> INode:
+    def serach(entry: INode) -> INode:
         raise NotImplementedError
     
     @staticmethod
     @abstractmethod
-    def ShowTree(parent: INode) -> None:
+    def show_tree(parent: INode) -> None:
+        raise NotImplementedError
+    
+    @staticmethod
+    @abstractmethod
+    def initialize_tree(parent: INode) -> None:
         raise NotImplementedError

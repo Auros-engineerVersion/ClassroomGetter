@@ -5,11 +5,11 @@ import unittest
 from unittest.mock import patch, Mock
 
 from src.browser.nodes import Node
-from src.browser.browser_controls import BrowserControls
+from src.browser.browser_controls import BrowserControl
 
 class NormalTest(unittest.TestCase):
     def setUp(self) -> None:
-        self.__bc_mock = Mock(spec=BrowserControls)
+        self.__bc_mock = Mock(spec=BrowserControl)
         Node.BrowserControl = self.__bc_mock
      
     def test_edge_getter(self):
@@ -57,7 +57,7 @@ class NormalTest(unittest.TestCase):
         next_mock.side_effect = mock_list
         
         root = Node('parent', 0)
-        Node.InitializeTree(root)
+        Node.initialize_tree(root)
         
         #すべての配列において呼び出しが発生しているかどうか
         self.assertEqual(next_mock.call_count, total_mock_list_size)

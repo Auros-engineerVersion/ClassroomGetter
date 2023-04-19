@@ -4,7 +4,7 @@ from inspect import signature
 
 from src import my_util
 from src.interface.i_node import INode
-from src.browser.browser_controls import BrowserControls as bc
+from src.browser.browser_controls import BrowserControl as bc
 
 class Node(INode):
     #クラス変数の宣言と同時に定義を行わないのは、変数が勝手に起動してしまうため
@@ -16,12 +16,11 @@ class Node(INode):
         if Node.BrowserControl is None:
             raise TypeError('BrowserControl is None')
         
-        self.__edges: list[INode] = []
+        self.__edges: set[INode] = set()
         self.key = key
         self.url = url
         self.tree_height = abs(tree_height) #負の値が入れられないように
         Node.Nodes.add(self)
-        pass
     
     def __str__(self) -> str:
         return str.format('{0}:{1}', self.tree_height, self.key)
@@ -59,11 +58,11 @@ class Node(INode):
                 node.edges().remove(self)
     
     #getter/setterを兼ねたもの
-    def edges(self, add_value: INode = None) -> list[INode]:
-        if add_value == None:
+    def edges(self, add_value: INode = None) -> set[INode]:
+        if add_value == None or add_value in self.__edges:
             return self.__edges
         else:
-            self.__edges.append(add_value)
+            self.__edges.add(add_value)
             Node.Nodes.add(add_value)
     
     def next_links(self) -> list[tuple[str, str]]: #(title, url)
@@ -71,7 +70,7 @@ class Node(INode):
 
         #ホームなら
         if (self.tree_height == 0):
-            c.move(self.key)
+            c.move(self.url)
             link_locator = (By.XPATH, "//a[@class='onkcGd ZmqAt Vx8Sxd']")
             link_pattern = '^.*/c/.{16}$'
             links = c.elements(link_locator, link_pattern)(lambda elem: elem.get_attribute('href'))
@@ -87,24 +86,33 @@ class Node(INode):
             return my_util.convert_to_tuple(titles, links)
                 
         #授業のタブなら
-        #https://drive.google.com/file/d/1DoNp1Z69OSnyp0LnZY-Z6d6ion7Bum1b/view?usp=drive_web&authuser=0
         elif (self.tree_height == 1):
             return [(self.key + '_授業タブ', my_util.to_all_tab_link(self.url))]
         
         #「全てのトピック」なら
         elif ('/t/all' in self.url):
             c.move(self.url)
-            file_locator = (By.XPATH, "//a[@class='VkhHKd e7EEH ']")
-            file_pattern = '^.*/file/d/.*$'
-            name_locator = (By.XPATH, "//div[@class='lIHx8b YVvGBb asQXV ']")
-            
-            file_tuples = c.click_all_sections(
-                my_util.convert_to_tuple,
-                lambda:c.elements(name_locator, '.+')(lambda elem: elem.text),
-                lambda:c.elements(file_locator, file_pattern)(lambda elem: elem.get_attribute('href')) 
+            title_locator = (By.XPATH, "//span[@class='YVvGBb UzbjTd']")
+            title_pattern = '.+'
+            details_locator = (By.XPATH, "//a[contains(@aria-label, '資料を表示')]")
+            details_pattern = '.*/details$'
+            c.click_all_sections() #すべてクリックして読み込ませる
+            #読み込んだものをすべて取得する
+            return my_util.convert_to_tuple(
+                c.elements(title_locator, title_pattern)(lambda elem: elem.text),
+                c.elements(details_locator, details_pattern)(lambda elem: elem.get_attribute('href'))
             )
-                        
-            return file_tuples
+        
+        elif '/details' in self.url:
+            c.move(self.url)
+            file_locator = (By.XPATH, "//a[@class='vwNuXe JkIgWb QRiHXd MymH0d maXJsd']")
+            file_pattern = '.*/file/d.*'
+            
+            return my_util.convert_to_tuple(
+                c.elements(file_locator, file_pattern)(lambda elem: elem.get_attribute('href')),
+                c.elements()
+            )
+            
         
         #ファイルのurlなら
         else:
@@ -119,7 +127,7 @@ class Node(INode):
         return self
 
     @staticmethod
-    def ShowTree(parent: INode):
+    def show_tree(parent: INode):
         def __indent(indent_size: int):
             result: str = ''
             for i in range(indent_size):
@@ -132,11 +140,11 @@ class Node(INode):
         print(__indent(parent.tree_height) + str(parent))
         
         for node in parent.edges():
-            Node.ShowTree(node)
+            Node.show_tree(node)
                 
     #深さ優先探索
     @staticmethod
-    def Serach(entry: INode) -> INode:
+    def serach(entry: INode) -> INode:
         def __do_serch(func):
             #if not my_util.has_curretn_args(func, Node):
             #    raise ValueError('func arguments invailed')
@@ -154,7 +162,7 @@ class Node(INode):
                 
     #幅優先探索
     @staticmethod
-    def InitializeTree(parent: INode):
+    def initialize_tree(parent: INode):
         queue: list[Node] = [parent]
                 
         while (len(queue) > 0):
