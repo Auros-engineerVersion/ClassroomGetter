@@ -58,5 +58,8 @@ class SearchParameterContainer:
     def current_params(id: int) -> SearchParameterPattern:
         if len(SearchParameterContainer.parameters) > id: #最大値を超えたら
             return SearchParameterContainer.parameters[id]
-
-SearchParameter.elements(print)
+        
+    @staticmethod
+    def elements(id: int):
+        params = SearchParameterContainer.current_params(id)
+        return params.elements
