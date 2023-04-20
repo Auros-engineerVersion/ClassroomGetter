@@ -12,10 +12,12 @@ class SearchParameter:
         self.filter_func = filter_func
         
     def next_values(self, acquiring_func: callable) -> list:
-        return map(
-            self.filter_func,
-            acquiring_func(self.xpath, self.regex)(self.filter_func)
-        )
+        try:
+            return map(
+                self.filter_func,
+                acquiring_func(self.xpath, self.regex)(self.filter_func)
+            )
+        except 
         
 @dataclass(frozen=True)
 class SearchParameterPattern:
@@ -46,7 +48,7 @@ class SearchParameterContainer:
         BrowserControl.move(node.url)
         BrowserControl.click_all_sections()
     
-    parameters: list = [
+    parameters: list[SearchParameterPattern] = [
         #添字とtree_heightを一致させる
         SearchParameterPattern(
             pattern_name='Home',
@@ -98,11 +100,11 @@ class SearchParameterContainer:
     ]
 
     @staticmethod
-    def current_params(id: int) -> SearchParameterPattern:
-        if len(SearchParameterContainer.parameters) > id:
-            return SearchParameterContainer.parameters[id]
-        
-    @staticmethod
     def elements(node: INode):
-        params = SearchParameterContainer.current_params(node.tree_height)
-        return params.elements(node)
+        #簡易化のため
+        id = node.tree_height
+        params = SearchParameterContainer.parameters
+        if len(params) < id:
+            return params[id].elements(node)
+        else:
+            return []
