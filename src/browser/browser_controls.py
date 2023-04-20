@@ -10,15 +10,6 @@ from src.browser.factory import create_driver
 from src.setting.setting_data import SettingData
 
 class BrowserControl:
-
-    serch_parameter_container = [
-        [
-            "//a[@class='onkcGd ZmqAt Vx8Sxd']",
-            
-                
-        ],
-    ]
-    
     def __init__(self, setting: SettingData, driver: webdriver = None, wait: WebDriverWait = None) -> None:        
         self.driver = driver if (driver != None) else create_driver(setting.profile())
         self.wait   = wait   if (wait   != None) else WebDriverWait(self.driver, setting.loading_wait_time)
@@ -37,7 +28,7 @@ class BrowserControl:
         return self.wait.until(EC.presence_of_element_located((By.XPATH, xpath)))
         
     def elements(self, xpath: str, pattern: str = ''):
-        def __get_hrefs(filter: callable):
+        def __get_hrefs(filter_func: callable):
             links = []
             elems = []
             try:
@@ -45,12 +36,13 @@ class BrowserControl:
             except TimeoutException:
                 return links
             
-            for elem in elems:
-                link = filter(elem)
-                #文字列が見つかれば
-                if (search(pattern, string=str(link)) != None):
-                    links.append(link)
-            return links
+            values = map(filter_func, elems)
+            current_values = filter(
+                lambda string: search(pattern, string=str(string)) != None,
+                values
+            )
+            
+            return list(current_values)
         
         return __get_hrefs
     
