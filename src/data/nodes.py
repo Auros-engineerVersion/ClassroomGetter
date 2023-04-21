@@ -1,4 +1,5 @@
 from __future__ import annotations
+import datetime
 
 from src.interface.i_node import INode
 from src.browser.browser_controls import BrowserControl as bc
@@ -10,7 +11,7 @@ class Node(INode):
     BrowserControl: bc = None
     Nodes: set[INode] = set() #全てのノードの集合
 
-    def __init__(self, key: str, url: str, tree_height: int) -> None:
+    def __init__(self, key: str, url: str, tree_height: int, next_init_time: datetime.datetime = 0) -> None:
         if Node.BrowserControl is None:
             raise TypeError('BrowserControl is None')
         
@@ -18,6 +19,7 @@ class Node(INode):
         self.key = key
         self.url = url
         self.tree_height = abs(tree_height) #負の値が入れられないように
+        self.next_init_time = next_init_time
         Node.Nodes.add(self)
     
     def __str__(self) -> str:
