@@ -1,10 +1,12 @@
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support import expected_conditions as EC
 from re import search
+from time import sleep
 
 from src.browser.factory import create_driver
 from src.setting.setting_data import SettingData
@@ -12,7 +14,7 @@ from src.setting.setting_data import SettingData
 class BrowserControl:
     def __init__(self, setting: SettingData, driver: webdriver = None, wait: WebDriverWait = None) -> None:        
         self.driver = driver if (driver != None) else create_driver(setting.profile())
-        self.wait   = wait   if (wait   != None) else WebDriverWait(self.driver, setting.loading_wait_time)
+        self.wait   = wait   if (wait   != None) else WebDriverWait(self.driver, setting.loading_wait_time, 1)
     
     def __del__(self):
         del self.wait
@@ -27,13 +29,12 @@ class BrowserControl:
         
     def elements(self, xpath: str, pattern: str = ''):
         def __get_hrefs(filter_func: callable):
-            links = []
             elems = []
             try:
-                elems = self.wait.until(EC.presence_of_all_elements_located(By.XPATH, xpath))
-            except TimeoutException:
-                return links
-            
+                elems = self.wait.until(EC.presence_of_all_elements_located((By.XPATH, xpath)))
+            except TimeoutException as e:
+                raise e
+                
             values = map(filter_func, elems)
             current_values = filter(
                 lambda string: search(pattern, string=str(string)) != None,
@@ -41,26 +42,29 @@ class BrowserControl:
             )
             
             return list(current_values)
-        
         return __get_hrefs
     
     def click_all_sections(self):
-        def __move_and_click(elem: WebElement):
-            self.driver.execute_script("arguments[0].scrollIntoView(true);", elem)
-            self.driver.execute_script('arguments[0].click()', elem)
-
-        #一つめは3点ボタン、2つめは「リンクをコピー」へのxpath
-        links = []
-        xpathes = ["//div[@class='SFCE1b']"]
-        
+        def __check_loaded(xpath) -> bool:
+            def __predictate(driver):
+                sample_buttons = driver.find_elements(By.XPATH, "//li[@jsmodel='dSSknb;PTCFbe;xeYtDf;']")
+                if all([x.get_attribute('data-controller-loaded') == 'true' for x in sample_buttons]):
+                    return driver.find_elements(By.XPATH, xpath)
+                else:
+                    return False
+            return __predictate
+            
         try:
-            buttons = self.wait.until(EC.presence_of_all_elements_located((By.XPATH, xpathes[0])))
+            xpath = "//div[@jsname='rQC7Ie' and @role='button']"
+            buttons = self.wait.until(__check_loaded(xpath))
+            
+            action = ActionChains(self.driver)
+            for button in buttons:
+                action.move_to_element(button).click(button).pause(self.wait._poll).perform()
+                
         except TimeoutException:
-            return []
+            return
         
-        for button in buttons:
-            __move_and_click(button)
- 
     def login_college_form(self, setting: SettingData):
         befor_at_index = setting.user_email.find('@')
         user_name = setting.user_email[:befor_at_index]

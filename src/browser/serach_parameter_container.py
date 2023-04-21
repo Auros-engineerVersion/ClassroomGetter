@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from selenium.common.exceptions import TimeoutException
 
 from src import my_util
 from src.browser.browser_controls import BrowserControl
@@ -8,43 +9,58 @@ from src.interface.i_node import INode
 class SearchParameter:
     xpath: str
     regex: str
-    filter_func: callable
+    attribute_func: callable
         
     def next_values(self, acquiring_func: callable) -> list:
-        return map(
-            self.filter_func,
-            acquiring_func(self.xpath, self.regex)(self.filter_func)
-        )
+        def __filter(format_func: callable):
+            return map(
+                format_func,
+                acquiring_func(self.xpath, self.regex)(self.attribute_func)
+            )
+        return __filter
         
 @dataclass(frozen=True)
 class SearchParameterPattern:
     pattern_name: str
     text_param: SearchParameter
     link_param: SearchParameter
-    pre_proc: callable
+    
+    text_filter: callable = my_util.do_nothing
+    link_filter: callable = my_util.do_nothing
+    pre_proc:    callable = my_util.do_nothing
     
     #func:textとlinkのペアに対して行う関数
     #text_filter, link_filter: それぞれのlistに対して行う関数
     def elements(self, node: INode) -> list[tuple[str, str]]:
         self.pre_proc(node)
         if self.text_param == None or self.link_param == None:
-            return my_util.convert_to_tuple([node.key + '授業タブ'], [my_util.to_all_tab_link(node.url)])
+            return my_util.convert_to_tuple([node.key + 'の授業タブ'], [my_util.to_all_tab_link(node.url)])
         else:
-            return list(
-                map(
-                    my_util.convert_to_tuple,
-                    self.text_param.next_values(BrowserControl.elements),
-                    self.link_param.next_values(BrowserControl.elements)
-                )
-            )
+            try:
+                return my_util.convert_to_tuple(
+                        self.text_param.next_values(node.BrowserControl.elements)(self.text_filter),
+                        self.link_param.next_values(node.BrowserControl.elements)(self.link_filter)
+                    )
+            except TimeoutException:
+                return []
         
 class SearchParameterContainer:
-    get_text = lambda elem: elem.text
-    get_link = lambda elem: elem.get_attribute('href')
-    def __move_page_and_click(node: INode):
-        BrowserControl.move(node.url)
-        BrowserControl.click_all_sections()
+    @staticmethod
+    def __get_text(elem):
+        return elem.text
     
+    @staticmethod
+    def __get_link(elem):
+        return elem.get_attribute('href')
+
+    @staticmethod
+    def __move(node: INode):
+        node.BrowserControl.move(node.url)
+        
+    def __move_and_click(node: INode):
+        SearchParameterContainer.__move(node)
+        node.BrowserControl.click_all_sections()
+
     parameters: list[SearchParameterPattern] = [
         #添字とtree_heightを一致させる
         SearchParameterPattern(
@@ -52,48 +68,51 @@ class SearchParameterContainer:
             text_param=SearchParameter(
                 "//div[@class='YVvGBb z3vRcc-ZoZQ1']",
                 '.+',
-                get_text
+                __get_text
             ),
             link_param=SearchParameter(
                 "//a[@class='onkcGd ZmqAt Vx8Sxd']",
                 "^.*/c/.{16}$",
-                get_link
+                __get_link
             ),
-            pre_proc=lambda node: BrowserControl.move(node.url)
+            text_filter = my_util.text_filter,
+            pre_proc=__move
         ),
+        
         SearchParameterPattern(
             pattern_name='LessonTab',
             text_param=None,
-            link_param=None,
-            pre_proc=my_util.do_nothing
+            link_param=None
         ),
+        
         SearchParameterPattern(
             pattern_name='Sections',
             text_param=SearchParameter(
                 "//span[@class='YVvGBb UzbjTd']",
                 ".+",
-                get_text
+                __get_text
             ),
             link_param=SearchParameter(
-                "//a[contains(@aria-label, '資料を表示')]",
+                "//a[contains(@aria-label, '表示')]",
                 ".*/details$",
-                get_link
+                __get_link
             ),
-            pre_proc=__move_page_and_click
+            pre_proc=__move_and_click
         ),
+        
         SearchParameterPattern(
             pattern_name='Details',
             text_param=SearchParameter(
                 "//div[@class='A6dC2c QDKOcc VBEdtc-Wvd9Cc zZN2Lb-Wvd9Cc']",
                 ".+",
-                get_text
+                __get_text
             ),
             link_param=SearchParameter(
                 "//a[@class='vwNuXe JkIgWb QRiHXd MymH0d maXJsd']",
                 '.*/file/d.*',
-                get_link
+                __get_link
             ),
-            pre_proc=lambda node: BrowserControl.move(node.url)
+            pre_proc=__move
         )
     ]
 
@@ -102,6 +121,7 @@ class SearchParameterContainer:
         #簡易化のため
         id: int = node.tree_height
         params = SearchParameterContainer.parameters
+        
         if len(params) > id:
             return params[id].elements(node)
         else:
