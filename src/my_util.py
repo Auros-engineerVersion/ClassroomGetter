@@ -79,3 +79,6 @@ def convert_to_tuple(list_1: Iterable, list_2: Iterable) -> list[tuple]:
             list_1, list_2
         )
     )
+    
+def do_nothing(*dummy_args):
+    pass

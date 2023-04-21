@@ -13,8 +13,6 @@ class BrowserControl:
     def __init__(self, setting: SettingData, driver: webdriver = None, wait: WebDriverWait = None) -> None:        
         self.driver = driver if (driver != None) else create_driver(setting.profile())
         self.wait   = wait   if (wait   != None) else WebDriverWait(self.driver, setting.loading_wait_time)
-        
-        self.__setting = setting
     
     def __del__(self):
         del self.wait
@@ -90,5 +88,3 @@ class BrowserControl:
         #3:プロファイルを設定する
         self.move(self.serch("//a[@class='gfe-button gfe-button--medium-emphasis gfe-button--middle-align']").get_attribute('href'))
         self.login_google(setting)
-        
-class SerchParrameterContainer

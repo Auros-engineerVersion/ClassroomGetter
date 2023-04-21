@@ -6,39 +6,36 @@ from src.interface.i_node import INode
 
 @dataclass(frozen=True)
 class SearchParameter:
-    def __init__(self, xpath: str, regex: str, filter_func: callable) -> None:
-        self.xpath = xpath
-        self.regex = regex
-        self.filter_func = filter_func
+    xpath: str
+    regex: str
+    filter_func: callable
         
     def next_values(self, acquiring_func: callable) -> list:
-        try:
-            return map(
-                self.filter_func,
-                acquiring_func(self.xpath, self.regex)(self.filter_func)
-            )
-        except 
+        return map(
+            self.filter_func,
+            acquiring_func(self.xpath, self.regex)(self.filter_func)
+        )
         
 @dataclass(frozen=True)
 class SearchParameterPattern:
-    def __init__(self, pattern_name: str, text_param: SearchParameter, link_param: SearchParameter, pre_proc: callable = None) -> None:
-        self.pattern_name = pattern_name
-        self.text_param   = text_param
-        self.link_param   = link_param
-        
-        self.__pre_proc = pre_proc
-        
+    pattern_name: str
+    text_param: SearchParameter
+    link_param: SearchParameter
+    pre_proc: callable
+    
     #func:textとlinkのペアに対して行う関数
     #text_filter, link_filter: それぞれのlistに対して行う関数
-    def elements(self, node: INode):
-        self.__pre_proc(node.url)
+    def elements(self, node: INode) -> list[tuple[str, str]]:
+        self.pre_proc(node)
         if self.text_param == None or self.link_param == None:
             return my_util.convert_to_tuple([node.key + '授業タブ'], [my_util.to_all_tab_link(node.url)])
         else:
-            return map(
-                my_util.convert_to_tuple,
-                self.text_param.next_values(BrowserControl.elements),
-                self.link_param.next_values(BrowserControl.elements)
+            return list(
+                map(
+                    my_util.convert_to_tuple,
+                    self.text_param.next_values(BrowserControl.elements),
+                    self.link_param.next_values(BrowserControl.elements)
+                )
             )
         
 class SearchParameterContainer:
@@ -62,7 +59,7 @@ class SearchParameterContainer:
                 "^.*/c/.{16}$",
                 get_link
             ),
-            pre_proc=BrowserControl.move
+            pre_proc=lambda node: BrowserControl.move(node.url)
         ),
         SearchParameterPattern(
             pattern_name='LessonTab',
@@ -88,23 +85,24 @@ class SearchParameterContainer:
             pattern_name='Details',
             text_param=SearchParameter(
                 "//div[@class='A6dC2c QDKOcc VBEdtc-Wvd9Cc zZN2Lb-Wvd9Cc']",
-                ".+"
+                ".+",
+                get_text
             ),
             link_param=SearchParameter(
                 "//a[@class='vwNuXe JkIgWb QRiHXd MymH0d maXJsd']",
                 '.*/file/d.*',
                 get_link
             ),
-            pre_proc=BrowserControl.move
+            pre_proc=lambda node: BrowserControl.move(node.url)
         )
     ]
 
     @staticmethod
     def elements(node: INode):
         #簡易化のため
-        id = node.tree_height
+        id: int = node.tree_height
         params = SearchParameterContainer.parameters
-        if len(params) < id:
+        if len(params) > id:
             return params[id].elements(node)
         else:
             return []

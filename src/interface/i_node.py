@@ -22,21 +22,10 @@ class INode(metaclass=ABCMeta):
     def __eq__(self, other) -> bool:
         raise NotImplementedError
 
-    @staticmethod
-    def Dispose(target: INode) -> None:
-        raise NotImplementedError
-    
-    @staticmethod
     @abstractmethod
     def serach(entry: INode) -> INode:
         raise NotImplementedError
-    
+
     @staticmethod
-    @abstractmethod
-    def show_tree(parent: INode) -> None:
-        raise NotImplementedError
-    
-    @staticmethod
-    @abstractmethod
-    def initialize_tree(parent: INode) -> None:
+    def Dispose(target: INode) -> None:
         raise NotImplementedError

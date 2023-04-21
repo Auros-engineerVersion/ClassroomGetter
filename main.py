@@ -27,7 +27,7 @@ try:
             bc.login_classroom(cfg)
 
         root = Node('Classroom', target_url, 0)
-        Node.initialize_tree(root)
+        root.initialize_tree()
     
         cfg.node_list = Node.Nodes
         Settings.save(cfg)

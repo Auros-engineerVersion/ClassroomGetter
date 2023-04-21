@@ -69,11 +69,6 @@ class NodeBox(tk.Frame):
     def on_frame_click(self, event):
         self.node_info_box.update_text(self)
         
-    def initialize(self):
-        self.__node.edges().clear()
-        self.__node.initialize_tree(self.__node)
-        self.__is_expand = False
-
     def dispose(self):
         stack: list[NodeBox] = [self]
         
@@ -84,6 +79,11 @@ class NodeBox(tk.Frame):
                 stack.append(box)
 
             value.destroy()
+        
+    def initialize(self):
+        self.__node.edges().clear()
+        self.__node.initialize_tree()
+        self.__is_expand = False
                     
     def expand(self):
         #反転する
@@ -108,7 +108,7 @@ class NodeInfoFrame(tk.Frame):
         
         self.__watching_box = watching_box
         self.__node_name_label = tk.Label(self, text=watching_box.text if watching_box.text != None else 'No Data')
-        #ボタンが押されたら、監視中のNodeからinitialize_treeを実行する
+        #ボタンが押されたら、監視中のNodeBoxからinitialize_treeを実行する
         initialize_button = tk.Button(self, text='実行', 
             command=lambda: self.__watching_box.initialize())
         
