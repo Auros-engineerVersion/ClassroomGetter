@@ -39,6 +39,7 @@ def link_filter(url: str):
         return url
     
 def text_filter(value: str) -> str:
+    @tail_recursion
     def __remove(value: str, patterns: list[str], pattern_count: int = 0) -> str:
         if pattern_count == len(patterns):
             return value
@@ -64,7 +65,7 @@ def to_tab_link(url: str):
 def to_all_tab_link(url: str):
     return to_tab_link(url) + '/t/all'
 
-def has_curretn_args(func, type):
+def has_curretnt_args(func, type):
     sig = inspect.signature(func)
     for param in sig.parameters:
         if sig.parameters[param].annotation == type:
@@ -80,5 +81,5 @@ def convert_to_tuple(list_1: Iterable, list_2: Iterable) -> list[tuple]:
         )
     )
     
-def do_nothing(*dummy_args):
-    pass
+def do_nothing(dummy_args):
+    return dummy_args
