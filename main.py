@@ -1,4 +1,3 @@
-import os
 import traceback
 from pydrive2.auth import GoogleAuth
 from selenium.common.exceptions import NoSuchWindowException
