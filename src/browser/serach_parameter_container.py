@@ -11,8 +11,18 @@ class SearchParameter:
     regex: str
     attribute_func: callable
         
-    def next_values(self, acquiring_func: callable) -> list:
-        def __filter(format_func: callable):
+    def next_values(self, acquiring_func: callable) -> callable:
+        """
+        この関数はカリー化されている
+
+        Args:
+            acquiring_func (callable):
+                この関数は高階関数で無ければならず、最終的にIterableな値を返さなければならない
+                
+            format_func (callable):
+                acquiring_funcの戻り値をこの関数でmapする
+        """
+        def __filter(format_func: callable) -> map:
             return map(
                 format_func,
                 acquiring_func(self.xpath, self.regex)(self.attribute_func)

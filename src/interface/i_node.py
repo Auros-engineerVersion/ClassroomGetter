@@ -25,7 +25,7 @@ class INode(metaclass=ABCMeta):
     @abstractmethod
     def serach(entry: INode) -> INode:
         raise NotImplementedError
-
-    @staticmethod
-    def Dispose(target: INode) -> None:
+    
+    @abstractmethod
+    def dispose(self) -> None:
         raise NotImplementedError

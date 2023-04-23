@@ -1,15 +1,8 @@
 import tkinter as tk
 
 from src.gui import custum_widgets as mytk
-from src.setting.setting_data import SettingData
 
 class Window(tk.Frame):
-    @staticmethod
-    def __get_data(frame: tk.Frame):
-        for child in frame.winfo_children():
-            if (type(child) == tk.Entry):
-                return child.get()
-            
     @staticmethod
     def __size(width: int, height: int) -> str:
         return str(width) + 'x' + str(height)
@@ -25,8 +18,8 @@ class Window(tk.Frame):
         padx_size = (5, 10)
         width = 30
         
-        email    = mytk.InputBox(master, width, padx_size, 'email')
-        password = mytk.InputBox(master, width, padx_size, 'password')
+        email    = mytk.InputBox(master, width=width, padx=padx_size, title='email')
+        password = mytk.InputBox(master, width=width, padx=padx_size, title='password')
         complete_button = tk.Button(master, text='完了', command=master.quit)
 
         # ウィジェットの配置
@@ -37,8 +30,8 @@ class Window(tk.Frame):
         master.mainloop()
                 
         #入力された値を取得して返す
-        email_info     = Window.__get_data(email)
-        password_info  = Window.__get_data(password)
+        email_info     = email.value()
+        password_info  = password.value()
         master.destroy() #値を取得できたらフォームを解放する
         return (email_info, password_info)
             

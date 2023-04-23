@@ -1,5 +1,4 @@
 import unittest
-from unittest.mock import Mock
 
 from src.my_util import do_nothing
 from src.browser.serach_parameter_container import SearchParameterContainer, SearchParameterPattern, SearchParameter
@@ -16,6 +15,6 @@ class NormalTest(unittest.TestCase):
             def __add(func):
                 return [x + y]
             return __add
-        
+                
         result = list(param.next_values(__add_str)(do_nothing))
         self.assertEqual([param.xpath + param.regex], result)

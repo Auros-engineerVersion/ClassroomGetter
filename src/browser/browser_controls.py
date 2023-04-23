@@ -6,10 +6,9 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support import expected_conditions as EC
 from re import search
-from time import sleep
 
 from src.browser.factory import create_driver
-from src.setting.setting_data import SettingData
+from src.data.setting_data import SettingData
 
 class BrowserControl:
     def __init__(self, setting: SettingData, driver: webdriver = None, wait: WebDriverWait = None) -> None:        

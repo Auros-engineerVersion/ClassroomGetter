@@ -2,65 +2,52 @@ import sys, os
 sys.path.append(os.path.abspath('.'))
 
 import unittest
-from unittest.mock import patch, Mock
+from unittest.mock import Mock
 
-from src.browser.nodes import Node
+from data.nodes import Node
 from src.browser.browser_controls import BrowserControl
 
 class NormalTest(unittest.TestCase):
     def setUp(self) -> None:
         self.__bc_mock = Mock(spec=BrowserControl)
         Node.BrowserControl = self.__bc_mock
-     
+    
+    def tearDown(self) -> None:
+        while len(Node.Nodes) > 0:
+            Node.Nodes.pop()
+    
     def test_edge_getter(self):
-        parent = Node('parent', 0)
-        child =  Node('child', 1)
+        parent = Node('parent', 'parent', 0)
+        child =  Node('child', 'child', 1)
         
         parent.edges(add_value=child)
-        self.assertEqual(parent.edges()[0], child)
-    
-    def test_create_child(self):
-        str_nums = []
-        for i in range(100):
-            str_nums.append(str(i))
-            
-        parent = Node('0', 0)
-        parent.create_childs(*str_nums)
-        self.assertCountEqual(parent.edges(), str_nums)
+        self.assertEqual(parent.edges().pop(), child)
         
-    def test_Dispose(self):
-        with self.subTest('Parent Dispose'):
-            parent = Node('Hoge', 0)
-            child = Node('Bar', 1)
+    def test_destructor(self):
+        def __create():
+            parent = Node('parent', 'parent', 0)
+            child = Node('child', 'child', 1)
             parent.edges(child)
-        
-            Node.Dispose(parent)
-        
-            #全体集合から削除されているかどうか
-            self.assertEqual(len(Node.Nodes), 1)
-            self.assertEqual(Node.Nodes.pop(), child)
             
-        with self.subTest('Child Dispose'):
-            parent = Node('Hoge', 0)
-            child = Node('Bar', 1)
-            parent.edges(child)
-        
-            Node.Dispose(child)
+            return (parent, child)
             
-            #各nodeから削除対象への参照がきちんと削除されているかどうか
-            self.assertEqual(len(parent.edges()), 0)
+        nodes = __create()
+        for target_node in nodes:
+            with self.subTest(target_node.key + ' delete'):
+                target_node.dispose()
+
+                #全体集合から削除されているかどうか
+                self.assertNotIn(target_node, Node.Nodes)
     
-    @patch.object(Node, 'next_links')    
-    def test_InitializeTree(self, next_mock):
-        mock_list = [*'abcde', *'ABCDE', *'あいうえお', *'*}_?|', []]
-        total_mock_list_size = 21
-        next_mock.side_effect = mock_list
+    def test_search(self):
+        root = Node('0', '0', 0)
+        childs = [Node('a', 'a', 1), Node('b', 'b', 1), Node('c', 'c', 1)]
+        list(map(root.edges, childs))
         
-        root = Node('parent', 0)
-        Node.initialize_tree(root)
-        
+        call_mock = Mock()
+        root.serach()(call_mock)
         #すべての配列において呼び出しが発生しているかどうか
-        self.assertEqual(next_mock.call_count, total_mock_list_size)
+        self.assertEqual(call_mock.call_count, len(Node.Nodes))
         
 class AbNormalTest(unittest.TestCase):
     def test_null_controls(self):

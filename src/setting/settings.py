@@ -2,7 +2,7 @@ from __future__ import annotations
 import pickle
 from pathlib import Path
 
-from src.setting.setting_data import SettingData
+from src.data.setting_data import SettingData
 from src.gui.window import Window
 
 class Settings:

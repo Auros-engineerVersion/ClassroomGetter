@@ -1,6 +1,6 @@
 from __future__ import annotations
-import datetime
 
+from src.data.routine_data import RoutineData
 from src.interface.i_node import INode
 from src.browser.browser_controls import BrowserControl as bc
 from src.browser.serach_parameter_container import SearchParameterContainer
@@ -11,7 +11,7 @@ class Node(INode):
     BrowserControl: bc = None
     Nodes: set[INode] = set() #全てのノードの集合
 
-    def __init__(self, key: str, url: str, tree_height: int, next_init_time: datetime.datetime = 0) -> None:
+    def __init__(self, key: str, url: str, tree_height: int, next_init_time: RoutineData = None) -> None:
         if Node.BrowserControl is None:
             raise TypeError('BrowserControl is None')
         
@@ -19,7 +19,7 @@ class Node(INode):
         self.key = key
         self.url = url
         self.tree_height = abs(tree_height) #負の値が入れられないように
-        self.next_init_time = next_init_time
+        self.next_init_time = next_init_time if next_init_time != None else RoutineData()
         Node.Nodes.add(self)
     
     def __str__(self) -> str:
@@ -46,6 +46,9 @@ class Node(INode):
         return hash((key_hash, url_hash, height_hash))
     
     def __del__(self) -> None:
+        self.dispose()
+    
+    def dispose(self) -> None:
         if (self in Node.Nodes):
             Node.Nodes.remove(self)
             
@@ -65,7 +68,11 @@ class Node(INode):
             self.__edges.add(add_value)
             Node.Nodes.add(add_value)
     
-    def serach(self, bfs = True) -> INode:
+    def serach(self, bfs = True) -> None:
+        """
+        Args:
+            bfs (bool, optional): Trueなら幅優先探索、Falseなら深さ優先探索を行う
+        """
         def __do_serch(func):
             list: list[INode] = [self]
             

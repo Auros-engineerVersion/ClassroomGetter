@@ -3,7 +3,7 @@ from pydrive2.auth import GoogleAuth
 from selenium.common.exceptions import NoSuchWindowException
 
 from src.setting.settings import Settings
-from src.browser.nodes import Node
+from src.data.nodes import Node
 from src.browser.browser_controls import BrowserControl
 from src.gui.window import Window
 
