@@ -1,49 +1,41 @@
 from dataclasses import dataclass
-import dataclasses
-from datetime import datetime
+from typing import SupportsInt
+from datetime import date, datetime, timedelta
+from dateutil.relativedelta import relativedelta
 
 @dataclass
 class RoutineData:
-    interval_time: datetime = datetime(
-            year=datetime.now().year,
-            month=datetime.now().month,
-            day=datetime.now().day
+    year: SupportsInt = 0
+    month: SupportsInt = 0
+    week: SupportsInt = 0
+    day: SupportsInt = 0
+    hour: SupportsInt = 0
+    minute: SupportsInt = 0
+    
+    def __post_init__(self):
+        self.__pre_time = datetime.now()
+        
+    def __str__(self) -> str:
+        return str(self.next().strftime("%Y-%m-%d %H:%M:%S"))
+            
+    def next(self) -> datetime:
+        return self.__pre_time + relativedelta(
+            years=self.year, 
+            months=self.month,
+            weeks=self.week,
+            days=self.day,
+            hours=self.hour,
+            minutes=self.minute
         )
-    
-    pre_time: datetime
-    
-    def next_time(self):
         
+    def remaine_time(self):
+        return self.next() - datetime.now()
     
-    def year(self, value = None):
-        if value != None and value != 0:
-            self.interval_time.year = value
-        
-        return self.interval_time.year
-            
-    def month(self, value = None):
-        if value != None and 0 < value < 13:
-            self.interval_time.month = value
-        
-        return self.interval_time.month
-    
-    def day(self, value = None):
-        if value != None and 0 < value < 32:
-            self.interval_time.day = value
-            
-        return self.interval_time.day
-    
-    def hour(self, value = None):
-        if value != None and 0 < value < 25:
-            self.interval_time.hour = value
-            
-        return self.interval_time.hour
-    
-    def minute(self, value = None):
-        if value != None and 0 < 60:
-            self.interval_time.minute = value
-            
-        return self.interval_time.minute
-        
-    def delta(self):
-        return datetime.now() - self.interval_time
+    def should_init(self):
+        #基準を経過したら
+        if self.year + self.month + self.week + self.day + self.hour + self.minute > 0 and\
+           self.next() < datetime.now():
+            self.__pre_time = datetime.now()
+            return True
+        else:
+            return False

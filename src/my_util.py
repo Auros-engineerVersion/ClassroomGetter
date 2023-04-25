@@ -1,6 +1,6 @@
 from functools import wraps
 from re import search, sub
-from typing import Iterable
+from typing import Iterable, SupportsInt
 import inspect
 
 #末尾再帰の最適化
@@ -83,3 +83,9 @@ def convert_to_tuple(list_1: Iterable, list_2: Iterable) -> list[tuple]:
     
 def do_nothing(dummy_args):
     return dummy_args
+
+def mid(x: SupportsInt, y: SupportsInt, z: SupportsInt):
+    xyz = [x, y, z]
+    xyz.remove(min(xyz))
+    xyz.remove(max(xyz))
+    return xyz.pop()

@@ -2,12 +2,16 @@ from __future__ import annotations
 import gc
 import tkinter as tk
 from datetime import datetime
+from time import sleep
 
 from src.interface.i_node import INode
 from src.data.routine_data import RoutineData
 
 BUTTON_PRESS = "<ButtonPress>"
 TEXT = "text"
+TEXT_VARIABLE = 'textvariable'
+STATE = 'state'
+NO_DATA = '未設定'
 
 class ScrollableFrame(tk.Frame):
     def __init__(self, master: tk.Misc, relief: str, width: int, height: int, padx: int, pady: int, bar_x = True, bar_y = True):
@@ -45,6 +49,9 @@ class InputBox(tk.Frame):
     def value(self):
         return self.input_box.get()
             
+    def set(self, variable):
+        self.input_box[TEXT_VARIABLE] = variable
+            
 class NodeBox(tk.Frame):
     node_info_box: NodeInfoFrame = None
     def __init__(self, master: tk.Misc, node: INode, parent: NodeBox = None):
@@ -71,22 +78,15 @@ class NodeBox(tk.Frame):
         self.__nextboxes: list[NodeBox] = []
         
         self.pack(anchor=tk.W, padx=(node.tree_height*20, 1), after=self.__parent_box)
-        
-        self.after(60, func=self.date_check)
-        
+    
     def node(self):
         return self.__node
-
-    def date_check(self):
-        if self.node().next_init_time.delta() <= 0:
-            self.initialize()
 
     def on_frame_click(self, event):
         self.node_info_box.update_text(self)
         
     def dispose(self):
         stack: list[NodeBox] = [self]
-        
         while(len(stack) > 0):
             value = stack.pop()
             
@@ -95,7 +95,7 @@ class NodeBox(tk.Frame):
 
             value.destroy()
         
-    def initialize(self):
+    def initialize(self, state: str):
         self.__node.edges().clear()
         self.__node.initialize_tree()
         self.__is_expand = False
@@ -115,7 +115,7 @@ class NodeBox(tk.Frame):
             for node in self.__node.edges():
                 new_box = NodeBox(self.__master, node, self)
                 self.__nextboxes.append(new_box)
-
+        
 class NodeInfoFrame(tk.Frame):
     def __init__(self, master: tk.Misc, watching_box: NodeBox = None):
         tk.Frame.__init__(self, master, background='green')
@@ -125,58 +125,79 @@ class NodeInfoFrame(tk.Frame):
         self.__time_box = TimeBox(self)
         
         #ボタンが押されたら、監視中のNodeBoxからinitialize_treeを実行する
-        initialize_button = tk.Button(self, text='実行', 
-            command=lambda: self.__watching_box.initialize())
+        self.__init_button = tk.Button(self,
+            text='実行', 
+            command=lambda: self.__run_initialize(self.__init_button[STATE])
+        )
         
         self.__node_name_label.pack(side=tk.TOP, anchor=tk.CENTER, padx=5, pady=5)
-        initialize_button.pack(side=tk.BOTTOM, fill=tk.X)
+        self.__init_button.pack(side=tk.BOTTOM, fill=tk.X)
         self.__time_box.pack(side=tk.BOTTOM)
+        
+    def __run_initialize(self, state: str):
+        def __change_state(state: str):
+            self.__init_button[STATE] = state
+        #通常状態からボタンが押されたら
+        if state == tk.NORMAL:
+            __change_state(tk.DISABLED)
+            self.__watching_box.initialize()
+        elif state == tk.DISABLED:
+            __change_state(tk.NORMAL)
         
     def update_text(self, target_box: NodeBox):
         self.__watching_box = target_box
         self.__node_name_label[TEXT] = target_box.text
-        self.__time_box.update_time_label(target_box.node().next_init_time)
-        
+        self.__time_box.update_clock(target_box.node().next_init_time)
+
 class TimeBox(tk.Frame):
     def __init__(self, master: tk.Misc):
         tk.Frame.__init__(self, master, background='yellow')
-        self.next_time: RoutineData = None
 
-        time_view_frame = tk.Frame(self)
-        time_view  = tk.Label(time_view_frame, text='次の更新まで')
-        self.time_view_label = tk.Label(time_view_frame, text='No Data')
+        clock_frame = tk.Frame(self)
+        clock_view  = tk.Label(clock_frame, text='次の更新まで')
+        self.clock_label = tk.Label(clock_frame, text=NO_DATA)
                 
         time_set_frame = tk.Frame(self)
-
-        set_button = tk.Button(time_set_frame, text='この時間に指定する',
-            command=self.set_date
+        time_setters = TimeSetters(self)
+        set_button = tk.Button(
+            time_set_frame, 
+            text='この時間に指定する',
+            command=lambda: self.set_date(RoutineData(*time_setters.values()))
         )
         
-        time_view_frame.pack()
-        time_view.pack(side=tk.TOP)
-        self.time_view_label.pack(side=tk.TOP)
+        clock_frame.pack()
+        clock_view.pack(side=tk.TOP)
+        self.clock_label.pack(side=tk.TOP)
         
-        time_set_frame.pack(side=tk.TOP)
-        self.month_setter.pack()
-        self.week_setter.pack()
-        self.day_setter.pack()
-        self.hour_setter.pack()
-        self.minute_setter.pack()
-        set_button.pack(side=tk.BOTTOM, anchor=tk.E)
+        time_set_frame.pack()
+        time_setters.pack()
+        set_button.pack()
         
-    def update_time_label(self, time_data: RoutineData):
-        self.next_time = time_data
-        self.time_view_label[TEXT] = str(time_data.delta().days) #現在時刻との差分を表示する
+        self.__events: list[str] = [] #afterのリスト
+                
+    def __del__(self):
+        self.__cancel_all()
+            
+    def __cancel_all(self):
+        for id in self.__events:
+            self.after_cancel(id)
+        self.__events.clear()
         
-    def set_date(self):
-        data = RoutineData()
-        data.month(int(self.month_setter.value()))
-        data.day(int(self.week_setter.value()) * 7 + int(self.day_setter.value()))
-        data.hour(int(self.hour_setter.value()))
-        data.minute(int(self.minute_setter.value()))
+    def update_clock(self, time_date: RoutineData):
+        if time_date.should_init():
+            self.clock_label[TEXT] = NO_DATA
+        else:
+            self.clock_label[TEXT] = str(time_date.remaine_time()) #現在時刻との差分を表示する
         
-        self.next_time = data
-        
+    #N秒ごとに文字盤を更新する
+    def update_event(self, time_date: RoutineData, wait_time: int = 1000):
+        self.update_clock(time_date)
+        self.__events.append(self.after(wait_time, self.update_event, time_date))
+
+    def set_date(self, time: RoutineData):
+        self.__cancel_all()
+        self.update_event(time)
+
 class TimeSetters(tk.Frame):
     def __init__(self, master: tk.Misc):
         tk.Frame.__init__(self, master)
@@ -185,3 +206,26 @@ class TimeSetters(tk.Frame):
         self.day_setter    = InputBox(self, False, title='日', from_=0, to=31)
         self.hour_setter   = InputBox(self, False, title='時', from_=0, to=23)
         self.minute_setter = InputBox(self, False, title='分', from_=0, to=59)
+        
+        self.month_setter.pack()
+        self.week_setter.pack()
+        self.day_setter.pack()
+        self.hour_setter.pack()
+        self.minute_setter.pack()
+        
+    def values(self):
+        return [
+            0, #年は0とする
+            int(self.month_setter.value()),
+            int(self.week_setter.value()),
+            int(self.day_setter.value()),
+            int(self.hour_setter.value()),
+            int(self.minute_setter.value())
+        ]
+        
+    def set_values(self, time: RoutineData):
+        self.month_setter.set(time.month)
+        self.week_setter.set(time.week)
+        self.day_setter.set(time.day)
+        self.hour_setter.set(time.hour)
+        self.minute_setter.set(time.minute)
