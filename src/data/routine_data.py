@@ -13,7 +13,7 @@ class RoutineData:
     minute: SupportsInt = 0
     
     def __post_init__(self):
-        self.__pre_time = datetime.now()
+        self.__pre_time = datetime.now().replace(microsecond=0)
         
     def __str__(self) -> str:
         return str(self.next().strftime("%Y-%m-%d %H:%M:%S"))
@@ -29,13 +29,18 @@ class RoutineData:
         )
         
     def remaine_time(self):
-        return self.next() - datetime.now()
+        if self.is_current():
+            return self.next() - datetime.now().replace(microsecond=0)
+        else:
+            return timedelta()
+    
+    def is_current(self) -> bool:
+        #すべての値が初期値でなければ
+        return self.year + self.month + self.week + self.day + self.hour + self.minute > 0
     
     def should_init(self):
-        #基準を経過したら
-        if self.year + self.month + self.week + self.day + self.hour + self.minute > 0 and\
-           self.next() < datetime.now():
-            self.__pre_time = datetime.now()
-            return True
-        else:
+        if self.remaine_time().total_seconds() > 0:
             return False
+        else:
+            self.__pre_time = datetime.now().replace(microsecond=0)
+            return True
