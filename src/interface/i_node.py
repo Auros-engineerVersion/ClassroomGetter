@@ -27,5 +27,9 @@ class INode(metaclass=ABCMeta):
         raise NotImplementedError
     
     @abstractmethod
+    def initialize_tree(entry: INode):
+        raise NotImplementedError
+    
+    @abstractmethod
     def dispose(self) -> None:
         raise NotImplementedError
