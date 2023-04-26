@@ -47,7 +47,8 @@ class Window(tk.Frame):
         node_canvas = mytk.ScrollableFrame(master, tk.SUNKEN, width=width/5, height=height/5, padx=1, pady=1)
         
         node_info = mytk.NodeInfoFrame(master)
-        mytk.NodeBox(node_canvas.scrollable_frame, node_info, root_node) #最初の頂点を初期化, これは動的にpackされる
+        root_box = mytk.NodeBox(node_canvas.scrollable_frame, node_info, root_node) #最初の頂点を初期化, これは動的にpackされる
+        node_info.set_box(root_box)
         
         node_canvas.pack(side=tk.LEFT, anchor=tk.W, fill=tk.Y)
         node_info.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)

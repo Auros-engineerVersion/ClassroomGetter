@@ -105,6 +105,7 @@ class NodeBox(tk.Frame):
         
     def initialize_node(self):
         self.__node_info_frame.change_state(tk.DISABLED, LOADING) #表示を変える
+        sleep(0.5)
         self.__node.edges().clear()
         self.__node.initialize_tree()
         self.__is_expand = False
@@ -138,12 +139,9 @@ class NodeBox(tk.Frame):
         if self.time.is_current() and self.time.should_init():
             self.__cancel_all()
             self.initialize_node()
-            self.__events.append(self.after(interval, self.validate_init, interval)) #再び繰り返す
-        elif self.time.remaine_time() != timedelta():
-            self.__events.append(self.after(interval, self.validate_init, interval))
-        else: #remaine_timeがtimedeltaなら終了する
-            self.__cancel_all()    
-
+        
+        self.__events.append(self.after(interval, self.validate_init, interval)) #再び繰り返す
+        
 class NodeInfoFrame(tk.Frame):
     def __init__(self, master: tk.Misc, watching_box: NodeBox = None):
         tk.Frame.__init__(self, master, background='green')
@@ -164,6 +162,7 @@ class NodeInfoFrame(tk.Frame):
         
     def set_box(self, box: NodeBox):
         self.__node_name_label[TEXT] = box.text
+        self.__watching_box = box
         self.__time_box.set_box(box)
         
     def change_state(self, state: str, text: str):
@@ -208,8 +207,13 @@ class TimeBox(tk.Frame):
             self.after_cancel(id)
         self.__events.clear()
         
-    def __update_clock(self, box: NodeBox, interval: int = 1000):
-        self.clock_label[TEXT] = box.time.remaine_time() if box.time.remaine_time() != timedelta() else NO_DATA
+    def __update_clock(self, box: NodeBox, interval: int):
+        remaine_time = box.time.remaine()
+        if remaine_time == timedelta():
+            self.clock_label[TEXT] = NO_DATA
+        else:
+            self.clock_label[TEXT] = remaine_time
+            
         self.__events.append(self.after(interval, self.__update_clock, box, interval))
         
     def __set_date(self, data: RoutineData):
@@ -224,13 +228,11 @@ class TimeBox(tk.Frame):
 class TimeSetters(tk.Frame):
     def __init__(self, master: tk.Misc):
         tk.Frame.__init__(self, master)
-        self.month_setter  = InputBox(self, False, title='月', from_=0, to=12)
         self.week_setter   = InputBox(self, False, title='週', from_=0, to=6)
         self.day_setter    = InputBox(self, False, title='日', from_=0, to=31)
         self.hour_setter   = InputBox(self, False, title='時', from_=0, to=23)
         self.minute_setter = InputBox(self, False, title='分', from_=0, to=59)
         
-        self.month_setter.pack()
         self.week_setter.pack()
         self.day_setter.pack()
         self.hour_setter.pack()
@@ -238,8 +240,6 @@ class TimeSetters(tk.Frame):
         
     def values(self):
         return [
-            0, #年は0とする
-            int(self.month_setter.value()),
             int(self.week_setter.value()),
             int(self.day_setter.value()),
             int(self.hour_setter.value()),
@@ -247,7 +247,6 @@ class TimeSetters(tk.Frame):
         ]
         
     def set_values(self, time: RoutineData):
-        self.month_setter.set(time.month)
         self.week_setter.set(time.week)
         self.day_setter.set(time.day)
         self.hour_setter.set(time.hour)
