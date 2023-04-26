@@ -1,6 +1,8 @@
 import sys, os
 sys.path.append(os.path.abspath('.'))
 import unittest
+from unittest.mock import patch
+import time
 from datetime import datetime, timedelta
 
 from src.data.routine_data import RoutineData
@@ -10,16 +12,16 @@ class NormalTest(unittest.TestCase):
         add_time = 5
         routine_data = RoutineData(minute=add_time)
         next = routine_data.next()
-        current_time = datetime.now()
+        current_time = datetime.now().replace(microsecond=0)
         current_time += timedelta(minutes=add_time)
         self.assertEqual(next, current_time)
         
     def test_remaine_time(self):
         zero = RoutineData()
-        self.assertEqual(zero.remaine_time(), timedelta())
+        self.assertEqual(zero.remaine(), timedelta())
         
         plus_one = RoutineData(1)
-        self.assertGreater(plus_one.remaine_time(), timedelta())
+        self.assertGreater(plus_one.remaine(), timedelta())
         
     def test_is_current(self):
         zero = RoutineData()
