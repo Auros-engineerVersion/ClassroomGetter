@@ -84,6 +84,12 @@ class NodeBox(tk.Frame):
         
         self.text = key_label[TEXT]
     
+    #すべてのafterをキャンセルする
+    def __cancel_all(self):
+        for id in self.__events:
+            self.after_cancel(id)
+        self.__events.clear()
+    
     def on_frame_click(self, event):
         self.__node_info_frame.set_box(self)
         
@@ -120,32 +126,23 @@ class NodeBox(tk.Frame):
                 new_box = NodeBox(self.__master, self.__node_info_frame, node, self)
                 self.__nextboxes.append(new_box)
                 
-    def publish(self, label: tk.Label, refresh: bool = True):
-        if refresh:
-            self.__cancel_all()
-        
-        self.__validate_init(label=label)
-                
-    def __cancel_all(self):
-        for id in self.__events:
-            self.after_cancel(id)
-        self.__events.clear()
-                
     #更新するかを検証する
-    def __validate_init(self, label: tk.Label, interval = 1000) -> bool:
+    def validate_init(self, interval: int) -> bool:
         """
         Args:
         Returns:
             bool:初期化したならTrue、そうでないならFalse
         """
+        self.__node.next_init_time = self.time
+        
         if self.time.is_current() and self.time.should_init():
             self.__cancel_all()
-            label[TEXT] = NO_DATA
             self.initialize_node()
-            self.__events.append(self.after(interval, self.__validate_init, label)) #再び繰り返す
-            
+            self.__events.append(self.after(interval, self.validate_init, interval)) #再び繰り返す
         elif self.time.remaine_time() != timedelta():
-            self.__events.append(self.after(interval, self.__validate_init, label))
+            self.__events.append(self.after(interval, self.validate_init, interval))
+        else: #remaine_timeがtimedeltaなら終了する
+            self.__cancel_all()    
 
 class NodeInfoFrame(tk.Frame):
     def __init__(self, master: tk.Misc, watching_box: NodeBox = None):
@@ -176,6 +173,7 @@ class NodeInfoFrame(tk.Frame):
 class TimeBox(tk.Frame):
     def __init__(self, master: tk.Misc, watching_box: NodeBox):
         tk.Frame.__init__(self, master, background='yellow')
+        self.__clocK_update_interval = 1000 #ms
         self.__watching_box = watching_box
         self.__events: list[str] = []
 
@@ -188,7 +186,12 @@ class TimeBox(tk.Frame):
         set_button = tk.Button(
             time_set_frame, 
             text='この時間に指定する',
-            command=self.__set_date
+            command=lambda: self.__set_date(RoutineData(*self.__time_setters.values()))
+        )
+        reset_button = tk.Button(
+            time_set_frame,
+            text='元に戻す',
+            command=lambda: self.__set_date(RoutineData())
         )
         
         clock_frame.pack()
@@ -197,25 +200,26 @@ class TimeBox(tk.Frame):
         
         time_set_frame.pack()
         self.__time_setters.pack()
-        set_button.pack()
+        set_button.pack(side=tk.LEFT)
+        reset_button.pack(side=tk.RIGHT)
         
     def __cancel_all(self):
         for id in self.__events:
             self.after_cancel(id)
         self.__events.clear()
         
-    def __update_clock(self, box: NodeBox, wait_time: int = 1000):
+    def __update_clock(self, box: NodeBox, interval: int = 1000):
         self.clock_label[TEXT] = box.time.remaine_time() if box.time.remaine_time() != timedelta() else NO_DATA
-        self.__events.append(self.after(wait_time, self.__update_clock, box))
+        self.__events.append(self.after(interval, self.__update_clock, box, interval))
+        
+    def __set_date(self, data: RoutineData):
+        self.__watching_box.time = data 
+        self.__watching_box.validate_init(interval=self.__clocK_update_interval)
         
     def set_box(self, box: NodeBox): #時計の更新を行う
         self.__watching_box = box
         self.__cancel_all()
-        self.__update_clock(box)
-    
-    def __set_date(self):
-        self.__watching_box.time = RoutineData(*self.__time_setters.values())    
-        self.__watching_box.publish(self.clock_label, True)
+        self.__update_clock(box, self.__clocK_update_interval)
 
 class TimeSetters(tk.Frame):
     def __init__(self, master: tk.Misc):
