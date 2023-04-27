@@ -1,5 +1,6 @@
 from __future__ import annotations
 import gc
+import asyncio
 import tkinter as tk
 from datetime import timedelta
 from time import sleep
@@ -104,12 +105,14 @@ class NodeBox(tk.Frame):
             value.destroy()
         
     def initialize_node(self):
+        loop = asyncio.get_event_loop()
         self.__node_info_frame.change_state(tk.DISABLED, LOADING) #表示を変える
-        sleep(0.5)
         self.__node.edges().clear()
-        self.__node.initialize_tree()
-        self.__is_expand = False
-        self.__node_info_frame.change_state(tk.NORMAL, RUN)
+        loop.run_in_executor(self.__node.initialize_tree)
+        
+        if not loop.is_running():
+            self.__is_expand = False
+            self.__node_info_frame.change_state(tk.NORMAL, RUN)
                     
     def expand(self):
         #反転する

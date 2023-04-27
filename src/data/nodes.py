@@ -88,7 +88,7 @@ class Node(INode):
         return __do_serch
                 
     #幅優先探索
-    def initialize_tree(root):
+    async def initialize_tree(root):
         def __next(node: INode):
             tuples = SearchParameterContainer.elements(node)
             for tuple in tuples:
