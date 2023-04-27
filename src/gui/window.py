@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import ttk
 
 from src.gui import custum_widgets as mytk
 
@@ -43,14 +44,14 @@ class Window(tk.Frame):
         master.title('ClassroomHack')
         master.geometry(Window.__size(width, height))
         master.resizable(0, 0) #windowのサイズ変更を許可しない
-        #アスペクト比を維持したまま小さいサイズにする
-        node_canvas = mytk.ScrollableFrame(master, tk.SUNKEN, width=width/5, height=height/5, padx=1, pady=1)
+    
+        note = ttk.Notebook(master)
+        main_frame = mytk.MainFrame(note, root_node, width, height)
+        setting_frame = mytk.SettingFrame(note)
         
-        node_info = mytk.NodeInfoFrame(master)
-        root_box = mytk.NodeBox(node_canvas.scrollable_frame, node_info, root_node) #最初の頂点を初期化, これは動的にpackされる
-        node_info.set_box(root_box)
+        note.add(main_frame, text='メイン')
+        note.add(setting_frame, text='設定')
         
-        node_canvas.pack(side=tk.LEFT, anchor=tk.W, fill=tk.Y)
-        node_info.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
+        note.pack(expand=True)
 
         master.mainloop()

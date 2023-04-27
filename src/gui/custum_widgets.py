@@ -1,9 +1,7 @@
 from __future__ import annotations
 import gc
-import asyncio
 import tkinter as tk
 from datetime import timedelta
-from time import sleep
 
 from src.interface.i_node import INode
 from src.data.routine_data import RoutineData
@@ -15,6 +13,22 @@ STATE = 'state'
 NO_DATA = '未設定'
 RUN = '実行'
 LOADING = '更新中'
+
+class MainFrame(tk.Frame):
+    def __init__(self, master: tk.Misc, root_node: INode, width: int, height: int):
+        tk.Frame.__init__(self, master)
+        #アスペクト比を維持したまま小さいサイズにする
+        node_canvas = ScrollableFrame(self, tk.SUNKEN, width=width/5, height=height/5, padx=1, pady=1)
+        node_info = NodeInfoFrame(self)
+        root_box = NodeBox(node_canvas.scrollable_frame, node_info, root_node) #最初の頂点を初期化, これは動的にpackされる
+        node_info.set_box(root_box)
+        
+        node_canvas.pack(side=tk.LEFT, anchor=tk.W, fill=tk.Y)
+        node_info.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
+
+class SettingFrame(tk.Frame):
+    def __init__(self, master: tk.Misc):
+        tk.Frame.__init__(self, master)
 
 class ScrollableFrame(tk.Frame):
     def __init__(self, master: tk.Misc, relief: str, width: int, height: int, padx: int, pady: int, bar_x = True, bar_y = True):
@@ -70,20 +84,18 @@ class NodeBox(tk.Frame):
         drop_button = tk.Button(self, command=self.expand, width=self.winfo_height())
         height_label = tk.Label(self, text=str(node.tree_height) + ':')
         key_label = tk.Label(self, text=str(node.key))
-        url_label = tk.Label(self, text=str(node.url))
         
         drop_button.pack(side=tk.LEFT)
         height_label.pack(side=tk.LEFT)
         key_label.pack(side=tk.LEFT)
-        url_label.pack(side=tk.LEFT)
         
         height_label.bind(BUTTON_PRESS, self.on_frame_click)        
         key_label.bind(BUTTON_PRESS, self.on_frame_click)
-        url_label.bind(BUTTON_PRESS, self.on_frame_click)
         
         self.pack(anchor=tk.W, padx=(node.tree_height*20, 1), after=self.__parent_box)
         
         self.text = key_label[TEXT]
+        self.url = node.url
     
     #すべてのafterをキャンセルする
     def __cancel_all(self):
@@ -105,14 +117,11 @@ class NodeBox(tk.Frame):
             value.destroy()
         
     def initialize_node(self):
-        loop = asyncio.get_event_loop()
         self.__node_info_frame.change_state(tk.DISABLED, LOADING) #表示を変える
         self.__node.edges().clear()
-        loop.run_in_executor(self.__node.initialize_tree)
-        
-        if not loop.is_running():
-            self.__is_expand = False
-            self.__node_info_frame.change_state(tk.NORMAL, RUN)
+        self.__node.initialize_tree()
+        self.__is_expand = False
+        self.__node_info_frame.change_state(tk.NORMAL, RUN)
                     
     def expand(self):
         #反転する
@@ -151,6 +160,7 @@ class NodeInfoFrame(tk.Frame):
         self.__watching_box = watching_box
         
         self.__node_name_label = tk.Label(self, text=watching_box.text if watching_box != None else NO_DATA)
+        self.__node_url_label = tk.Label(self, text=watching_box.url if watching_box != None else NO_DATA)
         self.__time_box = TimeBox(self, watching_box=self.__watching_box)
         
         #ボタンが押されたら、監視中のNodeBoxからinitialize_treeを実行する
@@ -160,17 +170,20 @@ class NodeInfoFrame(tk.Frame):
         )
         
         self.__node_name_label.pack(side=tk.TOP, anchor=tk.CENTER, padx=5, pady=5)
+        self.__node_url_label.pack(side=tk.TOP)
         self.__init_button.pack(side=tk.BOTTOM, fill=tk.X)
         self.__time_box.pack(side=tk.BOTTOM)
         
     def set_box(self, box: NodeBox):
         self.__node_name_label[TEXT] = box.text
+        self.__node_url_label[TEXT] = box.url
         self.__watching_box = box
         self.__time_box.set_box(box)
         
     def change_state(self, state: str, text: str):
         self.__init_button[STATE] = state
         self.__init_button[TEXT] = text
+        self.__init_button.update()
         
 class TimeBox(tk.Frame):
     def __init__(self, master: tk.Misc, watching_box: NodeBox):
