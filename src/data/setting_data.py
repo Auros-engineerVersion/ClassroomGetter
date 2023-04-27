@@ -8,7 +8,7 @@ class SettingData:
     user_password: str
 
     #セーブフォルダの場所
-    save_folder_path: Path = Path('./Save')
+    setting_folder_path: Path = Path('./Save')
     
     #webdriverに関する設定
     loading_wait_time: int = 5
@@ -33,7 +33,7 @@ class SettingData:
             '@' in self.user_email         and\
             len(self.user_password) > 0    and\
             self.loading_wait_time >= 0    and\
-            self.save_folder_path.exists()
+            self.setting_folder_path.exists()
         
     def profile(self) -> Path:
-        return Path(self.save_folder_path).absolute().joinpath('./ProfileData/Profile 1')
+        return Path(self.setting_folder_path).absolute().joinpath('./ProfileData/Profile 1')
