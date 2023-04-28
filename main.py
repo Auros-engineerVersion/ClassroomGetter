@@ -18,7 +18,7 @@ try:
     Settings.validate_data(cfg, bc)
         
     root = min(cfg.node_list) #tree_height == 0のものをrootとする
-    Window.RunWindow(root)
+    Window.RunWindow(root, cfg)
                 
 except NoSuchWindowException as e:
     print('\nProcess has finished by Hand')
