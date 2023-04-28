@@ -1,10 +1,13 @@
 from __future__ import annotations
 import gc
 import tkinter as tk
+from tkinter import filedialog
 from datetime import timedelta
+from pathlib import Path
 
 from src.interface.i_node import INode
 from src.data.routine_data import RoutineData
+from src.data.setting_data import SettingData
 
 BUTTON_PRESS = "<ButtonPress>"
 TEXT = "text"
@@ -13,6 +16,7 @@ STATE = 'state'
 NO_DATA = '未設定'
 RUN = '実行'
 LOADING = '更新中'
+BROWS = '参照'
 
 class MainFrame(tk.Frame):
     def __init__(self, master: tk.Misc, root_node: INode, width: int, height: int):
@@ -27,8 +31,30 @@ class MainFrame(tk.Frame):
         node_info.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
 
 class SettingFrame(tk.Frame):
-    def __init__(self, master: tk.Misc):
+    def __init__(self, master: tk.Misc, data: SettingData, width: int, height: int):
         tk.Frame.__init__(self, master)
+        self.__save_path = DialogInput(self, width=width, default_path=data.save_folder_path, title='セーブフォルダ')
+        self.__setting_path = DialogInput(self, width=width, default_path=data.setting_folder_path, title='設定フォルダ')
+        self.__loading_wait_time = InputBox(self, width=width, entry_or_spinbox=False, title='読み込み待機時間')
+        set_button = tk.Button(self, text='設定', command=self.save)
+        
+        self.__save_path.pack(side=tk.TOP, anchor=tk.W, fill=tk.X)
+        self.__setting_path.pack(side=tk.TOP, anchor=tk.W, fill=tk.X)
+        self.__loading_wait_time.pack(side=tk.TOP, anchor=tk.W)
+        set_button.pack(side=tk.BOTTOM, anchor=tk.E)
+        
+        self.__data = data
+        self.set(data)
+
+    def set(self, data: SettingData):
+        self.__save_path.set(data.save_folder_path.absolute())
+        self.__setting_path.set(data.setting_folder_path.absolute())
+        self.__loading_wait_time.set(data.loading_wait_time)
+        
+    def save(self):
+        self.__data.save_folder_path:    Path = self.__save_path.value()
+        self.__data.setting_folder_path: Path = self.__setting_path.value()
+        self.__data.loading_wait_time:   int  = self.__loading_wait_time.value()
 
 class ScrollableFrame(tk.Frame):
     def __init__(self, master: tk.Misc, relief: str, width: int, height: int, padx: int, pady: int, bar_x = True, bar_y = True):
@@ -55,19 +81,49 @@ class ScrollableFrame(tk.Frame):
         self.canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
 class InputBox(tk.Frame):
-    def __init__(self, master: tk.Misc, entry_or_spinbox = True, from_: int = 0, to: int = 0, width: int = 30, padx: tuple = (1, 1), title: str = 'title'):
+    def __init__(self, master: tk.Misc, entry_or_spinbox = True, from_: int = 0, to: int = 60, width: int = 30, padx: tuple = (1, 1), title: str = 'title'):
         tk.Frame.__init__(self, master)
         label = tk.Label(self, text=title)
-        self.input_box = tk.Entry(self, width=width) if entry_or_spinbox else tk.Spinbox(self, width=width, from_=from_, to=to)
+        self.input_box = \
+            tk.Entry(self, width=width) if entry_or_spinbox\
+            else tk.Spinbox(self, width=width, from_=from_, to=to)
         
         label.pack(side=tk.LEFT, anchor=tk.W, ipadx=1, padx=padx)
-        self.input_box.pack(side=tk.RIGHT, anchor=tk.E, ipadx= 1, padx=padx[:-1]) #tupleを反転させる
+        self.input_box.pack(side=tk.LEFT, anchor=tk.E, ipadx= 1, padx=padx[:-1], expand=True) #tupleを反転させる
+
+    def set(self, value):
+        self.input_box.delete(0, tk.END)
+        self.input_box.insert(0, value)
         
     def value(self):
-        return self.input_box.get()
+        if type(self.input_box) == tk.Entry:
+            return Path(self.input_box.get())
+        else:
+            return int(self.input_box.get())
             
-    def set(self, variable):
-        self.input_box[TEXT_VARIABLE] = variable
+class DialogInput(tk.Frame):
+    def __init__(self, master: tk.Misc, width: int, default_path: Path, title: str = 'title'):
+        tk.Frame.__init__(self, master)
+        self.input_box = InputBox(self, width=width//8, title=title)
+        brows_button = tk.Button(self, text=BROWS, command=self.folder_dialog)
+        
+        self.input_box.pack(side=tk.LEFT, expand=True)
+        brows_button.pack(side=tk.RIGHT, anchor=tk.E)
+
+        self.default_path = default_path
+        
+    def folder_dialog(self):
+        folder_name = filedialog.askdirectory()
+        if len(folder_name) > 0:
+            self.input_box.set(folder_name)
+        else:
+            self.input_box.set(self.default_path.absolute())
+            
+    def set(self, path: Path):
+        self.input_box.set(path)
+        
+    def value(self):
+        return self.input_box.value()
             
 class NodeBox(tk.Frame):
     def __init__(self, master: tk.Misc, node_info_frame: NodeInfoFrame, node: INode, parent: NodeBox = None):

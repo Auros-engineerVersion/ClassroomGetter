@@ -37,7 +37,7 @@ class Window(tk.Frame):
         return (email_info, password_info)
             
     @staticmethod
-    def RunWindow(root_node, master: tk.Misc = None, width: int = 600, height: int = 300):        
+    def RunWindow(root_node, cfg, master: tk.Misc = None, width: int = 600, height: int = 300):        
         if master is None:
             master = tk.Tk()
         
@@ -45,9 +45,9 @@ class Window(tk.Frame):
         master.geometry(Window.__size(width, height))
         master.resizable(0, 0) #windowのサイズ変更を許可しない
     
-        note = ttk.Notebook(master)
+        note = ttk.Notebook(master, width=width, height=height)
         main_frame = mytk.MainFrame(note, root_node, width, height)
-        setting_frame = mytk.SettingFrame(note)
+        setting_frame = mytk.SettingFrame(note, cfg, width, height)
         
         note.add(main_frame, text='メイン')
         note.add(setting_frame, text='設定')
