@@ -17,12 +17,12 @@ class Settings:
     @staticmethod
     def save(data: SettingData) -> None:
         #directoryが存在していれば
-        if (data.save_folder_path.exists()):
+        if (data.setting_folder_path.exists()):
             file_name = 'save.pkl'
-            with open(data.save_folder_path.joinpath(file_name), 'wb') as f:
+            with open(data.setting_folder_path.joinpath(file_name), 'wb') as f:
                 pickle.dump(data, f)
         else:
-            data.save_folder_path.mkdir(parents=True, exist_ok=True)
+            data.setting_folder_path.mkdir(parents=True, exist_ok=True)
             Settings.save(data) #Directoryが無ければもう一度行う
     
     @staticmethod

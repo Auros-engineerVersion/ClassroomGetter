@@ -8,6 +8,9 @@ class SettingData:
     user_password: str
 
     #セーブフォルダの場所
+    save_folder_path: Path = Path('./Save')
+
+    #設定フォルダの場所
     setting_folder_path: Path = Path('./Save')
     
     #webdriverに関する設定
@@ -28,11 +31,11 @@ class SettingData:
         
     def is_current_data(self):
         return\
-            self.node_list != None         and\
+            self.node_list != None              and\
             len(self.node_list) > 1             and\
-            '@' in self.user_email         and\
-            len(self.user_password) > 0    and\
-            self.loading_wait_time >= 0    and\
+            '@' in self.user_email              and\
+            len(self.user_password) > 0         and\
+            int(self.loading_wait_time) >= 0    and\
             self.setting_folder_path.exists()
         
     def profile(self) -> Path:
