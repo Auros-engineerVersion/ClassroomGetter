@@ -4,7 +4,7 @@ sys.path.append(os.path.abspath('.'))
 import unittest
 from unittest.mock import patch, Mock
 
-from src.settings import Settings
+from src.setting.settings import Settings
 
 class NormaTest(unittest.TestCase):
     def setUp(self) -> None:

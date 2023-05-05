@@ -39,3 +39,6 @@ class NormalTest(unittest.TestCase):
         
         sub_one = RoutineData(minute=-1)
         self.assertTrue(sub_one.should_init)
+        
+if __name__ == '__main__':
+    unittest.main()

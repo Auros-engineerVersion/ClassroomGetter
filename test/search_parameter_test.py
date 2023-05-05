@@ -1,7 +1,7 @@
 import unittest
 
 from src.my_util import do_nothing
-from src.browser.serach_parameter_container import SearchParameterContainer, SearchParameterPattern, SearchParameter
+from src.browser.serach_parameter_container import *
 
 class NormalTest(unittest.TestCase):    
     def test_next_value(self):
