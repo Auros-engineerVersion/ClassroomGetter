@@ -31,8 +31,8 @@ class RoutineData:
         return self.__pre_time + self.interval()
         
     def remaine(self) -> timedelta:
-        remain_time = self.next() - self.__now()
         if self.is_current():
+            remain_time = self.next() - self.__now()
             if remain_time.total_seconds() > 0:
                 return remain_time
             else:

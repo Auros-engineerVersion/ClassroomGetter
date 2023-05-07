@@ -128,11 +128,7 @@ class SearchParameterContainer:
 
     @staticmethod
     def elements(node: INode):
-        #簡易化のため
-        id: int = node.tree_height
-        params = SearchParameterContainer.parameters
-        
-        if len(params) > id:
-            return params[id].elements(node)
+        if len(SearchParameterContainer.parameters) > node.tree_height:
+            return SearchParameterContainer.parameters[node.tree_height].elements(node)
         else:
             return []

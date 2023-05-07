@@ -7,7 +7,6 @@ from pathlib import Path
 
 from src.interface.i_node import INode
 from src.data.routine_data import RoutineData
-from src.data.setting_data import SettingData
 
 BUTTON_PRESS = "<ButtonPress>"
 TEXT = "text"
@@ -18,43 +17,15 @@ RUN = '実行'
 LOADING = '更新中'
 BROWS = '参照'
 
-class MainFrame(tk.Frame):
-    def __init__(self, master: tk.Misc, root_node: INode, width: int, height: int):
-        tk.Frame.__init__(self, master)
-        #アスペクト比を維持したまま小さいサイズにする
-        node_canvas = ScrollableFrame(self, tk.SUNKEN, width=width/5, height=height/5, padx=1, pady=1)
-        node_info = NodeInfoFrame(self)
-        root_box = NodeBox(node_canvas.scrollable_frame, node_info, root_node) #最初の頂点を初期化, これは動的にpackされる
-        node_info.set_box(root_box)
-        
-        node_canvas.pack(side=tk.LEFT, anchor=tk.W, fill=tk.Y)
-        node_info.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
-
-class SettingFrame(tk.Frame):
-    def __init__(self, master: tk.Misc, data: SettingData, width: int, height: int):
-        tk.Frame.__init__(self, master)
-        self.__save_path = DialogInput(self, width=width, default_path=data.save_folder_path, title='セーブフォルダ')
-        self.__setting_path = DialogInput(self, width=width, default_path=data.setting_folder_path, title='設定フォルダ')
-        self.__loading_wait_time = InputBox(self, width=width, entry_or_spinbox=False, title='読み込み待機時間')
-        set_button = tk.Button(self, text='設定', command=self.save)
-        
-        self.__save_path.pack(side=tk.TOP, anchor=tk.W, fill=tk.X)
-        self.__setting_path.pack(side=tk.TOP, anchor=tk.W, fill=tk.X)
-        self.__loading_wait_time.pack(side=tk.TOP, anchor=tk.W)
-        set_button.pack(side=tk.BOTTOM, anchor=tk.E)
-        
-        self.__data = data
-        self.set(data)
-
-    def set(self, data: SettingData):
-        self.__save_path.set(data.save_folder_path.absolute())
-        self.__setting_path.set(data.setting_folder_path.absolute())
-        self.__loading_wait_time.set(data.loading_wait_time)
-        
-    def save(self):
-        self.__data.save_folder_path:    Path = self.__save_path.value()
-        self.__data.setting_folder_path: Path = self.__setting_path.value()
-        self.__data.loading_wait_time:   int  = self.__loading_wait_time.value()
+def box_factory(key_name, value, width: int):
+    if type(value) == str:
+        return lambda master: InputBox(master, width=width, entry_or_spinbox=True, title=key_name)
+    elif type(value) == int:
+        return lambda master: InputBox(master, width=width, entry_or_spinbox=False, title=key_name)
+    elif type(value) == None or type(value) == set:
+        return lambda master: None #この使われていないmasterは他のlambda関数と規格を合わせるために必要である
+    else: #Pathなら
+        return lambda master: DialogInput(master, width=width, default_path=value, title=key_name)
 
 class ScrollableFrame(tk.Frame):
     def __init__(self, master: tk.Misc, relief: str, width: int, height: int, padx: int, pady: int, bar_x = True, bar_y = True):

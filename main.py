@@ -2,7 +2,7 @@ import traceback
 from pydrive2.auth import GoogleAuth
 from selenium.common.exceptions import NoSuchWindowException
 
-from src.setting.settings import Settings
+from src.setting.settings import Settings, SettingData
 from src.data.nodes import Node
 from src.browser.browser_controls import BrowserControl
 from src.gui.window import Window
@@ -11,15 +11,11 @@ try:
     #最初の認証
     #gauth = GoogleAuth()
     #gauth.LocalWebserverAuth()
-    cfg = Settings.load(Settings.DEFAULT_SAVEFOLDER_PATH)
-    bc = BrowserControl(setting=cfg)
-    Node.BrowserControl = bc
+    cfg = Window.setup()
+    Window.RunWindow(min(cfg.node_list), cfg)
+    Settings.save(SettingData.SETTINGFOLDER_PATH, cfg)
+            
         
-    Settings.validate_data(cfg, bc)
-        
-    root = min(cfg.node_list) #tree_height == 0のものをrootとする
-    Window.RunWindow(root, cfg)
-                
 except NoSuchWindowException as e:
     print('\nProcess has finished by Hand')
         
@@ -30,5 +26,4 @@ except Exception as e:
         print(trace)
     
 finally:
-    Settings.save(cfg)
     print('\033[0m')

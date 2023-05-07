@@ -12,5 +12,5 @@ def create_driver(profile: Path) -> webdriver.Chrome:
     service = Service(ChromeDriverManager().install())
     
     driver = webdriver.Chrome(service=service, options=options)
-    driver.set_window_size(1200,1000)
+    driver.set_window_size(5000,5000)
     return driver

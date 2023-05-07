@@ -10,6 +10,7 @@ from src.setting.settings import Settings, SettingData
 class NormaTest(unittest.TestCase):
     def setUp(self) -> None:
         self.__test_folder_path = Path('./test/for_settings_test')
+        self.__test_folder_path.mkdir()
         return super().setUp()
 
     def tearDown(self) -> None:
@@ -18,16 +19,16 @@ class NormaTest(unittest.TestCase):
         return super().tearDown()
 
     def test_save_and_load(self):
-        target_1 = SettingData('いろはにほへと', setting_folder_path=self.__test_folder_path)
-        target_2 = SettingData('ちりぬるお', setting_folder_path=self.__test_folder_path)
+        target_1 = SettingData('いろはにほへと')
+        target_2 = SettingData('ちりぬるお')
         
-        Settings.save(target_1)
+        Settings.save(self.__test_folder_path, target_1)
         result = Settings.load(self.__test_folder_path)
         self.assertEqual(result, target_1)
         
         #上書き
-        Settings.save(target_1)
-        Settings.save(target_2)
+        Settings.save(self.__test_folder_path, target_1)
+        Settings.save(self.__test_folder_path, target_2)
         result = Settings.load(self.__test_folder_path)
         self.assertEqual(result, target_2)
     

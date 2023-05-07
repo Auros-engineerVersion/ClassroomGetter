@@ -81,11 +81,20 @@ def convert_to_tuple(list_1: Iterable, list_2: Iterable) -> list[tuple]:
         )
     )
     
-def do_nothing(dummy_args):
-    return dummy_args
+def do_nothing(x):
+    return x
+    
+def identity(x):
+    def func(f):
+        f(x)
+        return x
+    return func
 
 def mid(x: SupportsInt, y: SupportsInt, z: SupportsInt):
     xyz = [x, y, z]
     xyz.remove(min(xyz))
     xyz.remove(max(xyz))
     return xyz.pop()
+
+class Jump(Exception):
+    pass
