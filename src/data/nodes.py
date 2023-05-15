@@ -16,17 +16,37 @@ class Node(INode):
             raise TypeError('BrowserControl is None')
         
         self.__edges: set[INode] = set()
-        self.key = key
-        self.url = url
-        self.tree_height = abs(tree_height) #負の値が入れられないように
-        self.next_init_time = next_init_time if next_init_time != None else RoutineData()
+        self.__key = key
+        self.__url = url
+        self.__tree_height = abs(tree_height) #負の値が入れられないように
+        self.__next_init_time = next_init_time if next_init_time != None else RoutineData()
         Node.Nodes.add(self)
+        
+    @property
+    def edges(self):
+        return self.__edges
+        
+    @property
+    def key(self):
+        return self.__key
+    
+    @property
+    def url(self):
+        return self.__url
+        
+    @property
+    def tree_height(self):
+        return self.__tree_height
+    
+    @property
+    def next_init_time(self):
+        return self.__next_init_time
     
     def __str__(self) -> str:
-        return str.format('{0}:{1}', self.tree_height, self.key)
+        return str.format('{0}:{1}', self.__tree_height, self.__key)
     
     def __lt__(self, other) -> bool:
-        return self.tree_height < other.tree_height
+        return self.__tree_height < other.tree_height
     
     def __eq__(self, other) -> bool:
         if (other == None):
@@ -62,10 +82,10 @@ class Node(INode):
     
     #getter/setterを兼ねたもの
     def edges(self, add_value: INode = None) -> set[INode]:
-        if add_value == None or add_value in self.__edges:
-            return self.__edges
+        if add_value == None or add_value in self.edges:
+            return self.edges
         else:
-            self.__edges.add(add_value)
+            self.edges.add(add_value)
             Node.Nodes.add(add_value)
     
     def serach(self, bfs = True) -> None:
