@@ -59,7 +59,7 @@ class BrowserControl:
             
             action = ActionChains(self.driver)
             for button in buttons:
-                action.move_to_element(button).click(button).pause(self.wait._poll/2).perform()
+                action.move_to_element(button).click(button).pause(self.wait._poll).perform()
                 
         except TimeoutException:
             return

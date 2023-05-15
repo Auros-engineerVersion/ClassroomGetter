@@ -12,10 +12,9 @@ try:
     #gauth = GoogleAuth()
     #gauth.LocalWebserverAuth()
     cfg = Window.setup()
-    Window.RunWindow(min(cfg.node_list), cfg)
-    Settings.save(SettingData.SETTINGFOLDER_PATH, cfg)
+    new_cfg = Window.RunWindow(min(cfg.node_list), cfg)
+    Settings.save(SettingData.SETTINGFOLDER_PATH, new_cfg)
             
-        
 except NoSuchWindowException as e:
     print('\nProcess has finished by Hand')
         

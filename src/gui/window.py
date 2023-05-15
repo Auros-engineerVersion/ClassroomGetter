@@ -54,6 +54,7 @@ class SettingFrame(tk.Frame):
         
         if messagebox.askyesno('注意', '設定を更新するためには、アプリを再起動しなければなりません。再起動しますか？'):
             Settings.save(SettingData.SETTINGFOLDER_PATH, data)
+            self.master.master.destroy()
             Window.RunWindow(min(data.node_list), data)
 
 class Window(tk.Frame):
@@ -122,3 +123,5 @@ class Window(tk.Frame):
         note.pack(expand=True)
 
         master.mainloop()
+        
+        return cfg
