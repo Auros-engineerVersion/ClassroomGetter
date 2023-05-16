@@ -11,7 +11,7 @@ BUTTON_PRESS = "<ButtonPress>"
 TEXT = "text"
 
 class NodeBox(tk.Frame):
-    def __init__(self, master: tk.Misc, set_info_func: Callable, node: INode, parent: NodeBox = None):
+    def __init__(self, master: tk.Misc, set_info_func: Callable[[NodeBox], None], node: INode, parent: NodeBox = None):
         tk.Frame.__init__(self, master)
         self.__master = master
         self.__set_info_func = set_info_func
@@ -19,7 +19,6 @@ class NodeBox(tk.Frame):
         self.__node = node
         self.__is_expand: bool = False
         self.__nextboxes: list[NodeBox] = []
-        self.__events: list[str] = [] #afterのリスト
         
         drop_button = tk.Button(self, command=self.expand, width=self.winfo_height())
         height_label = tk.Label(self, text=str(node.tree_height) + ':')
@@ -37,14 +36,8 @@ class NodeBox(tk.Frame):
         self.text = key_label[TEXT]
         self.url = node.url
     
-    #すべてのafterをキャンセルする
-    def __cancel_all(self):
-        for id in self.__events:
-            self.after_cancel(id)
-        self.__events.clear()
-    
     def on_frame_click(self, event):
-        self.__set_info_func()
+        self.__set_info_func(self)
         
     def dispose(self):
         stack: list[NodeBox] = [self]
