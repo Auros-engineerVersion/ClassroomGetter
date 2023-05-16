@@ -3,7 +3,7 @@ from __future__ import annotations
 from src.data.routine_data import RoutineData
 from src.interface.i_node import INode
 from src.browser.browser_controls import BrowserControl as bc
-from src.browser.serach_parameter_container import SearchParameterContainer
+from data.serach_parameter_container import SearchParameterContainer
 
 class Node(INode):
     #クラス変数の宣言と同時に定義を行わないのは、変数が勝手に起動してしまうため
