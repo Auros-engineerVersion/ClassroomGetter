@@ -1,7 +1,8 @@
 import tkinter as tk
+
 from src.data.routine_data import RoutineData, timedelta
 from src.gui.custum_widgets.info_boxes.node_box import NodeBox
-from src.gui.custum_widgets.info_boxes.input_boxes import InputBox
+from src.gui.custum_widgets.info_boxes.input_boxes import SpinInput
 
 TEXT = "text"
 STATE = 'state'
@@ -55,12 +56,13 @@ class TimeBox(tk.Frame):
         set_button = tk.Button(
             time_set_frame, 
             text='この時間に指定する',
-            command=lambda: self.__set_date(RoutineData(*self.__time_setters.values()))
+            command=lambda: self.__set_dateself.__time_setters.values()
         )
+        
         reset_button = tk.Button(
             time_set_frame,
             text='元に戻す',
-            command=lambda: self.__set_date(RoutineData())
+            command=lambda: self.__set(RoutineData())
         )
         
         clock_frame.pack()
@@ -86,7 +88,7 @@ class TimeBox(tk.Frame):
             
         self.__events.append(self.after(interval, self.__update_clock, box, interval))
         
-    def __set_date(self, data: RoutineData):
+    def __set(self, data: RoutineData):
         self.__watching_box.time = data 
         self.__watching_box.validate_init(interval=self.__clocK_update_interval)
         
@@ -98,26 +100,28 @@ class TimeBox(tk.Frame):
 class TimeSetters(tk.Frame):
     def __init__(self, master: tk.Misc):
         tk.Frame.__init__(self, master)
-        self.week_setter   = InputBox(self, False, title='週', from_=0, to=6)
-        self.day_setter    = InputBox(self, False, title='日', from_=0, to=31)
-        self.hour_setter   = InputBox(self, False, title='時', from_=0, to=23)
-        self.minute_setter = InputBox(self, False, title='分', from_=0, to=59)
+        self.__boxes = list(
+            map(
+                lambda items, range: SpinInput(self, range, title=items[0]),
+                vars(RoutineData()).items(), RoutineData.time_range
+            )
+        )
         
-        self.week_setter.pack()
-        self.day_setter.pack()
-        self.hour_setter.pack()
-        self.minute_setter.pack()
+        for box in self.__boxes:
+            box.pack()
+                    
+    def values(self) -> RoutineData:
+        return RoutineData(
+            *map(
+                lambda box: box.value(),
+                self.__boxes
+            )
+        )
         
-    def values(self):
-        return [
-            int(self.week_setter.value()),
-            int(self.day_setter.value()),
-            int(self.hour_setter.value()),
-            int(self.minute_setter.value())
-        ]
-        
-    def set_values(self, time: RoutineData):
-        self.week_setter.set(time.week)
-        self.day_setter.set(time.day)
-        self.hour_setter.set(time.hour)
-        self.minute_setter.set(time.minute)
+    def set(self, time: RoutineData):
+        list(
+            map(
+                lambda box, value: box.set(value),
+                self.__boxes, vars(time).values()
+            )
+        )
