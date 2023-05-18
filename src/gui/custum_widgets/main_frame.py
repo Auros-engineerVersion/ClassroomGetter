@@ -1,7 +1,7 @@
 import tkinter as tk
 
 from src.interface.i_node import INode
-from src.gui.custum_widgets.infomations import *
+from src.gui.custum_widgets.base.infomations import *
 from src.gui.custum_widgets.base.scrollable_frame import ScrollableFrame
 
 class MainFrame(tk.Frame):

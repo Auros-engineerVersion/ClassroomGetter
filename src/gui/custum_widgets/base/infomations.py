@@ -1,4 +1,5 @@
 import tkinter as tk
+import asyncio
 
 from src.data.routine_data import RoutineData, timedelta
 from src.gui.custum_widgets.info_boxes.node_box import NodeBox
@@ -21,7 +22,7 @@ class NodeInfoFrame(tk.Frame):
         #ボタンが押されたら、監視中のNodeBoxからinitialize_treeを実行する
         self.__init_button = tk.Button(self,
             text=RUN,
-            command=lambda: self.__watching_box.initialize_node()
+            command=lambda: asyncio.run(self.__watching_box.initialize_node())
         )
         
         self.__node_name_label.pack(side=tk.TOP, anchor=tk.CENTER, padx=5, pady=5)
