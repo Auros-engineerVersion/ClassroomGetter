@@ -26,11 +26,11 @@ class BrowserControl:
     def serch(self, xpath: str) -> WebElement:
         return self.wait.until(EC.presence_of_element_located((By.XPATH, xpath)))
         
-    def elements(self, xpath: str, pattern: str = ''):
-        def __get_hrefs(filter_func: callable):
+    async def elements(self, xpath: str, pattern: str = ''):
+        async def __get_hrefs(filter_func: callable):
             elems = []
             try:
-                elems = self.wait.until(EC.presence_of_all_elements_located((By.XPATH, xpath)))
+                elems = await self.wait.until(EC.presence_of_all_elements_located((By.XPATH, xpath)))
             except TimeoutException as e:
                 raise e
                 

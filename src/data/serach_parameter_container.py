@@ -1,8 +1,9 @@
+import asyncio
+from typing import Coroutine
 from dataclasses import dataclass
 from selenium.common.exceptions import TimeoutException
 
 from src import my_util
-from src.browser.browser_controls import BrowserControl
 from src.interface.i_node import INode
 
 @dataclass(frozen=True)
@@ -22,10 +23,17 @@ class SearchParameter:
             format_func (callable):
                 acquiring_funcの戻り値をこの関数でmapする
         """
-        def __filter(format_func: callable) -> map:
+        async def __filter(format_func: callable) -> Coroutine:
             return map(
                 format_func,
-                acquiring_func(self.xpath, self.regex)(self.attribute_func)
+                #asyncio.gatherは値をリストに包んで返すため、二次元リストとなってしまう。
+                #そのため平坦化する
+                sum(
+                    await asyncio.gather(
+                        acquiring_func(self.xpath, self.regex)(self.attribute_func)
+                    ),
+                    []
+                )
             )
         return __filter
         
@@ -41,15 +49,15 @@ class SearchParameterPattern:
     
     #func:textとlinkのペアに対して行う関数
     #text_filter, link_filter: それぞれのlistに対して行う関数
-    def elements(self, node: INode) -> list[tuple[str, str]]:
+    async def elements(self, node: INode) -> list[tuple[str, str]]:
         self.pre_proc(node)
         if self.text_param == None or self.link_param == None:
             return my_util.convert_to_tuple([node.key + 'の授業タブ'], [my_util.to_all_tab_link(node.url)])
         else:
             try:
                 return my_util.convert_to_tuple(
-                        self.text_param.next_values(node.BrowserControl.elements)(self.text_filter),
-                        self.link_param.next_values(node.BrowserControl.elements)(self.link_filter)
+                        await self.text_param.next_values(node.BrowserControl.elements)(self.text_filter),
+                        await self.link_param.next_values(node.BrowserControl.elements)(self.link_filter)
                     )
             except TimeoutException:
                 return []
@@ -127,8 +135,8 @@ class SearchParameterContainer:
     ]
 
     @staticmethod
-    def elements(node: INode):
+    async def elements(node: INode):
         if len(SearchParameterContainer.parameters) > node.tree_height:
-            return SearchParameterContainer.parameters[node.tree_height].elements(node)
+            return await SearchParameterContainer.parameters[node.tree_height].elements(node)
         else:
             return []
