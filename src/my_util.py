@@ -96,5 +96,5 @@ def mid(x: SupportsInt, y: SupportsInt, z: SupportsInt):
     xyz.remove(max(xyz))
     return xyz.pop()
 
-class Jump(Exception):
-    pass
+def public_vars(x) -> filter:
+    return filter(lambda x: '__' not in x[0], vars(x).items())
