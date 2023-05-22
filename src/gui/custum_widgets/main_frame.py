@@ -9,9 +9,11 @@ class MainFrame(tk.Frame):
         tk.Frame.__init__(self, master)
         #アスペクト比を維持したまま小さいサイズにする
         node_canvas = ScrollableFrame(self, tk.SUNKEN, width=width/5, height=height/5, padx=1, pady=1)
-        node_info = NodeInfoFrame(self)
-        root_box = NodeBox(node_canvas.scrollable_frame, node_info.set_box, root) #最初の頂点を初期化, これは動的にpackされる
-        node_info.set_box(root_box)
+        self.__node_info = NodeInfoFrame(self)
+        NodeBox(node_canvas.scrollable_frame, self.__node_info.set_box, root) #最初の頂点を初期化, これは動的にpackされる
         
         node_canvas.pack(side=tk.LEFT, anchor=tk.W, fill=tk.Y)
-        node_info.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
+        self.__node_info.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
+        
+    async def run_clock(self):
+        self.__node_info.run_clock_async()
