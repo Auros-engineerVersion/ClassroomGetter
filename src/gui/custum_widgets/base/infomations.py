@@ -17,12 +17,12 @@ class NodeInfoFrame(tk.Frame):
         
         self.__node_name_label = tk.Label(self, text=watching_box.text if watching_box != None else NO_DATA)
         self.__node_url_label = tk.Label(self, text=watching_box.url if watching_box != None else NO_DATA)
-        self.__time_box = TimeBox(self, watching_box=self.__watching_box)
+        self.__time_box = Timer(self, watching_box=self.__watching_box)
         
         #ボタンが押されたら、監視中のNodeBoxからinitialize_treeを実行する
         self.__init_button = tk.Button(self,
             text=RUN,
-            command=lambda: asyncio.run(self.__watching_box.initialize_node())
+            command=lambda: self.__watching_box.initialize_node()
         )
         
         self.__node_name_label.pack(side=tk.TOP, anchor=tk.CENTER, padx=5, pady=5)
@@ -41,7 +41,7 @@ class NodeInfoFrame(tk.Frame):
         self.__init_button[TEXT] = text
         self.__init_button.update()
         
-class TimeBox(tk.Frame):
+class Timer(tk.Frame):
     def __init__(self, master: tk.Misc, watching_box: NodeBox):
         tk.Frame.__init__(self, master, background='yellow')
         self.__clocK_update_interval = 1000 #ms
@@ -63,7 +63,7 @@ class TimeBox(tk.Frame):
         reset_button = tk.Button(
             time_set_frame,
             text='元に戻す',
-            command=lambda: self.__set(RoutineData())
+            command=self.__watching_box.time_reset
         )
         
         clock_frame.pack()
@@ -79,7 +79,8 @@ class TimeBox(tk.Frame):
         for id in self.__events:
             self.after_cancel(id)
         self.__events.clear()
-        
+                
+    #ループの中核
     def __update_clock(self, box: NodeBox, interval: int):
         remaine_time = box.time.remaine()
         if remaine_time == timedelta():
@@ -88,11 +89,7 @@ class TimeBox(tk.Frame):
             self.clock_label[TEXT] = remaine_time
             
         self.__events.append(self.after(interval, self.__update_clock, box, interval))
-        
-    def __set(self, data: RoutineData):
-        self.__watching_box.time = data 
-        self.__watching_box.validate_init(interval=self.__clocK_update_interval)
-        
+
     def set_box(self, box: NodeBox): #時計の更新を行う
         self.__watching_box = box
         self.__cancel_all()
@@ -112,12 +109,7 @@ class TimeSetters(tk.Frame):
             box.pack()
                     
     def values(self) -> RoutineData:
-        return RoutineData(
-            *map(
-                lambda box: box.value(),
-                self.__boxes
-            )
-        )
+        return RoutineData(*map(lambda box: box.value(), self.__boxes))
         
     def set(self, time: RoutineData):
         list(
