@@ -109,12 +109,12 @@ class Node(INode):
         return __do_serch
                 
     #幅優先探索
-    def initialize_tree(root):
+    async def initialize_tree(root):
         async def __next(node: INode):
-            tuples = SearchParameterContainer.elements(node)
+            tuples = await SearchParameterContainer.elements(node)
             for tuple in tuples:
                 node.add_edge(
                     add_value=Node(*tuple, node.tree_height + 1)
                 )
             
-        asyncio.gather(root.serach()(__next))
+        await root.serach()(__next)
