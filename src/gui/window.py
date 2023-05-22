@@ -55,22 +55,3 @@ class Window(tk.Frame):
         password_info  = str(password.value())
         master.destroy() #値を取得できたらフォームを解放する
         return (email_info, password_info)
-            
-    @staticmethod
-    async def RunWindow(root_node, cfg, master: tk.Misc = None, width: int = 600, height: int = 300):
-        if master is None:
-            master = tk.Tk()
-
-        master.title('ClassroomHack')
-        master.geometry(Window.__size(width, height))
-        master.resizable(0, 0) #windowのサイズ変更を許可しない
-
-        note = ttk.Notebook(master, width=width, height=height)
-        main_frame = FrontFrame(note, root_node, width, height)
-        setting_frame = SettingFrame(note, cfg, width, height)
-
-        note.add(main_frame, text='メイン')
-        note.add(setting_frame, text='設定')
-        note.pack(expand=True)
-        
-        return cfg
