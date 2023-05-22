@@ -1,5 +1,6 @@
 from __future__ import annotations
 import gc
+import asyncio
 import tkinter as tk
 from typing import Callable
 
@@ -22,19 +23,31 @@ class NodeBox(tk.Frame):
         
         drop_button = tk.Button(self, command=self.expand, width=self.winfo_height())
         height_label = tk.Label(self, text=str(node.tree_height) + ':')
-        key_label = tk.Label(self, text=str(node.key))
+        height_label.bind(BUTTON_PRESS, self.on_frame_click)
         
+        key_label = tk.Label(self, text=str(node.key))        
+        key_label.bind(BUTTON_PRESS, self.on_frame_click)
+        
+#region pack
         drop_button.pack(side=tk.LEFT)
         height_label.pack(side=tk.LEFT)
         key_label.pack(side=tk.LEFT)
         
-        height_label.bind(BUTTON_PRESS, self.on_frame_click)        
-        key_label.bind(BUTTON_PRESS, self.on_frame_click)
-        
         self.pack(anchor=tk.W, padx=(node.tree_height*20, 1), after=self.__parent_box)
+#endregion
         
         self.text = key_label[TEXT]
         self.url = node.url
+        
+    @property
+    def time(self):
+        return self.__node.next_init_time
+    
+    def set_time(self, data):
+        self.__node.next_init_time = data
+            
+    def time_reset(self):
+        self.__node.next_init_time.reset()
     
     def on_frame_click(self, event):
         self.__set_info_func(self)
@@ -49,9 +62,9 @@ class NodeBox(tk.Frame):
 
             value.destroy()
         
-    def initialize_node(self):
-        self.__node.edges().clear()
-        self.__node.initialize_tree()
+    async def initialize_node(self):
+        self.__node.edges.clear()
+        await self.__node.initialize_tree()
         self.__is_expand = False
                     
     def expand(self):
