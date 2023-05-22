@@ -8,6 +8,10 @@ from datetime import datetime, timedelta
 from src.data.routine_data import RoutineData
 
 class NormalTest(unittest.TestCase):
+    def test_reset(self):
+        data = RoutineData(0,0,0,1)
+        self.assertEqual(data.reset(), RoutineData())
+    
     def test_next(self):
         add_time = 5
         routine_data = RoutineData(minute=add_time)

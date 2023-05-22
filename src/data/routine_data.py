@@ -2,6 +2,8 @@ from dataclasses import dataclass
 from typing import SupportsInt, ClassVar
 from datetime import datetime, timedelta
 
+from src.my_util import public_vars
+
 @dataclass
 class RoutineData:
     week: SupportsInt = 0
@@ -26,11 +28,19 @@ class RoutineData:
     def __now(self):
         return datetime.now().replace(microsecond=0)
     
+    def reset(self):
+        self.week = 0
+        self.day = 0
+        self.hour = 0
+        self.minute = 0
+            
+        return self
+    
     def interval(self) -> timedelta:
         return timedelta(
-            weeks=self.week,
-            days=self.day,
-            hours=self.hour,
+            weeks=  self.week,
+            days=   self.day,
+            hours=  self.hour,
             minutes=self.minute
         )
             
@@ -51,7 +61,11 @@ class RoutineData:
     
     def is_current(self) -> bool:
         #すべての値が初期値でなければ
-        return self.week + self.day + self.hour + self.minute > 0
+            total = map(
+                lambda x: x[1], public_vars(self)
+            )
+            
+            return sum(total) > 0
     
     def should_init(self):
         if self.remaine().total_seconds() <= 0:
