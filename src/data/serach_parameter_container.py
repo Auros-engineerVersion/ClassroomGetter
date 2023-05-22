@@ -28,13 +28,8 @@ class SearchParameter:
                 format_func,
                 #asyncio.gatherは値をリストに包んで返すため、二次元リストとなってしまう。
                 #そのため平坦化する
-                sum(
-                    await asyncio.gather(
-                        acquiring_func(self.xpath, self.regex)(self.attribute_func)
-                    ),
-                    []
+                    await asyncio.create_task(acquiring_func(self.xpath, self.regex)(self.attribute_func)) 
                 )
-            )
         return __filter
         
 @dataclass(frozen=True)
