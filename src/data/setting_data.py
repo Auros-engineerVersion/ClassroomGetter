@@ -17,7 +17,7 @@ class SettingData:
     #webdriverに関する設定
     loading_wait_time: int = 5
     
-    node_list: set = None
+    nodes: set = None
         
     def __add__(self: SettingData, other: SettingData) -> SettingData:
         args = list(
@@ -29,6 +29,15 @@ class SettingData:
         )
         
         return SettingData(*args)
+    
+    @property
+    def profile(self):
+        return (self.user_email, self.user_password)
+    
+    @profile.setter
+    def profile(self, other: tuple[str, str]):
+        self.user_email = other[0]
+        self.user_password = other[1]
         
     def is_current_data(self):
         return\
@@ -39,7 +48,7 @@ class SettingData:
             self.save_folder_path.exists()
         
     def is_current_nodes(self):
-        return self.node_list != None and len(self.node_list) > 1
+        return self.nodes != None and len(self.nodes) > 1
             
     def is_current_user(self):
         return '@' in self.user_email and len(self.user_password) > 0
