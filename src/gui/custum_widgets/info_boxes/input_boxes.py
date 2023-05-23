@@ -4,6 +4,7 @@ from pathlib import Path
 from abc import ABCMeta, abstractmethod
 
 BROWS = '参照'
+BUTTON_PRESS = '<ButtonPress>'
 
 def box_factory(key_name, value, width: int):
     if type(value) == str:
@@ -80,3 +81,39 @@ class DialogInput(InputBox):
         
     def value(self):
         return self.__entry.get()
+    
+class ProfileForm(tk.Frame):
+    def __init__(self, master: tk.Misc, title: str):
+        tk.Frame.__init__(self, master, title=title)
+        
+        padx_size = (5, 10)
+        width = 30
+
+        self.__email    = EntryInput(master, width=width, padx=padx_size, title='email')
+        self.__password = EntryInput(master, width=width, padx=padx_size, title='password')
+        complete_button = tk.Button(master, text='完了')
+        complete_button.bind(BUTTON_PRESS, self.__complete)
+        
+#region pack
+        self.__email.pack(side=tk.TOP, anchor=tk.W, fill=tk.X)
+        self.__password.pack(side=tk.TOP, anchor=tk.W, fill=tk.X)
+        complete_button.pack(side=tk.BOTTOM, anchor=tk.E, padx=5, pady=5)
+#endregion
+
+    def set(self, email: str, password: str):
+        self.__email.set(email)
+        self.__password.set(password)
+        
+    def value(self) -> tuple:
+        return (self.__email.value(), self.__password.value())
+    
+    def __complete(self):
+        profile = self.value()
+        self.destroy()
+        return profile
+    
+    @staticmethod
+    def pop_up():
+        form = ProfileForm(tk.Tk(), 'ProfileForm')
+        form.mainloop()
+        return ProfileForm.__complete()
