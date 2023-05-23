@@ -4,7 +4,6 @@ from pathlib import Path
 from abc import ABCMeta, abstractmethod
 
 BROWS = '参照'
-BUTTON_PRESS = '<ButtonPress>'
 
 def box_factory(key_name, value, width: int):
     if type(value) == str:
@@ -61,9 +60,9 @@ class DialogInput(InputBox):
     def __init__(self, master: tk.Misc, default_path: Path, width: int=30, padx: tuple = (1, 1), title: str = 'title'):
         super().__init__(master, padx, title)
         brows_button = tk.Button(self, text=BROWS, command=self.folder_dialog)
-        brows_button.pack(side=tk.RIGHT, anchor=tk.E)
+        self.__entry = tk.Entry(self, width=width//8)
         
-        self.__entry = tk.Entry(self, width=width//8)                
+        brows_button.pack(side=tk.RIGHT, anchor=tk.E)           
         self.__entry.pack(side=tk.RIGHT, expand=True)
 
         self.__default_path = default_path
@@ -83,16 +82,15 @@ class DialogInput(InputBox):
         return self.__entry.get()
     
 class ProfileForm(tk.Frame):
-    def __init__(self, master: tk.Misc, title: str):
-        tk.Frame.__init__(self, master, title=title)
+    def __init__(self, master: tk.Misc):
+        tk.Frame.__init__(self, master)
         
         padx_size = (5, 10)
         width = 30
 
-        self.__email    = EntryInput(master, width=width, padx=padx_size, title='email')
-        self.__password = EntryInput(master, width=width, padx=padx_size, title='password')
-        complete_button = tk.Button(master, text='完了')
-        complete_button.bind(BUTTON_PRESS, self.__complete)
+        self.__email    = EntryInput(self, width=width, padx=padx_size, title='email')
+        self.__password = EntryInput(self, width=width, padx=padx_size, title='password')
+        complete_button = tk.Button(self, text='完了', command=self.quit)
         
 #region pack
         self.__email.pack(side=tk.TOP, anchor=tk.W, fill=tk.X)
@@ -107,13 +105,15 @@ class ProfileForm(tk.Frame):
     def value(self) -> tuple:
         return (self.__email.value(), self.__password.value())
     
-    def __complete(self):
-        profile = self.value()
-        self.destroy()
-        return profile
-    
     @staticmethod
-    def pop_up():
-        form = ProfileForm(tk.Tk(), 'ProfileForm')
+    def pop_up(title: str):
+        root = tk.Tk()
+        root.title(title)
+        form = ProfileForm(root)
+        form.pack()
+        
         form.mainloop()
-        return ProfileForm.__complete()
+
+        profile = form.value()
+        root.destroy()
+        return profile
