@@ -10,8 +10,7 @@ from src.interface.i_node import INode
 from src.data.serach_parameter_container import *
 
 def add_str(x, y):
-    async def __add(func):
-        await asyncio.sleep(0.1)
+    def __add(func):
         return [x + y]
     return __add
 
@@ -23,7 +22,7 @@ class ParameterTest(unittest.TestCase):
             attribute_func=do_nothing
         )
 
-        result = asyncio.run(param.next_values(add_str)(do_nothing))
+        result = param.next_values(add_str)(do_nothing)
         self.assertEqual([param.xpath + param.regex], list(result))
         
 class PatternTest(unittest.TestCase):
@@ -48,4 +47,4 @@ class PatternTest(unittest.TestCase):
         )
     
     def test_elements(self):       
-        self.assertEqual(asyncio.run(self.__pattern.elements(self.__node_mock)), [('hogehuga', 'HOGEHUGA')])
+        self.assertEqual(self.__pattern.elements(MagicMock(), self.__node_mock), [('hogehuga', 'HOGEHUGA')])

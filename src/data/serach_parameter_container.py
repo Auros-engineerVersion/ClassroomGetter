@@ -1,10 +1,11 @@
-import asyncio
 from typing import Coroutine
 from dataclasses import dataclass
 from selenium.common.exceptions import TimeoutException
 
 from src import my_util
 from src.interface.i_node import INode
+from src.browser.browser_controls import *
+from src.data.browser_control_data import BrowserControlData as bc_data
 
 @dataclass(frozen=True)
 class SearchParameter:
@@ -23,13 +24,12 @@ class SearchParameter:
             format_func (callable):
                 acquiring_funcの戻り値をこの関数でmapする
         """
-        async def __filter(format_func: callable) -> Coroutine:
+        def __filter(format_func: callable) -> Coroutine:
             return map(
                 format_func,
-                #asyncio.gatherは値をリストに包んで返すため、二次元リストとなってしまう。
-                #そのため平坦化する
-                    await asyncio.create_task(acquiring_func(self.xpath, self.regex)(self.attribute_func)) 
-                )
+                acquiring_func(self.xpath, self.regex)(self.attribute_func)
+            ) 
+                
         return __filter
         
 @dataclass(frozen=True)
@@ -44,20 +44,22 @@ class SearchParameterPattern:
     
     #func:textとlinkのペアに対して行う関数
     #text_filter, link_filter: それぞれのlistに対して行う関数
-    async def elements(self, node: INode) -> list[tuple[str, str]]:
-        self.pre_proc(node)
+    def elements(self, bc_data: bc_data, node: INode) -> list[tuple[str, str]]:
+        self.pre_proc((bc_data, node))
         if self.text_param == None or self.link_param == None:
             return my_util.convert_to_tuple([node.key + 'の授業タブ'], [my_util.to_all_tab_link(node.url)])
         else:
             try:
                 return my_util.convert_to_tuple(
-                        await self.text_param.next_values(node.BrowserControl.elements)(self.text_filter),
-                        await self.link_param.next_values(node.BrowserControl.elements)(self.link_filter)
+                        self.text_param.next_values(node.BrowserControl.elements)(self.text_filter),
+                        self.link_param.next_values(node.BrowserControl.elements)(self.link_filter)
                     )
             except TimeoutException:
                 return []
         
 class SearchParameterContainer:
+    browser_control_data: bc_data = None
+    
     @staticmethod
     def __get_text(elem):
         return elem.text
@@ -67,12 +69,12 @@ class SearchParameterContainer:
         return elem.get_attribute('href')
 
     @staticmethod
-    def __move(node: INode):
-        node.BrowserControl.move(node.url)
+    def __move(bc_and_node):
+        move(*bc_and_node)
         
-    def __move_and_click(node: INode):
-        SearchParameterContainer.__move(node)
-        node.BrowserControl.click_all_sections()
+    def __move_and_click(bc_and_node):
+        SearchParameterContainer.__move(bc_and_node)
+        click_all_sections(bc_and_node[0])
 
     parameters: list[SearchParameterPattern] = [
         #添字とtree_heightを一致させる
@@ -130,8 +132,8 @@ class SearchParameterContainer:
     ]
 
     @staticmethod
-    async def elements(node: INode):
+    def elements(node: INode):
         if len(SearchParameterContainer.parameters) > node.tree_height:
-            return await SearchParameterContainer.parameters[node.tree_height].elements(node)
+            return SearchParameterContainer.parameters[node.tree_height].elements(SearchParameterContainer.browser_control_data, node)
         else:
             return []
