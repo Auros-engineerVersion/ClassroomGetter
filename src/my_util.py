@@ -81,7 +81,7 @@ def convert_to_tuple(list_1: Iterable, list_2: Iterable) -> list[tuple]:
         )
     )
     
-def do_nothing(*x):
+def do_nothing(x):
     return x
     
 def identity(x):
