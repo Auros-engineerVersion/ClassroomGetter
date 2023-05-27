@@ -3,4 +3,8 @@ from abc import ABCMeta, abstractmethod, abstractproperty
 from typing import Coroutine, Callable
 
 class IBrowserControlData(metaclass=ABCMeta):
-    raise NotImplementedError
+    def __init__(self) -> None:
+        raise NotImplementedError
+    
+    def __del__(self):
+        raise NotImplementedError
