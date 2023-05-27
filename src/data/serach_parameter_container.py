@@ -4,8 +4,8 @@ from selenium.common.exceptions import TimeoutException
 
 from src import my_util
 from src.interface.i_node import INode
+from src.interface.i_browser_control_data import IBrowserControlData as bc_data
 from src.browser.browser_controls import *
-from src.data.browser_control_data import BrowserControlData as bc_data
 
 @dataclass(frozen=True)
 class SearchParameter:

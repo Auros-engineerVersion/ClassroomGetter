@@ -5,7 +5,7 @@ import asyncio
 
 from src.data.serach_parameter_container import SearchParameterContainer
 from src.browser.browser_controls import *
-from src.data.browser_control_data import BrowserControlData as bc_data
+from src.interface.i_browser_control_data import IBrowserControlData as bc_data
 from src.data.setting_data import SettingData
 from src.data.nodes import Node
 

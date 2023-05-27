@@ -1,5 +1,3 @@
-from selenium import webdriver
-from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.common.by import By
@@ -7,7 +5,7 @@ from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support import expected_conditions as EC
 from re import search
 
-from src.data.browser_control_data import BrowserControlData as bc_data
+from src.interface.i_browser_control_data import IBrowserControlData as bc_data
 from src.data.setting_data import SettingData
 
 def move(bc: bc_data, url: str):
