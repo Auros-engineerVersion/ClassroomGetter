@@ -1,4 +1,4 @@
-from typing import Coroutine
+from typing import Callable
 from dataclasses import dataclass
 from selenium.common.exceptions import TimeoutException
 
@@ -11,12 +11,11 @@ from src.data.browser_control_data import BrowserControlData as bc_data
 class SearchParameter:
     xpath: str
     regex: str
-    attribute_func: callable
+    attribute_func: Callable
         
-    def next_values(self, acquiring_func: callable) -> callable:
+    def next_values(self, bc_data: bc_data) -> Callable:
         """
         この関数はカリー化されている
-
         Args:
             acquiring_func (callable):
                 この関数は高階関数で無ければならず、最終的にIterableな値を返さなければならない
@@ -24,13 +23,15 @@ class SearchParameter:
             format_func (callable):
                 acquiring_funcの戻り値をこの関数でmapする
         """
-        def __filter(format_func: callable) -> Coroutine:
-            return map(
-                format_func,
-                acquiring_func(self.xpath, self.regex)(self.attribute_func)
-            ) 
-                
-        return __filter
+        def __acc_func(acquiring_func: Callable) -> Callable:
+            def __map(format_func: Callable) -> map:
+                return map(
+                    format_func,
+                    acquiring_func(bc_data, self.xpath, self.regex)(self.attribute_func)
+                ) 
+
+            return __map
+        return __acc_func
         
 @dataclass(frozen=True)
 class SearchParameterPattern:
@@ -51,8 +52,8 @@ class SearchParameterPattern:
         else:
             try:
                 return my_util.convert_to_tuple(
-                        self.text_param.next_values(node.BrowserControl.elements)(self.text_filter),
-                        self.link_param.next_values(node.BrowserControl.elements)(self.link_filter)
+                        self.text_param.next_values(bc_data)(elements)(self.text_filter),
+                        self.link_param.next_values(bc_data)(elements)(self.link_filter)
                     )
             except TimeoutException:
                 return []
@@ -70,7 +71,7 @@ class SearchParameterContainer:
 
     @staticmethod
     def __move(bc_and_node):
-        move(*bc_and_node)
+        move(bc_and_node[0], bc_and_node[1].url)
         
     def __move_and_click(bc_and_node):
         SearchParameterContainer.__move(bc_and_node)

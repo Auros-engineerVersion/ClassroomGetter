@@ -4,19 +4,12 @@ from typing import Coroutine, Callable
 
 from src.data.routine_data import RoutineData
 from src.interface.i_node import INode
-from src.browser.browser_controls import BrowserControl as bc
 from src.data.serach_parameter_container import SearchParameterContainer
 
 class Node(INode):
-    #クラス変数の宣言と同時に定義を行わないのは、変数が勝手に起動してしまうため
-    #つまり、BrowserControlはWebDrivreを有しているため、Chromeが勝手に起動してしまう
-    BrowserControl: bc = None
     Nodes: set[INode] = set() #全てのノードの集合
 
-    def __init__(self, key: str, url: str, tree_height: int, next_init_time: RoutineData = None) -> None:
-        if Node.BrowserControl is None:
-            raise TypeError('BrowserControl is None')
-        
+    def __init__(self, key: str, url: str, tree_height: int, next_init_time: RoutineData = None) -> None:        
         self.__edges: set[INode] = set()
         self.__key = key
         self.__url = url
@@ -94,14 +87,14 @@ class Node(INode):
         Args:
             bfs (bool, optional): Trueなら幅優先探索、Falseなら深さ優先探索を行う
         """
-        async def __do_serch(func):
+        def __do_serch(func):
             list: list[INode] = [self]
             
             while(len(list) > 0):
                 #出す場所が0なら幅優先探索, queueの振る舞いをする
                 #何もないのであれば幅優先探索, stackの振る舞いをする
                 value = list.pop(0) if bfs == True else list.pop()
-                await func(value)
+                func(value)
 
                 for child in value.edges:
                     list.append(child)
@@ -109,12 +102,10 @@ class Node(INode):
         return __do_serch
                 
     #幅優先探索
-    async def initialize_tree(root):
-        async def __next(node: INode):
-            tuples = await SearchParameterContainer.elements(node)
+    def initialize_tree(root):
+        def __next(node: INode):
+            tuples = SearchParameterContainer.elements(node)
             for tuple in tuples:
-                node.add_edge(
-                    add_value=Node(*tuple, node.tree_height + 1)
-                )
+                node.add_edge(Node(*tuple, node.tree_height + 1))
             
-        await root.serach()(__next)
+        root.serach()(__next)

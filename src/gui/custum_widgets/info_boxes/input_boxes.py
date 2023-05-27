@@ -1,9 +1,13 @@
 import tkinter as tk
 from tkinter import filedialog
+from tkinter import messagebox
 from pathlib import Path
 from abc import ABCMeta, abstractmethod
 
+from src.my_util import do_nothing
+
 BROWS = '参照'
+WM_DELETE_WINDOW = 'WM_DELETE_WINDOW'
 
 def box_factory(key_name, value, width: int):
     if type(value) == str:
@@ -91,13 +95,25 @@ class ProfileForm(tk.Frame):
         self.__email    = EntryInput(self, width=width, padx=padx_size, title='email')
         self.__password = EntryInput(self, width=width, padx=padx_size, title='password')
         complete_button = tk.Button(self, text='完了', command=self.quit)
+        master.protocol(WM_DELETE_WINDOW, lambda: self.__stop_or_continue(master))
         
 #region pack
         self.__email.pack(side=tk.TOP, anchor=tk.W, fill=tk.X)
         self.__password.pack(side=tk.TOP, anchor=tk.W, fill=tk.X)
         complete_button.pack(side=tk.BOTTOM, anchor=tk.E, padx=5, pady=5)
 #endregion
-
+    
+    def __stop_or_continue(self, target: tk.Misc):
+        ok_cancel = messagebox.askokcancel(
+                title='警告',
+                message='入力の途中でフォームを閉じようとしています。\n閉じますか?',
+            )
+        
+        if ok_cancel:
+            target.destroy()
+        else:
+            do_nothing()
+    
     def set(self, email: str, password: str):
         self.__email.set(email)
         self.__password.set(password)
@@ -114,6 +130,11 @@ class ProfileForm(tk.Frame):
         
         form.mainloop()
 
-        profile = form.value()
-        root.destroy()
+        profile = None
+        try:
+            profile = form.value()
+            root.destroy()
+        except tk.TclError as e:
+            pass
+            
         return profile

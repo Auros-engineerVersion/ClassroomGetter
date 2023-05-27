@@ -17,7 +17,7 @@ class SettingFrame(tk.Frame):
         )
         list(box_set)
         
-        set_button = tk.Button(self, text='設定', command=lambda: self.save(data.node_list, self.__boxes))
+        set_button = tk.Button(self, text='設定', command=lambda: self.save(data.nodes, self.__boxes))
         set_button.pack(side=tk.BOTTOM, anchor=tk.E)
         
         self.set(data)

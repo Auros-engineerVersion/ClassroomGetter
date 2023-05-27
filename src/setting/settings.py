@@ -1,8 +1,11 @@
 from __future__ import annotations
 import pickle
 from pathlib import Path
+import asyncio
 
-from src.browser.browser_controls import BrowserControl
+from src.data.serach_parameter_container import SearchParameterContainer
+from src.browser.browser_controls import *
+from src.data.browser_control_data import BrowserControlData as bc_data
 from src.data.setting_data import SettingData
 from src.data.nodes import Node
 
@@ -39,17 +42,18 @@ class Settings:
             return data
     
     @staticmethod
-    def setup_data(data: SettingData, bc: BrowserControl):
+    def setup_data(data: SettingData, bc: bc_data):
+        SearchParameterContainer.browser_control_data = bc #初期値を設定
         #node_listが何も設定されていないのなら値を取りに行く
         if not data.is_current_nodes():
             #プロファイルが指定されているかどうか
             #されていなければログインして指定する
-            bc.move(Settings.TARGET_URL)
+            move(bc, Settings.TARGET_URL)
             if Settings.TARGET_URL not in bc.driver.current_url and data:
-                bc.login_classroom(data)
+                login_classroom(bc, data)
 
             root = Node('Classroom', Settings.TARGET_URL, 0)
             root.initialize_tree()
 
-            data.node_list = Node.Nodes
+            data.nodes = Node.Nodes
             Settings.save(SettingData.SETTINGFOLDER_PATH, data)

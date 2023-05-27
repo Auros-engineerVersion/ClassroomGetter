@@ -19,5 +19,5 @@ class NormalTest(unittest.TestCase):
         sets.add('Hoge')
         sets.add('bar')
         directory = Path('.')
-        current_data = SettingData('hogehoge@gmail.com', 'hogehoge', node_list=sets, save_folder_path=directory)
+        current_data = SettingData('hogehoge@gmail.com', 'hogehoge', nodes=sets, save_folder_path=directory)
         self.assertTrue(current_data.is_current_data())

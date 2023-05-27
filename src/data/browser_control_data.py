@@ -16,10 +16,11 @@ class BrowserControlData:
         self.driver.quit()
         del self.driver
         
-def create_driver(profile: Path) -> webdriver.Chrome:
+def create_driver(profile: Path, *optional_args) -> webdriver.Chrome:
     options = webdriver.ChromeOptions()
-    options.add_argument(f'--user-data-dir={profile.parent}')
-    options.add_argument(f'--profile-directory={profile.name}')
+    option_list = [f'--user-data-dir={profile.parent}', f'--profile-directory={profile.name}', *optional_args]
+    for option in option_list:
+        options.add_argument(option)
         
     service = Service(ChromeDriverManager().install())
     
