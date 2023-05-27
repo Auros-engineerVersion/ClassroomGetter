@@ -8,8 +8,8 @@ from src.data.setting_data import SettingData
 
 class BrowserControlData:
     def __init__(self, setting: SettingData, driver: webdriver = None, wait: WebDriverWait = None) -> None:        
-        self.driver = driver if (driver != None) else create_driver(SettingData.profile_path())
-        self.wait   = wait   if (wait   != None) else WebDriverWait(self.driver, setting.loading_wait_time, 1)
+        self.driver = driver if driver != None else create_driver(SettingData.profile_path())
+        self.wait   = wait   if wait   != None else WebDriverWait(self.driver, setting.loading_wait_time, 1)
     
     def __del__(self):
         del self.wait
