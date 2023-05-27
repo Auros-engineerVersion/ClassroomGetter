@@ -9,8 +9,8 @@ class FrontFrame(tk.Frame):
         tk.Frame.__init__(self, master)
         #アスペクト比を維持したまま小さいサイズにする
         node_canvas = ScrollableFrame(self, tk.SUNKEN, width=width/5, height=height/5, padx=1, pady=1)
-        self.__node_info = NodeInfoFrame(self)
-        NodeBox(node_canvas.scrollable_frame, self.__node_info.set_box, root) #最初の頂点を初期化, これは動的にpackされる
+        self.__node_info = NodeInfoFrame(self, NodeBox(node_canvas.scrollable_frame, root))
+        NodeBox.node_info_frame = self.__node_info
         
         node_canvas.pack(side=tk.LEFT, anchor=tk.W, fill=tk.Y)
         self.__node_info.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)

@@ -12,10 +12,11 @@ BUTTON_PRESS = "<ButtonPress>"
 TEXT = "text"
 
 class NodeBox(tk.Frame):
-    def __init__(self, master: tk.Misc, set_info_func: Callable[[NodeBox], None], node: INode, parent: NodeBox = None):
+    node_info_frame = None
+    
+    def __init__(self, master: tk.Misc, node: INode, parent: NodeBox = None):
         tk.Frame.__init__(self, master)
         self.__master = master
-        self.__set_info_func = set_info_func
         self.__parent_box = parent
         self.__node = node
         self.__is_expand: bool = False
