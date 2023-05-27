@@ -11,9 +11,9 @@ WM_DELETE_WINDOW = 'WM_DELETE_WINDOW'
 
 def box_factory(key_name, value, width: int):
     if type(value) == str:
-        return lambda master: EntryInput(master, width=width, entry_or_spinbox=True, title=key_name)
+        return lambda master: EntryInput(master, width=width, title=key_name)
     elif type(value) == int:
-        return lambda master: SpinInput(master, width=width, entry_or_spinbox=False, title=key_name)
+        return lambda master: SpinInput(master, from_to=(0, 256), width=width, title=key_name)
     elif type(value) == None or type(value) == set:
         return lambda master: None #この使われていないmasterは他のlambda関数と規格を合わせるために必要である
     else: #Pathなら
