@@ -36,7 +36,7 @@ def elements(bc: bc_data, xpath: str, pattern: str = ''):
 def click_all_sections(bc: bc_data):
     def __check_loaded(xpath) -> bool:
         def __predictate(driver):
-            sample_buttons = driver.find_elements(By.XPATH, "//li[@jsmodel='dSSknb;PTCFbe;xeYtDf;']")
+            sample_buttons = driver.find_elements(By.XPATH, "//div[@jsmodel='RH7Ihb']")
             if all([x.get_attribute('data-controller-loaded') == 'true' for x in sample_buttons]):
                 return driver.find_elements(By.XPATH, xpath)
             else:
