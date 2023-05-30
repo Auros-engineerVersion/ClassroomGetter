@@ -1,6 +1,6 @@
 from functools import wraps
 from re import sub
-from typing import Iterable
+from typing import Iterable, SupportsInt
 
 #末尾再帰の最適化
 def tail_recursion(func):
@@ -72,3 +72,9 @@ def identity(x):
 
 def public_vars(x) -> filter:
     return filter(lambda x: '__' not in x[0], vars(x).items())
+
+def ratio(x: SupportsInt, y: SupportsInt, a: SupportsInt) -> tuple[SupportsInt, SupportsInt]:
+    if a == 0:
+        return (0, 0)
+    else:
+        return (x // abs(a), y // abs(a))

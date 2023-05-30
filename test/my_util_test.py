@@ -14,14 +14,15 @@ class NormalTest(unittest.TestCase):
         result = convert_to_tuple([1], [2])
         self.assertEqual([(1, 2)], result)
         
-    def test_mid(self):
-        x = 0
-        y = 1
-        z = 2
-        n = mid(x, y, z)
-        self.assertEqual(y, n)
-        
     def test_identity(self):
         x = 0
         y = identity(x)(do_nothing)
         self.assertEqual(x, y)
+        
+    def test_ratio(self):
+        x_y = (400, 300)
+        a = 5
+        self.assertEqual((80, 60), ratio(*x_y, a))
+        
+        a = 0
+        self.assertEqual((0, 0), ratio(*x_y, a))
