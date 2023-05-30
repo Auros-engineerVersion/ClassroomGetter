@@ -3,13 +3,26 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 from pathlib import Path
+from src.interface.i_browser_control_data import *
 
 from src.data.setting_data import SettingData
 
-class BrowserControlData:
+#options.add_argument("--ignore-certificate-error")
+#options.add_argument("--ignore-ssl-errors")
+class BrowserControlData(IBrowserControlData):
     def __init__(self, setting: SettingData, driver: webdriver = None, wait: WebDriverWait = None) -> None:        
-        self.driver = driver if driver != None else create_driver(SettingData.profile_path())
-        self.wait   = wait   if wait   != None else WebDriverWait(self.driver, setting.loading_wait_time, 1)
+        self.driver = driver \
+            if driver != None \
+            else create_driver(
+                SettingData.profile_path(),
+                '--ignore-certificate-error', 
+                '--ignore-ssl-errors',
+                '--headless'
+            )
+            
+        self.wait = wait \
+            if wait != None \
+            else WebDriverWait(self.driver, setting.loading_wait_time, 1)
     
     def __del__(self):
         del self.wait
