@@ -13,9 +13,9 @@ WM_DELETE_WINDOW = 'WM_DELETE_WINDOW'
 
 class ApplicationRoot(tk.Tk):
     def __init__(self, cfg: SettingData, bc: bc_data, size: tuple) -> None:
-        tk.Tk.__init__(self, sync=True)
+        tk.Tk.__init__(self)
         
-        self.title = ROOT_TITLE
+        self.title(ROOT_TITLE)
         self.geometry(f'{size[0]}x{size[1]}')
         self.resizable(0, 0)
                 
