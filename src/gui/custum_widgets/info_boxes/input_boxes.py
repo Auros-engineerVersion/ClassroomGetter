@@ -4,10 +4,8 @@ from tkinter import messagebox
 from pathlib import Path
 from abc import ABCMeta, abstractmethod
 
+from src.gui.literals import *
 from src.my_util import do_nothing
-
-BROWS = '参照'
-WM_DELETE_WINDOW = 'WM_DELETE_WINDOW'
 
 def box_factory(key_name, value, width: int):
     if type(value) == str:
@@ -20,10 +18,10 @@ def box_factory(key_name, value, width: int):
         return lambda master: DialogInput(master, width=width, default_path=value, title=key_name)
 
 class InputBox(tk.Frame, metaclass=ABCMeta):
-    def __init__(self, master: tk.Misc, padx: tuple = (1, 1), title: str = 'title') -> None:
+    def __init__(self, master: tk.Misc, padx: tuple = (1, 1), title: str = TITLE) -> None:
         tk.Frame.__init__(self, master)
         label = tk.Label(self, text=title)
-        label.pack(side=tk.LEFT, anchor=tk.W, ipadx=1, padx=padx)
+        label.grid(column=0, ipadx=1, padx=padx)
         
     @abstractmethod
     def set(self, value) -> None:
@@ -34,10 +32,10 @@ class InputBox(tk.Frame, metaclass=ABCMeta):
         raise NotImplementedError
 
 class EntryInput(InputBox):
-    def __init__(self, master: tk.Misc, width: int=30, padx: tuple = (1, 1), title: str = 'title') -> None:
+    def __init__(self, master: tk.Misc, width: int=30, padx: tuple = (1, 1), title: str = TITLE) -> None:
         super().__init__(master, padx, title)
         self.__entry = tk.Entry(self, width=width)
-        self.__entry.pack(side=tk.RIGHT)
+        self.__entry.grid(column=1)
     
     def set(self, value):
         self.__entry.delete(0, tk.END)
@@ -51,7 +49,7 @@ class SpinInput(InputBox):
         super().__init__(master, padx, title)
         
         self.__spin = tk.Spinbox(self, width=width, from_=from_to[0], to=from_to[1])
-        self.__spin.pack(side=tk.RIGHT)
+        self.__spin.grid(column=1)
         
     def set(self, value: int) -> None:
         self.__spin.delete(0, tk.END)
@@ -61,13 +59,13 @@ class SpinInput(InputBox):
         return int(self.__spin.get())
             
 class DialogInput(InputBox):
-    def __init__(self, master: tk.Misc, default_path: Path, width: int=30, padx: tuple = (1, 1), title: str = 'title'):
+    def __init__(self, master: tk.Misc, default_path: Path, width: int=30, padx: tuple = (1, 1), title: str = TITLE):
         super().__init__(master, padx, title)
         brows_button = tk.Button(self, text=BROWS, command=self.folder_dialog)
         self.__entry = tk.Entry(self, width=width//8)
         
-        brows_button.pack(side=tk.RIGHT, anchor=tk.E)           
-        self.__entry.pack(side=tk.RIGHT, expand=True)
+        self.__entry.grid(column=1, sticky=tk.W)
+        brows_button.grid(column=2)
 
         self.__default_path = default_path
         
@@ -94,7 +92,7 @@ class ProfileForm(tk.Frame):
 
         self.__email    = EntryInput(self, width=width, padx=padx_size, title='email')
         self.__password = EntryInput(self, width=width, padx=padx_size, title='password')
-        complete_button = tk.Button(self, text='完了', command=self.quit)
+        complete_button = tk.Button(self, text=COMPLETE, command=self.quit)
         master.protocol(WM_DELETE_WINDOW, lambda: self.__stop_or_continue(master))
         
 #region pack
@@ -105,8 +103,8 @@ class ProfileForm(tk.Frame):
     
     def __stop_or_continue(self, target: tk.Misc):
         ok_cancel = messagebox.askokcancel(
-                title='警告',
-                message='入力の途中でフォームを閉じようとしています。\n閉じますか?',
+                title=WARNING,
+                message=STOP_OR_CONTINUE,
             )
         
         if ok_cancel:

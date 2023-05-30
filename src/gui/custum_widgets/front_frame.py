@@ -12,8 +12,8 @@ class FrontFrame(tk.Frame):
         self.__node_info = NodeInfoFrame(self, NodeBox(node_canvas.scrollable_frame, root))
         NodeBox.node_info_frame = self.__node_info
         
-        node_canvas.pack(side=tk.LEFT, anchor=tk.W, fill=tk.Y)
-        self.__node_info.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
+        node_canvas.grid(column=0, sticky=tk.NS)
+        self.__node_info.grid(column=1, sticky=tk.NS)
         
     async def run_clock(self):
         self.__node_info.run_clock_async()
