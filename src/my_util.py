@@ -1,7 +1,6 @@
 from functools import wraps
-from re import search, sub
-from typing import Iterable, SupportsInt
-import inspect
+from re import sub
+from typing import Iterable
 
 #末尾再帰の最適化
 def tail_recursion(func):
@@ -26,17 +25,6 @@ def tail_recursion(func):
           return func
     
     return wrapper
-
-def link_filter(url: str):
-    #0番目が授業タブの全てのトピック, 1番目が各トピック, 2番目がファイルの正規表現
-    patterns = ['^.+/0/.{11,20}$', '.*/details$', '.*file/d/.*']
-    
-    result = 0
-    for pattern in patterns:
-        result += search(pattern, url) != None
-        
-    if (result > 0):
-        return url
     
 def text_filter(value: str) -> str:
     @tail_recursion
@@ -65,14 +53,6 @@ def to_tab_link(url: str):
 def to_all_tab_link(url: str):
     return to_tab_link(url) + '/t/all'
 
-def has_curretnt_args(func, type):
-    sig = inspect.signature(func)
-    for param in sig.parameters:
-        if sig.parameters[param].annotation == type:
-            return True
-        
-    return False
-
 def convert_to_tuple(list_1: Iterable, list_2: Iterable) -> list[tuple]:
     return list(
         map(
@@ -89,12 +69,6 @@ def identity(x):
         f(x)
         return x
     return func
-
-def mid(x: SupportsInt, y: SupportsInt, z: SupportsInt):
-    xyz = [x, y, z]
-    xyz.remove(min(xyz))
-    xyz.remove(max(xyz))
-    return xyz.pop()
 
 def public_vars(x) -> filter:
     return filter(lambda x: '__' not in x[0], vars(x).items())
