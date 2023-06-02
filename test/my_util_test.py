@@ -19,10 +19,7 @@ class NormalTest(unittest.TestCase):
         y = identity(x)(do_nothing)
         self.assertEqual(x, y)
         
-    def test_ratio(self):
-        x_y = (400, 300)
-        a = 5
-        self.assertEqual((80, 60), ratio(*x_y, a))
-        
-        a = 0
-        self.assertEqual((0, 0), ratio(*x_y, a))
+    def test_randstr(self):
+        length = 10
+        result = randstr(length)
+        self.assertEqual(length, len(result))

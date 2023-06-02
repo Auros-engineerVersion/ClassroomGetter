@@ -1,5 +1,7 @@
 from functools import wraps
 from re import sub
+from random import choice
+from string import ascii_letters, digits
 from typing import Callable, Iterable, SupportsInt
 
 #末尾再帰の最適化
@@ -72,3 +74,6 @@ def identity(x):
 
 def public_vars(x) -> filter:
     return filter(lambda x: '__' not in x[0], vars(x).items())
+
+def randstr(length: SupportsInt) -> str:
+    return ''.join(choice(ascii_letters + digits) for _ in range(length))
