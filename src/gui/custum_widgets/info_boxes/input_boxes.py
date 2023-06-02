@@ -7,21 +7,21 @@ from abc import ABCMeta, abstractmethod
 from src.gui.literals import *
 from src.my_util import do_nothing
 
-def box_factory(key_name, value, width: int):
+def box_factory(key_name, value):
     if type(value) == str:
-        return lambda master: EntryInput(master, width=width, title=key_name)
+        return lambda master: EntryInput(master, title=key_name)
     elif type(value) == int:
-        return lambda master: SpinInput(master, from_to=(0, 256), width=width, title=key_name)
+        return lambda master: SpinInput(master, from_to=(0, 256), title=key_name)
     elif type(value) == None or type(value) == set:
         return lambda master: None #この使われていないmasterは他のlambda関数と規格を合わせるために必要である
     else: #Pathなら
-        return lambda master: DialogInput(master, width=width, default_path=value, title=key_name)
+        return lambda master: DialogInput(master, default_path=value, title=key_name)
 
 class InputBox(tk.Frame, metaclass=ABCMeta):
     def __init__(self, master: tk.Misc, padx: tuple = (1, 1), title: str = TITLE) -> None:
         tk.Frame.__init__(self, master)
         label = tk.Label(self, text=title)
-        label.grid(column=0, ipadx=1, padx=padx)
+        label.pack(side=tk.LEFT, anchor=tk.W, padx=padx)
         
     @abstractmethod
     def set(self, value) -> None:
@@ -32,10 +32,10 @@ class InputBox(tk.Frame, metaclass=ABCMeta):
         raise NotImplementedError
 
 class EntryInput(InputBox):
-    def __init__(self, master: tk.Misc, width: int=30, padx: tuple = (1, 1), title: str = TITLE) -> None:
+    def __init__(self, master: tk.Misc, padx: tuple = (1, 1), title: str = TITLE) -> None:
         super().__init__(master, padx, title)
-        self.__entry = tk.Entry(self, width=width)
-        self.__entry.grid(column=1)
+        self.__entry = tk.Entry(self)
+        self.__entry.pack(side=tk.LEFT, anchor=tk.W)
     
     def set(self, value):
         self.__entry.delete(0, tk.END)
@@ -45,11 +45,11 @@ class EntryInput(InputBox):
         return self.__entry.get()
     
 class SpinInput(InputBox):
-    def __init__(self, master: tk.Misc, from_to: tuple[int, int],  width: int=30, padx: tuple = (1, 1), title: str = 'title') -> None:
+    def __init__(self, master: tk.Misc, from_to: tuple[int, int], padx: tuple = (1, 1), title: str = 'title') -> None:
         super().__init__(master, padx, title)
         
-        self.__spin = tk.Spinbox(self, width=width, from_=from_to[0], to=from_to[1])
-        self.__spin.grid(column=1)
+        self.__spin = tk.Spinbox(self, from_=from_to[0], to=from_to[1])
+        self.__spin.pack(side=tk.LEFT, anchor=tk.W)
         
     def set(self, value: int) -> None:
         self.__spin.delete(0, tk.END)
@@ -59,13 +59,13 @@ class SpinInput(InputBox):
         return int(self.__spin.get())
             
 class DialogInput(InputBox):
-    def __init__(self, master: tk.Misc, default_path: Path, width: int=30, padx: tuple = (1, 1), title: str = TITLE):
+    def __init__(self, master: tk.Misc, default_path: Path, padx: tuple = (1, 1), title: str = TITLE):
         super().__init__(master, padx, title)
+        self.__entry = tk.Entry(self)
         brows_button = tk.Button(self, text=BROWS, command=self.folder_dialog)
-        self.__entry = tk.Entry(self, width=width//8)
         
-        self.__entry.grid(column=1, sticky=tk.W)
-        brows_button.grid(column=2)
+        self.__entry.pack(side=tk.LEFT, anchor=tk.W)
+        brows_button.pack(side=tk.LEFT, anchor=tk.E, padx=padx)
 
         self.__default_path = default_path
         

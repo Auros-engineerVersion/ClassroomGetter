@@ -1,8 +1,8 @@
 import tkinter as tk
 
 class ScrollableFrame(tk.Frame):
-    def __init__(self, master: tk.Misc, relief: str, width: int, height: int, padx: int, pady: int, bar_x = True, bar_y = True):
-        tk.Frame.__init__(self, master, width=width, height=height, padx=padx, pady=pady, background='red')
+    def __init__(self, master: tk.Misc, relief: str, padx: int, pady: int, bar_x = True, bar_y = True):
+        tk.Frame.__init__(self, master, padx=padx, pady=pady, background='red')
         self.canvas = tk.Canvas(self, relief=relief, borderwidth=1)
         self.scrollable_frame = tk.Frame(self.canvas)
         self.scrollable_frame.bind(
