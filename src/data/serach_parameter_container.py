@@ -4,7 +4,7 @@ from selenium.common.exceptions import TimeoutException
 
 from src import my_util
 from src.interface.i_node import INode
-from src.interface.i_browser_control_data import IBrowserControlData as bc_data
+from src.interface.i_browser_control_data import IBrowserControlData
 from src.browser.browser_controls import *
 
 @dataclass(frozen=True)
@@ -13,7 +13,7 @@ class SearchParameter:
     regex: str
     attribute_func: Callable
         
-    def next_values(self, bc_data: bc_data) -> Callable:
+    def next_values(self, bc_data: IBrowserControlData) -> Callable[[Callable], Callable]:
         """
         この関数はカリー化されている
         Args:
@@ -23,7 +23,7 @@ class SearchParameter:
             format_func (callable):
                 acquiring_funcの戻り値をこの関数でmapする
         """
-        def __acc_func(acquiring_func: Callable) -> Callable:
+        def __acc_func(acquiring_func: Callable) -> Callable[[Callable], map]:
             def __map(format_func: Callable) -> map:
                 return map(
                     format_func,
@@ -45,21 +45,20 @@ class SearchParameterPattern:
     
     #func:textとlinkのペアに対して行う関数
     #text_filter, link_filter: それぞれのlistに対して行う関数
-    def elements(self, bc_data: bc_data, node: INode) -> list[tuple[str, str]]:
-        self.pre_proc((bc_data, node))
-        if self.text_param == None or self.link_param == None:
-            return my_util.convert_to_tuple([node.key + 'の授業タブ'], [my_util.to_all_tab_link(node.url)])
-        else:
-            try:
+    def name_elements_pair(self, bc_data: IBrowserControlData, node: INode):
+        def __accuring_func(f: Callable[[IBrowserControlData, str, str], map]):
+            self.pre_proc((bc_data, node))
+            if self.text_param == None or self.link_param == None:
+                return my_util.convert_to_tuple([node.key + 'の授業タブ'], [my_util.to_all_tab_link(node.url)])
+            else:
                 return my_util.convert_to_tuple(
-                        self.text_param.next_values(bc_data)(elements)(self.text_filter),
-                        self.link_param.next_values(bc_data)(elements)(self.link_filter)
+                        self.text_param.next_values(bc_data)(f)(self.text_filter),
+                        self.link_param.next_values(bc_data)(f)(self.link_filter)
                     )
-            except TimeoutException:
-                return []
+        return __accuring_func
         
 class SearchParameterContainer:
-    browser_control_data: bc_data = None
+    browser_control_data: IBrowserControlData = None
     
     @staticmethod
     def __get_text(elem):
@@ -134,7 +133,12 @@ class SearchParameterContainer:
 
     @staticmethod
     def elements(node: INode):
-        if len(SearchParameterContainer.parameters) > node.tree_height:
-            return SearchParameterContainer.parameters[node.tree_height].elements(SearchParameterContainer.browser_control_data, node)
+        param = SearchParameterContainer.parameters
+        if len(param) > node.tree_height:
+            return param[node.tree_height].\
+                name_elements_pair(
+                    SearchParameterContainer.browser_control_data,
+                    node
+                )(elements)
         else:
             return []
