@@ -77,3 +77,6 @@ def public_vars(x) -> filter:
 
 def randstr(length: SupportsInt) -> str:
     return ''.join(choice(ascii_letters + digits) for _ in range(length))
+
+def get_geometory(widget) -> str:
+    return f'{widget.winfo_width()}x{widget.winfo_height()}'
