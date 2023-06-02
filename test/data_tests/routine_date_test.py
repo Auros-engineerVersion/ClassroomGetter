@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 
 from src.data.routine_data import RoutineData
 
-class NormalTest(unittest.TestCase):
+class Routine_data_Test(unittest.TestCase):
     def test_reset(self):
         data = RoutineData(0,0,0,1)
         self.assertEqual(data.reset(), RoutineData())

@@ -7,7 +7,7 @@ from pathlib import Path
 
 from src.data.setting_data import SettingData
 
-class NormalTest(unittest.TestCase):
+class Setting_Data_Test(unittest.TestCase):
     def test_is_current(self):
         invailed_data1 = SettingData()
         self.assertFalse(invailed_data1.is_current_data())
