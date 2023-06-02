@@ -50,10 +50,10 @@ def get_from_pattern(pattern: SearchParameterPattern):
     
 class ParameterTest(unittest.TestCase):
     def test_next_value(self):
-        bc = 'BC'
+        bc = ''
         param = create_param(randstr, 10)
 
-        result = param.next_values(bc)(add_str)(do_nothing)
+        result = param.next_values(bc)(do_nothing)(add_str)(do_nothing)
         self.assertEqual([bc + param.xpath + param.regex], list(result))
         
 class ParameterPatternTest(unittest.TestCase):
@@ -64,7 +64,7 @@ class ParameterPatternTest(unittest.TestCase):
         node.url = 'URL'
         
         patterns = pattern_factory(randint(1, 10))        
-        result = map(lambda x: x.name_elements_pair(bc, node)(add_str), patterns)
+        result = map(lambda x: x.name_elements_pair(bc, node)(add_str, do_nothing), patterns)
         excepted_result = map(get_from_pattern, patterns)
 
         self.assertListEqual(sum(list(result), start=[]), list(excepted_result))

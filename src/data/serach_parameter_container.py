@@ -17,21 +17,25 @@ class SearchParameter:
         """
         この関数はカリー化されている
         Args:
+            format_func (callable):
+                acquiring_funcの戻り値をこの関数でmapする
+                
             acquiring_func (callable):
                 この関数は高階関数で無ければならず、最終的にIterableな値を返さなければならない
                 
-            format_func (callable):
-                acquiring_funcの戻り値をこの関数でmapする
+            filter_func (callable):
+                acquiring_funcの戻り値をこの関数でfilterする
         """
-        def __acc_func(acquiring_func: Callable) -> Callable[[Callable], map]:
-            def __map(format_func: Callable) -> map:
-                return map(
-                    format_func,
-                    acquiring_func(bc_data, self.xpath, self.regex)(self.attribute_func)
-                ) 
-
-            return __map
-        return __acc_func
+        def __filter_func(format_func: Callable) -> Callable[[Callable], Callable]:
+            def __acquiring_func(acquiring_func: Callable) -> Callable[[Callable], map]:
+                def __map(filter_func: Callable) -> map:
+                    return map(
+                        format_func,
+                        filter_func(acquiring_func(bc_data, self.xpath, self.regex)(self.attribute_func))
+                    ) 
+                return __map
+            return __acquiring_func
+        return __filter_func
         
 @dataclass(frozen=True)
 class SearchParameterPattern:
@@ -39,23 +43,23 @@ class SearchParameterPattern:
     text_param: SearchParameter
     link_param: SearchParameter
     
-    text_filter: Callable = my_util.do_nothing
-    link_filter: Callable = my_util.do_nothing
+    text_format: Callable = my_util.do_nothing
+    link_format: Callable = my_util.do_nothing
     pre_proc:    Callable = my_util.do_nothing
     
     #func:textとlinkのペアに対して行う関数
     #text_filter, link_filter: それぞれのlistに対して行う関数
     def name_elements_pair(self, bc_data: IBrowserControlData, node: INode):
-        def __accuring_func(f: Callable[[IBrowserControlData, str, str], map]):
+        def __functions(acc_f: Callable, filter_f: Callable):
             self.pre_proc((bc_data, node))
             if self.text_param == None or self.link_param == None:
                 return my_util.convert_to_tuple([node.key + 'の授業タブ'], [my_util.to_all_tab_link(node.url)])
             else:
                 return my_util.convert_to_tuple(
-                        self.text_param.next_values(bc_data)(f)(self.text_filter),
-                        self.link_param.next_values(bc_data)(f)(self.link_filter)
+                        self.text_param.next_values(bc_data)(self.text_format)(acc_f)(filter_f),
+                        self.link_param.next_values(bc_data)(self.link_format)(acc_f)(filter_f)
                     )
-        return __accuring_func
+        return __functions
         
 class SearchParameterContainer:
     browser_control_data: IBrowserControlData = None
@@ -90,7 +94,7 @@ class SearchParameterContainer:
                 "^.*/c/.{16}$",
                 __get_link
             ),
-            text_filter = my_util.text_filter,
+            text_format = my_util.text_filter,
             pre_proc=__move
         ),
         
@@ -139,6 +143,6 @@ class SearchParameterContainer:
                 name_elements_pair(
                     SearchParameterContainer.browser_control_data,
                     node
-                )(elements)
+                )(search_element_all, elements_filter)
         else:
             return []
