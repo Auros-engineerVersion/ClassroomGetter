@@ -1,15 +1,10 @@
 import tkinter as tk
 import asyncio
 
+from src.gui.literals import *
 from src.data.routine_data import RoutineData, timedelta
 from src.gui.custum_widgets.info_boxes.node_box import NodeBox
 from src.gui.custum_widgets.info_boxes.input_boxes import SpinInput
-
-TEXT = "text"
-STATE = 'state'
-NO_DATA = '未設定'
-RUN = '実行'
-BUTTON_PRESS = '<ButtonPress>'
 
 class NodeInfoFrame(tk.Frame):
     def __init__(self, master: tk.Misc, watching_box: NodeBox = None):
@@ -22,7 +17,7 @@ class NodeInfoFrame(tk.Frame):
         
         #ボタンが押されたら、監視中のNodeBoxからinitialize_treeを実行する
         self.__init_button = tk.Button(self, text=RUN)
-        self.__init_button.bind(BUTTON_PRESS, lambda: asyncio.run(self.__watching_box.initialize_node()))
+        self.__init_button.bind(BUTTON_PRESS, lambda event: self.__watching_box.initialize_node())
         
 #region pack
         self.__node_name_label.pack(side=tk.TOP, anchor=tk.CENTER, padx=5, pady=5)
@@ -58,9 +53,9 @@ class Timer(tk.Frame):
         time_set_frame = tk.Frame(self)
         self.__time_setters = TimeSetters(self)
         set_button = tk.Button(time_set_frame, text='この時間に指定する')
-        set_button.bind(BUTTON_PRESS, lambda: self.__watching_box.set_time(RoutineData(*self.__time_setters.values())))
+        set_button.bind(BUTTON_PRESS, lambda event: self.__watching_box.set_time(RoutineData(*self.__time_setters.values())))
         
-        reset_button = tk.Button(time_set_frame, text='元に戻す')
+        reset_button = tk.Button(time_set_frame, text=RESET)
         reset_button.bind(BUTTON_PRESS, self.__watching_box.time_reset)
         
 #region pack
@@ -77,6 +72,11 @@ class Timer(tk.Frame):
     @property
     def watching_box(self):
         return self.__watching_box
+    
+    @watching_box.setter
+    def watching_box(self, box: NodeBox):
+        self.__watching_box = box
+        self.__time_setters.set(box.time)
         
     async def update_clock(self, box: NodeBox, interval: int):
         try:
@@ -85,7 +85,7 @@ class Timer(tk.Frame):
                 await asyncio.sleep(interval)
                 
             else:
-                await asyncio.create_task(box.initialize_node()) 
+                box.initialize_node()
         except asyncio.CancelledError:
             return
 
@@ -106,9 +106,9 @@ class TimeSetters(tk.Frame):
         return RoutineData(*map(lambda box: box.value(), self.__boxes))
         
     def set(self, time: RoutineData):
-        list(
-            map(
-                lambda box, value: box.set(value),
-                self.__boxes, vars(time).values()
-            )
+        tmp = map(
+            lambda box, value: box.set(value),
+            self.__boxes, vars(time).values()
         )
+        list(tmp)
+        
