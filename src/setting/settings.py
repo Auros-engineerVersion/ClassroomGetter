@@ -5,7 +5,7 @@ import asyncio
 
 from src.data.serach_parameter_container import SearchParameterContainer
 from src.browser.browser_controls import *
-from src.interface.i_browser_control_data import IBrowserControlData as bc_data
+from src.interface.i_browser_control_data import IBrowserControlData as IBrowserControlData
 from src.data.setting_data import SettingData
 from src.data.nodes import Node
 
@@ -42,7 +42,7 @@ class Settings:
             return data
     
     @staticmethod
-    def setup_data(data: SettingData, bc: bc_data):
+    def setup_data(data: SettingData, bc: IBrowserControlData):
         SearchParameterContainer.browser_control_data = bc #初期値を設定
         #node_listが何も設定されていないのなら値を取りに行く
         if not data.is_current_nodes():

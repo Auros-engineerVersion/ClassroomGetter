@@ -7,16 +7,14 @@ from pathlib import Path
 
 from src.setting.settings import Settings, SettingData
 
-class NormaTest(unittest.TestCase):
+class SettingTest(unittest.TestCase):
     def setUp(self) -> None:
         self.__test_folder_path = Path('./test/for_settings_test')
-        self.__test_folder_path.mkdir()
-        return super().setUp()
+        self.__test_folder_path.mkdir(parents=True, exist_ok=True)
 
     def tearDown(self) -> None:
-        os.remove(self.__test_folder_path.joinpath('save.pkl'))
+        self.__test_folder_path.joinpath('save.pkl').unlink(missing_ok=True)
         os.rmdir(self.__test_folder_path)
-        return super().tearDown()
 
     def test_save_and_load(self):
         target_1 = SettingData('いろはにほへと')
@@ -31,17 +29,7 @@ class NormaTest(unittest.TestCase):
         Settings.save(self.__test_folder_path, target_2)
         result = Settings.load(self.__test_folder_path)
         self.assertEqual(result, target_2)
-    
-class AbNormalTest(unittest.TestCase):
-    def setUp(self) -> None:
-        self.__test_folder_path = Path('./test/for_settings_test')
-        self.__test_folder_path.mkdir(parents=True, exist_ok=True)
-        return super().setUp()
-
-    def tearDown(self) -> None:
-        os.rmdir(self.__test_folder_path)
-        return super().tearDown()
-    
+        
     def test_no_such_file(self):
         self.assertEqual(Settings.load(self.__test_folder_path), SettingData())
     
