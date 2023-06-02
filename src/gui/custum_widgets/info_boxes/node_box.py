@@ -47,11 +47,11 @@ class NodeBox(tk.Frame):
     def set_time(self, data):
         self.__node.next_init_time = data
             
-    def time_reset(self):
+    def time_reset(self, event):
         self.__node.next_init_time.reset()
     
     def on_frame_click(self, event):
-        self.__set_info_func(self)
+        NodeBox.node_info_frame.set_box(self)
         
     def dispose(self):
         stack: list[NodeBox] = [self]
@@ -63,9 +63,9 @@ class NodeBox(tk.Frame):
 
             value.destroy()
         
-    async def initialize_node(self):
+    def initialize_node(self):
         self.__node.edges.clear()
-        await self.__node.initialize_tree()
+        self.__node.initialize_tree()
         self.__is_expand = False
                     
     def expand(self):
@@ -80,6 +80,6 @@ class NodeBox(tk.Frame):
         
         if self.__is_expand:
             self.pack(anchor=tk.W)
-            for node in self.__node.edges():
-                new_box = NodeBox(self.__master, self.__set_info_func, node, self)
+            for node in self.__node.edges:
+                new_box = NodeBox(self.__master, node, self)
                 self.__nextboxes.append(new_box)
