@@ -3,7 +3,7 @@ from unittest.mock import Mock
 
 from src.my_util import *
 
-class NormalTest(unittest.TestCase):
+class MyUtilTest(unittest.TestCase):
     def test_convert_to_tuple(self):
         x = [0, 1, 2]
         y = ['a', 'b', 'c']
