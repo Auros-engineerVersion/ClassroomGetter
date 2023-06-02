@@ -1,19 +1,19 @@
+from typing import Callable, Iterable
+from re import search
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
 from selenium.common.exceptions import InvalidSelectorException
 from selenium.webdriver.support import expected_conditions as EC
-from typing import Callable
-from re import search
 
-from src.interface.i_browser_control_data import IBrowserControlData as bc_data
+from src.interface.i_browser_control_data import IBrowserControlData
 from src.data.setting_data import SettingData
 
-def move(bc: bc_data, url: str):
+def move(bc: IBrowserControlData, url: str):
     bc.driver.get(url)
     
-def search_element(bc: bc_data, xpath: str) -> WebElement:
+def search_element(bc: IBrowserControlData, xpath: str) -> WebElement:
     try:
         return bc.wait.until(EC.presence_of_element_located((By.XPATH, xpath)))
     except TimeoutException:
@@ -21,7 +21,7 @@ def search_element(bc: bc_data, xpath: str) -> WebElement:
     except InvalidSelectorException:
         return None
 
-def search_element_all(bc: bc_data, xpath: str) -> list[WebElement]:
+def search_element_all(bc: IBrowserControlData, xpath: str) -> list[WebElement]:
     try:
         return bc.wait.until(EC.presence_of_all_elements_located((By.XPATH, xpath)))
     except TimeoutException:
@@ -29,19 +29,17 @@ def search_element_all(bc: bc_data, xpath: str) -> list[WebElement]:
     except InvalidSelectorException:
         return []
     
-def elements(bc: bc_data, xpath: str, pattern: str = ''):
-    def __get_hrefs(filter_func: Callable):
-        elems: list[WebElement] = search_element_all(bc, xpath)
-            
+def elements_filter(filter_func: Callable, pattern: str = ''):
+    def __get_hrefs(target: Iterable):
         current_values = filter(
             lambda string: search(pattern, string=str(string)) != None,
-            map(filter_func, elems)
+            map(filter_func, target)
         )
         
         return list(current_values)
     return __get_hrefs
 
-def click_all_sections(bc: bc_data):
+def click_all_sections(bc: IBrowserControlData):
     def __check_loaded(xpath) -> bool:
         def __predictate(driver):
             sample_buttons = search_element_all(bc, By.XPATH, "//div[@jsmodel='RH7Ihb']")
@@ -62,7 +60,7 @@ def click_all_sections(bc: bc_data):
     except TimeoutException:
         return
     
-def login_college_form(bc: bc_data, setting: SettingData):
+def login_college_form(bc: IBrowserControlData, setting: SettingData):
     befor_at_index = setting.user_email.find('@')
     user_name = setting.user_email[:befor_at_index]
     
@@ -73,7 +71,7 @@ def login_college_form(bc: bc_data, setting: SettingData):
     search(bc, "//input[@id='j_password']").send_keys(setting.user_password)
     search(bc, "//button[@type='submit']").click()
 
-def login_google(bc: bc_data, setting: SettingData):
+def login_google(bc: IBrowserControlData, setting: SettingData):
     #1:emailを入力する
     #2:続行を押す
     #3:大学のフォームにログイン
@@ -83,7 +81,7 @@ def login_google(bc: bc_data, setting: SettingData):
     login_college_form(bc, setting)
     search(bc, "//div[@jsname='Njthtb']")       .click()
     
-def login_classroom(bc: bc_data, setting: SettingData):
+def login_classroom(bc: IBrowserControlData, setting: SettingData):
     #1:ログイン画面に移動する
     #2:Googleにログインする
     #3:プロファイルを設定する
