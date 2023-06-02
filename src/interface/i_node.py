@@ -44,7 +44,7 @@ class INode(metaclass=ABCMeta):
         raise NotImplementedError
     
     @abstractmethod
-    async def initialize_tree(entry: INode) -> None:
+    def initialize_tree(entry: INode) -> None:
         raise NotImplementedError
     
     @abstractmethod
