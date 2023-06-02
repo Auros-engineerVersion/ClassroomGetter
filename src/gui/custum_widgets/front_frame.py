@@ -13,6 +13,9 @@ class FrontFrame(tk.Frame):
         
         node_canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         self.__node_info.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
-        
+    
+    def resize(self):
+        pass
+    
     async def run_clock(self):
         self.__node_info.run_clock_async()

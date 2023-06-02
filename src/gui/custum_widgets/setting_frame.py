@@ -52,6 +52,9 @@ class SettingFrame(tk.Frame):
         
         self.set(self.__boxes, data)
         
+    def resize(self):
+        pass
+        
     def set(self, targets: list, data: SettingData):
         data_set = map(
             lambda d, box: box.set(d) if box is not None else None,
