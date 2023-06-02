@@ -11,7 +11,7 @@ from src.data.setting_data import SettingData
 #options.add_argument("--ignore-ssl-errors")
 class BrowserControlData(IBrowserControlData):
     def __init__(self, setting: SettingData, driver: webdriver = None, wait: WebDriverWait = None) -> None:        
-        self.driver = driver \
+        self.__driver = driver \
             if driver != None \
             else create_driver(
                 SettingData.profile_path(),
@@ -20,14 +20,22 @@ class BrowserControlData(IBrowserControlData):
                 '--headless'
             )
             
-        self.wait = wait \
+        self.__wait = wait \
             if wait != None \
-            else WebDriverWait(self.driver, setting.loading_wait_time, 1)
+            else WebDriverWait(self.__driver, setting.loading_wait_time, 1)
     
     def __del__(self):
-        del self.wait
-        self.driver.quit()
-        del self.driver
+        del self.__wait
+        self.__driver.quit()
+        del self.__driver
+    
+    @property
+    def driver(self) -> webdriver:
+        return self.__driver
+    
+    @property
+    def wait(self) -> WebDriverWait:
+        return self.__wait
         
 def create_driver(profile: Path, *optional_args) -> webdriver.Chrome:
     options = webdriver.ChromeOptions()

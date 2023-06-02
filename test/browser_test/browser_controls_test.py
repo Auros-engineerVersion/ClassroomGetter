@@ -5,21 +5,38 @@ import unittest
 from unittest.mock import patch, AsyncMock
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
-from re import search
-import asyncio
+from selenium import webdriver
 
+from src.browser.browser_controls import *
+from src.data.browser_control_data import BrowserControlData
 from src.data.setting_data import SettingData
 from src.browser.browser_controls import *
 from src.my_util import do_nothing
 
-class BrowserControlsTest(unittest.TestCase):    
-    def test_elements_with_valid_xpath(self):
-        xpath = '//div[@class="test"]'
-        pattern = ''
-        elems = [1, 2, 3]
+class BrowserControlsTest(unittest.TestCase):
+    def setUp(self):
+        self.__data = SettingData(loading_wait_time=1)
+        self.__bc = BrowserControlData(self.__data)
+        move(self.__bc, 'https://tonari-it.com/scraping-test/')
         
-        bc = BrowserControl(SettingData())
-        self.assertEqual(asyncio.run(elements(bc, xpath, pattern)(do_nothing)), elems)
+    def tearDown(self):
+        del self.__bc
+    
+    def test_serch_elements(self):
+        xpathes = [
+            '//div[@id="hoge"]',
+            'qwryioplkjhgdsazxvnm',
+            '//div[@class="13-.,,""@[]/;/"]'
+        ]
+        
+        excepted_results = ['hoge', None, None]
+        
+        results = map(
+            lambda elem: elem.get_attribute('id') if elem != None else None,
+            map(lambda xpath: search_element(self.__bc, xpath), xpathes)
+        )
+        
+        self.assertEqual(list(results), excepted_results)
 
     #@patch('selenium.webdriver.support.ui.WebDriverWait.until')
     #def test_elements_with_invalid_xpath(self, mock_wait):

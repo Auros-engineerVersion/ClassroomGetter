@@ -3,8 +3,14 @@ from abc import ABCMeta, abstractmethod, abstractproperty
 from typing import Coroutine, Callable
 
 class IBrowserControlData(metaclass=ABCMeta):
-    def __init__(self) -> None:
+    @abstractmethod
+    def __init__(self, setting, driver = None, wait = None) -> None:
+        pass
+        
+    @abstractproperty
+    def driver(self):
         raise NotImplementedError
     
-    def __del__(self):
+    @abstractproperty
+    def wait(self):
         raise NotImplementedError
