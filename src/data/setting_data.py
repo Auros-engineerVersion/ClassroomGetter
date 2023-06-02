@@ -6,8 +6,7 @@ import dataclasses
 NO_DATA = 'No Data'
 
 @dataclasses.dataclass
-class SettingData:
-    SETTINGFOLDER_PATH: ClassVar[Path] = Path('./Setting')
+class SettingData:    
     user_email: str     = NO_DATA
     user_password: str  = NO_DATA
 
@@ -18,6 +17,18 @@ class SettingData:
     loading_wait_time: int = 5
     
     nodes: set = None
+    
+    SETTINGFOLDER_PATH: ClassVar[Path] = Path('./Setting')
+    DESCRIPTIONS: ClassVar[dict[str, str]] = {
+        'user_email': 
+            'ユーザーのメールアドレスを入力してください',
+        'user_password': 
+            'ユーザーアカウントのパスワードを入力してください',
+        'save_folder_path': 
+            '入手したファイルを保存する場所を入力してください',
+        'loading_wait_time':
+            'ページの読み込みを待つ時間を入力してください',
+    }
         
     def __add__(self: SettingData, other: SettingData) -> SettingData:
         args = list(
