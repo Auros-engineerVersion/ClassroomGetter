@@ -39,9 +39,9 @@ class SearchParameterPattern:
     text_param: SearchParameter
     link_param: SearchParameter
     
-    text_filter: callable = my_util.do_nothing
-    link_filter: callable = my_util.do_nothing
-    pre_proc:    callable = my_util.do_nothing
+    text_filter: Callable = my_util.do_nothing
+    link_filter: Callable = my_util.do_nothing
+    pre_proc:    Callable = my_util.do_nothing
     
     #func:textとlinkのペアに対して行う関数
     #text_filter, link_filter: それぞれのlistに対して行う関数
