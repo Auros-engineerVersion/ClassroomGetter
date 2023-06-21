@@ -21,13 +21,13 @@ class SettingData:
     SETTINGFOLDER_PATH: ClassVar[Path] = Path('./Setting')
     DESCRIPTIONS: ClassVar[dict[str, str]] = {
         'user_email': 
-            'ユーザーのメールアドレスを入力してください',
+            '　ユーザーのメールアドレスを入力してください',
         'user_password': 
-            'ユーザーアカウントのパスワードを入力してください',
+            '　ユーザーアカウントのパスワードを入力してください',
         'save_folder_path': 
-            '入手したファイルを保存する場所を入力してください',
+            '　入手したファイルを保存する場所を入力してください',
         'loading_wait_time':
-            'ページの読み込みを待つ時間を入力してください',
+            '　ページの読み込みを待つ時間を入力してください',
     }
         
     def __add__(self: SettingData, other: SettingData) -> SettingData:
@@ -43,7 +43,7 @@ class SettingData:
     
     @property
     def profile(self):
-        return (self.user_email, self.user_password)
+        return self.user_email, self.user_password
     
     @profile.setter
     def profile(self, other: tuple[str, str]):
