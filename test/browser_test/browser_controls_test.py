@@ -38,8 +38,8 @@ class BrowserControlsTest(unittest.TestCase):
         self.assertListEqual(list(results), excepted_results)
     
     def test_elements_filter_test(self):
-        target = ['1', do_nothing, -3, 1024, 'hoge', 'fuga', 'piyo']
-        self.assertEqual(elements_filter(do_nothing, '.{4}')(target), ['hoge', 'fuga', 'piyo'])
+        target = ['1', do_nothing, -3.000, 1024, 'hoge', 'fuga', 'piyo']
+        self.assertEqual(elements_filter(do_nothing, '[a-z]{4}')(target), ['hoge', 'fuga', 'piyo'])
         
 if __name__ == '__main__':
     unittest.main()

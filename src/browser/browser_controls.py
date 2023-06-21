@@ -33,7 +33,10 @@ def elements_filter(filter_func: Callable, pattern: str = ''):
     def __get_hrefs(target: Iterable) -> list:
         current_values = filter(
             lambda string: search(pattern, string=str(string)) != None,
-            map(filter_func, target)
+            filter(
+                lambda obj: type(obj) == str,
+                map(filter_func, target)
+            )
         )
         
         return list(current_values)
