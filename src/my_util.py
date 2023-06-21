@@ -80,3 +80,6 @@ def randstr(length: SupportsInt) -> str:
 
 def get_geometory(widget) -> str:
     return f'{widget.winfo_width()}x{widget.winfo_height()}'
+
+def size_to_geometory(width: int, height: int) -> str:
+    return f'{width}x{height}'
