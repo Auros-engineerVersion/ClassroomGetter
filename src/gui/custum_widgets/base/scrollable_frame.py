@@ -1,4 +1,5 @@
 import tkinter as tk
+from src.gui.literals import CONFIGURE
 
 class ScrollableFrame(tk.Frame):
     def __init__(self, master: tk.Misc, relief: str, padx: int, pady: int, bar_x = True, bar_y = True):
@@ -6,7 +7,7 @@ class ScrollableFrame(tk.Frame):
         self.canvas = tk.Canvas(self, relief=relief, borderwidth=1)
         self.scrollable_frame = tk.Frame(self.canvas)
         self.scrollable_frame.bind(
-            "<Configure>",
+            CONFIGURE,
             lambda e: self.canvas.configure(
                 scrollregion=self.canvas.bbox(tk.ALL)
             )
