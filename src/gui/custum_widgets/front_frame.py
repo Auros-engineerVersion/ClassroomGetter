@@ -1,6 +1,7 @@
 import tkinter as tk
 
-from src.my_util import get_geometory
+from src.gui.literals import CONFIGURE
+from src.my_util import size_to_geometory
 from src.interface.i_node import INode
 from src.gui.custum_widgets.base.infomations import *
 from src.gui.custum_widgets.base.scrollable_frame import ScrollableFrame
@@ -15,10 +16,10 @@ class FrontFrame(tk.Frame):
         node_canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         self.__node_info.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
     
-    def resize(self):
+    def resize(self, width: int = 400, height: int = 300):
         root = self.winfo_toplevel()
         root.resizable(True, True)
-        root.geometry(get_geometory(root))
+        root.geometry(size_to_geometory(width, height))
         
     async def run_clock(self):
         self.__node_info.run_clock_async()

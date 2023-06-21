@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import font
 
 from src.gui.literals import *
-from src.my_util import identity
+from src.my_util import identity, size_to_geometory
 from src.setting.settings import Settings, SettingData
 from src.gui.custum_widgets.info_boxes.input_boxes import box_factory, InputBox
 
@@ -52,8 +52,10 @@ class SettingFrame(tk.Frame):
         
         self.set(self.__boxes, data)
         
-    def resize(self):
-        pass
+    def resize(self, width: int = 800, height: int = 600):
+        root = self.winfo_toplevel()
+        root.resizable(width=False, height=False)
+        root.geometry(size_to_geometory(width, height))
         
     def set(self, targets: list, data: SettingData):
         data_set = map(
