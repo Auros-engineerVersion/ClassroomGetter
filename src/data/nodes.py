@@ -4,9 +4,10 @@ from typing import Coroutine, Callable
 
 from src.data.routine_data import RoutineData
 from src.interface.i_node import INode
+from src.interface.i_comparable import IComparale
 from src.data.serach_parameter_container import SearchParameterContainer
 
-class Node(INode):
+class Node(INode, IComparale):
     Nodes: set[INode] = set() #全てのノードの集合
 
     def __init__(self, key: str, url: str, tree_height: int, next_init_time: RoutineData = None) -> None:        

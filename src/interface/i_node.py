@@ -28,18 +28,6 @@ class INode(metaclass=ABCMeta):
         raise NotImplementedError
 
     @abstractmethod
-    def __lt__(self, other) -> bool:
-        raise NotImplementedError
-
-    @abstractmethod
-    def __hash__(self) -> int:
-        raise NotImplementedError
-
-    @abstractmethod
-    def __eq__(self, other) -> bool:
-        raise NotImplementedError
-
-    @abstractmethod
     def serach(entry: INode) -> Coroutine[Callable[[Callable], None]]:
         raise NotImplementedError
     
