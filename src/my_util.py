@@ -4,6 +4,7 @@ from random import choice
 from string import ascii_letters, digits
 from typing import Callable, Iterable, SupportsInt
 from pathlib import Path
+import inspect
 
 #末尾再帰の最適化
 def tail_recursion(func):
@@ -87,7 +88,7 @@ def size_to_geometory(width: int, height: int) -> str:
 
 #exec関数を用いて指定したフォルダ内のすべてのファイルをimportする
 #importした後、クラスを名前とペアでdictとして返す関数
-def __recursion_import(path: Path) -> dict[str, object]:
+def __directory_import(path: Path) -> dict[str, object]:
     '''戻り値: {ファイル名: モジュール}'''
     from importlib import machinery
     
@@ -106,7 +107,6 @@ def __recursion_import(path: Path) -> dict[str, object]:
     return modules
 
 def __menbers(module) -> list[str]:
-    import inspect
     return [name for name, _ in inspect.getmembers(module, inspect.isclass)]
 
 def __get_class(module: object, class_name: str, *args, **kwargs) -> object:
@@ -115,8 +115,11 @@ def __get_class(module: object, class_name: str, *args, **kwargs) -> object:
 
 def all_class_in_dir(path: Path):
     result = []
-    for v in __recursion_import(path).items():
+    for v in __directory_import(path).items():
         for name in __menbers(v[1]):
             result.append(__get_class(v[1], name))
         
     return result
+
+def argments_size(func):
+    return len(inspect.signature(func).parameters)
