@@ -11,6 +11,7 @@ from src.data.setting_data import SettingData
 from src.data.nodes import Node
 
 IMAGE_PATH = Path('test/gui_tests/images')
+SAVE_PATH = Path('test/gui_tests/save')
 WHITE_LIST = ['SettingFrame', 'FrontFrame']
 
 class ImageTest(unittest.TestCase):
@@ -19,7 +20,7 @@ class ImageTest(unittest.TestCase):
         if annotation is tk.Misc:
             return tk.Tk()
         elif annotation is SettingData:
-            return SettingData()
+            return SettingData(save_folder_path=SAVE_PATH.absolute())
         elif annotation is Node:
             return Node('key', 'url', 1)
         elif annotation is str:
@@ -39,11 +40,9 @@ class ImageTest(unittest.TestCase):
         
     def test_caputuer(self):
         for cls in filter(lambda cls: cls.__name__ in WHITE_LIST, all_class_in_dir(Path('src/gui'))):
-            caputer.caputuer(
-                cls(*map(lambda x: self.__create_placeholder(x), cls.__init__.__annotations__.values())),
-                f'test/gui_tests/images/{cls}.png', 
-                overwrite=True
-            )
+            ins = cls(*map(lambda x: self.__create_placeholder(x), cls.__init__.__annotations__.values()))
+            ins.pack()
+            caputer.caputuer(ins, IMAGE_PATH.joinpath(f'{cls.__name__}.png'), overwrite=True)
                 
 if __name__ == '__main__':
     unittest.main()
