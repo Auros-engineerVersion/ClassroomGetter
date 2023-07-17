@@ -16,7 +16,7 @@ class SettingData:
     #webdriverに関する設定
     loading_wait_time: int = 5
     
-    nodes: set = None
+    nodes: set = set()
     
     SETTINGFOLDER_PATH: ClassVar[Path] = Path('./Setting')
     DESCRIPTIONS: ClassVar[dict[str, str]] = {
