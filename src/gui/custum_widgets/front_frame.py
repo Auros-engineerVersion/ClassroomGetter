@@ -7,7 +7,7 @@ from src.gui.custum_widgets.base.infomations import *
 from src.gui.custum_widgets.base.scrollable_frame import ScrollableFrame
 
 class FrontFrame(tk.Frame):
-    def __init__(self, master: tk.Misc, root: INode):
+    def __init__(self, master: tk.Misc, root: INode = None):
         tk.Frame.__init__(self, master)
         node_canvas = ScrollableFrame(self, tk.SUNKEN, padx=1, pady=1)
         self.__node_info = NodeInfoFrame(self, NodeBox(node_canvas.scrollable_frame, root))

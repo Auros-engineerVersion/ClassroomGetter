@@ -7,7 +7,7 @@ from src.setting.settings import Settings, SettingData
 from src.gui.custum_widgets.info_boxes.input_boxes import box_factory, InputBox
 
 class DescBox(tk.Frame):
-    def __init__(self, master: tk.Misc, box: InputBox, text: str, font_size: int):
+    def __init__(self, master: tk.Misc, box: InputBox = ..., text: str = ..., font_size: int = 8):
         tk.Frame.__init__(self, master, relief=tk.GROOVE, background=master[BACKGROUND], padx=5, pady=5)
         box.pack(side=tk.TOP, anchor=tk.W)
         self.update_idletasks()

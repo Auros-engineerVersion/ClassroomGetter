@@ -2,7 +2,7 @@ import tkinter as tk
 from src.gui.literals import CONFIGURE
 
 class ScrollableFrame(tk.Frame):
-    def __init__(self, master: tk.Misc, relief: str, padx: int, pady: int, bar_x = True, bar_y = True):
+    def __init__(self, master: tk.Misc, relief: str = tk.SUNKEN, padx: int = 1, pady: int = 1, bar_x = True, bar_y = True):
         tk.Frame.__init__(self, master, padx=padx, pady=pady, background='red')
         self.canvas = tk.Canvas(self, relief=relief, borderwidth=1)
         self.scrollable_frame = tk.Frame(self.canvas)
