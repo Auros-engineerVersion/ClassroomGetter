@@ -7,6 +7,7 @@ NO_DATA = 'No Data'
 
 @dataclasses.dataclass
 class SettingData:    
+    #----------------通常のデータ------------------------
     user_email: str     = NO_DATA
     user_password: str  = NO_DATA
 
@@ -16,7 +17,9 @@ class SettingData:
     #webdriverに関する設定
     loading_wait_time: int = 5
     
+    #----------------高度なデータ------------------------
     nodes: set = dataclasses.field(default_factory=set)
+    web_driver_options: list[str] = dataclasses.field(default_factory=['--ignore-certificate-error', '--ignore-ssl-errors', '--headless'])
     
     SETTINGFOLDER_PATH: ClassVar[Path] = Path('./Setting')
     DESCRIPTIONS: ClassVar[dict[str, str]] = {
@@ -66,6 +69,12 @@ class SettingData:
             
     def is_default(self):
         return NO_DATA in self.user_email + self.user_password
+    
+    def normal_data(self):
+        return self.user_email, self.user_password, self.save_folder_path, self.loading_wait_time
+    
+    def advanced_data(self): #ユーザーにあまり触れてほしくないデータ
+        return self.web_driver_options
     
     @staticmethod
     def profile_path():
