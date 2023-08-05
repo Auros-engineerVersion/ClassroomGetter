@@ -7,7 +7,7 @@
             "label": "Run All Tests",
             "type": "shell",
             "windows":{
-                "command": "python -m ${workspaceFolder}\\test discover -v"
+                "command": "python discover -s ./test -p '*test.py'"
             },
         }
     ]
