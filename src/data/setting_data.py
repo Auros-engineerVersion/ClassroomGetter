@@ -14,13 +14,20 @@ class SettingData:
     #セーブフォルダの場所
     save_folder_path: Path = Path('./Save').absolute()
     
-    #webdriverに関する設定
+    #ページの読み込みを待つ時間
     loading_wait_time: int = 5
     
     #----------------高度なデータ------------------------
-    nodes: set = dataclasses.field(default_factory=set)
-    web_driver_options: list[str] = dataclasses.field(default_factory=['--ignore-certificate-error', '--ignore-ssl-errors', '--headless'])
+    web_driver_options: str = '''
+        --headless,
+        --disable-gpu,
+        --blink-settings=imagesEnabled=false
+    '''
     
+    #----------------保存されたデータ--------------------
+    nodes: set = dataclasses.field(default_factory=set)
+    
+#region 定数
     SETTINGFOLDER_PATH: ClassVar[Path] = Path('./Setting')
     DESCRIPTIONS: ClassVar[dict[str, str]] = {
         'user_email': 
@@ -31,7 +38,10 @@ class SettingData:
             '　入手したファイルを保存する場所を入力してください',
         'loading_wait_time':
             '　ページの読み込みを待つ時間を入力してください',
+        'web_driver_options':
+            'Web Driverが起動する際のオプションです'
     }
+#endregion
         
     def __add__(self: SettingData, other: SettingData) -> SettingData:
         args = list(
@@ -70,11 +80,13 @@ class SettingData:
     def is_default(self):
         return NO_DATA in self.user_email + self.user_password
     
-    def normal_data(self):
-        return self.user_email, self.user_password, self.save_folder_path, self.loading_wait_time
+    def normal_data(self) -> list:
+        get_by_index = lambda index: list(self.__dict__.items())[index]
+        return [get_by_index(i) for i in range(0, 3)]
     
     def advanced_data(self): #ユーザーにあまり触れてほしくないデータ
-        return self.web_driver_options
+        get_by_index = lambda index: list(self.__dict__.items())[index]
+        return [get_by_index(4)]
     
     @staticmethod
     def profile_path():
