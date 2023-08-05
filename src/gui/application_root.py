@@ -2,14 +2,12 @@ import tkinter as tk
 from tkinter import ttk
 import asyncio
 
+from literals import *
 from src.gui.custum_widgets.front_frame import *
 from src.gui.custum_widgets.setting_frame import *
 from src.data.browser_control_data import BrowserControlData as bc_data
 from src.gui.custum_widgets.info_boxes.input_boxes import ProfileForm
 from src.setting.settings import Settings, SettingData
-
-ROOT_TITLE = 'ClassroomHack'
-WM_DELETE_WINDOW = 'WM_DELETE_WINDOW'
 
 class ApplicationRoot(tk.Tk):
     def __init__(self, cfg: SettingData, bc: bc_data, size: tuple) -> None:
@@ -17,20 +15,25 @@ class ApplicationRoot(tk.Tk):
         
         self.title(ROOT_TITLE)
         self.geometry(f'{size[0]}x{size[1]}')
-        self.resizable(0, 0)
-                
+        
         note = ttk.Notebook(self, width=size[0], height=size[1])
-        main_frame = FrontFrame(note, min(cfg.nodes), *size) #頂点を探して設定する
-        setting_frame = SettingFrame(note, cfg, *size)
+        main_frame = FrontFrame(note, None if len(cfg.nodes) > 0 else min(cfg.nodes)) #頂点を探して設定する
+        setting_frame = SettingFrame(note, cfg)
+        
+        note.bind(NOTEBOOK_TAB_CHANGED, lambda event: self.resize(note))
         
         self.__cfg = cfg #状態を持たせるために必要
         self.protocol(WM_DELETE_WINDOW, lambda: self.stop(self.__cfg, bc))
 
 #region pack
-        note.add(main_frame, text='メイン')
-        note.add(setting_frame, text='設定')
-        note.pack(expand=True)
+        note.add(main_frame, text=MAIN)
+        note.add(setting_frame, text=SETTING)
+        note.pack(fill=tk.BOTH, expand=True)
 #endregion
+        
+    #NoteBookを引数にとる。そのNoteBoolのページが遷移した際、windowのサイズを変更する関数
+    def resize(self, note: ttk.Notebook):
+        note.nametowidget(note.select()).resize()
         
     @staticmethod
     def setup() -> tuple[SettingData, bc_data]:
@@ -50,7 +53,6 @@ class ApplicationRoot(tk.Tk):
             await asyncio.sleep(1/refresh_rate)
             
     def stop(self, cfg: SettingData, bc: bc_data):
-        Settings.save(cfg.SETTINGFOLDER_PATH, cfg)
         del bc
         self.destroy()
         self.__is_running = False
