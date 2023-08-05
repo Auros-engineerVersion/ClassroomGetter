@@ -21,7 +21,9 @@ class SettingData:
     web_driver_options: str = '''
         --headless,
         --disable-gpu,
-        --blink-settings=imagesEnabled=false
+        --blink-settings=imagesEnabled=false,
+        --ignore-certificate-error,
+        --ignore-certificate-error
     '''
     
     #----------------保存されたデータ--------------------
