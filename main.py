@@ -5,22 +5,33 @@ from selenium.common.exceptions import NoSuchWindowException
 
 from src.gui.application_root import ApplicationRoot
 
-try:
+def main():
     #最初の認証
     #gauth = GoogleAuth()
     #gauth.LocalWebserverAuth()h
-    cfg = ApplicationRoot.setup()
-    root = ApplicationRoot(min(cfg.nodes), cfg, (500, 300))
-    asyncio.run(root.run_async())
-    #Settings.save(SettingData.SETTINGFOLDER_PATH, new_cfg)
+    
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    
+    cfg_and_bc = ApplicationRoot.setup()
+    root = ApplicationRoot(*cfg_and_bc, (400, 300))
+    root_run_task = loop.create_task(root.run_async(refresh_rate=12))
+    
+    try:
+        loop.run_until_complete(root_run_task)
+        
+    except ChildProcessError as e:
+            print('\nProcess has finished by Hand')
+
+    except NoSuchWindowException as e:
+            print('\nProcess has finished by Hand')
             
-except ChildProcessError as e:
-    root.stop()
-    print('\nProcess has finished by Hand')
-            
-except NoSuchWindowException as e:
-    root.stop()
-    print('\nProcess has finished by Hand')
+    finally:
+        root_run_task.cancel()
+        asyncio.get_event_loop().close()
+
+try:
+    main()
         
 except Exception as e:
     print('\033[31m')
