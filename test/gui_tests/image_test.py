@@ -18,7 +18,7 @@ class ImageTest(unittest.TestCase):
     @staticmethod
     def __create_placeholder(annotation):
         if annotation is tk.Misc:
-            return tk.Tk()
+            return tk.Tk(screenName='test', baseName='testbase', className='testclass', useTk=1)
         elif annotation is SettingData:
             return SettingData(save_folder_path=SAVE_PATH.absolute())
         elif annotation is Node:
