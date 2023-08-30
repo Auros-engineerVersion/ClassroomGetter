@@ -7,18 +7,11 @@ from src.interface.i_browser_control_data import *
 
 from src.data.setting_data import SettingData
 
-#options.add_argument("--ignore-certificate-error")
-#options.add_argument("--ignore-ssl-errors")
 class BrowserControlData(IBrowserControlData):
     def __init__(self, setting: SettingData, driver: webdriver = None, wait: WebDriverWait = None) -> None:        
         self.__driver = driver \
             if driver != None \
-            else create_driver(
-                SettingData.profile_path(),
-                '--ignore-certificate-error', 
-                '--ignore-ssl-errors',
-                '--headless'
-            )
+            else create_driver(SettingData.profile_path(), *setting.web_driver_options)
             
         self.__wait = wait \
             if wait != None \
