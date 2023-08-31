@@ -1,9 +1,9 @@
 from __future__ import annotations
 from typing import Coroutine, Callable
 
-from interface import *
-from routine_data import *
-from serach_parameter_container import *
+from ..interface import *
+from .routine_data import *
+from .serach_parameter_container import *
 
 class Node(INode, IComparale):
     Nodes: set[INode] = set() #全てのノードの集合

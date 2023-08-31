@@ -7,8 +7,8 @@ from selenium.common.exceptions import TimeoutException
 from selenium.common.exceptions import InvalidSelectorException
 from selenium.webdriver.support import expected_conditions as EC
 
-from src.interface.i_browser_control_data import IBrowserControlData
-from src.data.setting_data import SettingData
+from ..interface import *
+from ..data import *
 
 def move(bc: IBrowserControlData, url: str):
     bc.driver.get(url)

@@ -1,3 +1,3 @@
-from interface.i_browser_control_data import *
-from interface.i_comparable import *
-from interface.i_node import *
+from .i_browser_control_data import *
+from .i_comparable import *
+from .i_node import *

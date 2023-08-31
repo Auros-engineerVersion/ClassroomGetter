@@ -5,8 +5,8 @@ from selenium.common.exceptions import InvalidArgumentException
 from webdriver_manager.chrome import ChromeDriverManager
 from pathlib import Path
 
-from interface import *
-from setting_data import *
+from ..interface import *
+from .setting_data import *
 
 class BrowserControlData(IBrowserControlData):
     def __init__(self, setting: SettingData, driver: webdriver = None, wait: WebDriverWait = None) -> None:        
