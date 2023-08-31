@@ -1,6 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.chrome.service import Service
+from selenium.common.exceptions import InvalidArgumentException
 from webdriver_manager.chrome import ChromeDriverManager
 from pathlib import Path
 from src.interface.i_browser_control_data import *
@@ -32,12 +33,15 @@ class BrowserControlData(IBrowserControlData):
         
 def create_driver(profile: Path, *optional_args) -> webdriver.Chrome:
     options = webdriver.ChromeOptions()
-    option_list = [f'--user-data-dir={profile.parent}', f'--profile-directory={profile.name}', *optional_args]
+    option_list = [f'--user-data-dir={profile.parent}', f'--profile-directory={profile.name}', *list(optional_args)]
     for option in option_list:
-        options.add_argument(option)
-        
-    service = Service(ChromeDriverManager().install())
+        if type(option) is str:
+            options.add_argument(option)
+        else:
+            raise ValueError(f'Invalid option: {option}')
     
-    driver = webdriver.Chrome(service=service, options=options)
-    driver.set_window_size(5000,5000)
+    try:
+        driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+    except InvalidArgumentException:
+        raise ValueError(f'Invalid options: {option_list}')
     return driver
