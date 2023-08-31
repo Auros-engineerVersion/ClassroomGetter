@@ -4,16 +4,16 @@ from selenium.webdriver.chrome.service import Service
 from selenium.common.exceptions import InvalidArgumentException
 from webdriver_manager.chrome import ChromeDriverManager
 from pathlib import Path
-from src.interface.i_browser_control_data import *
 
-from src.data.setting_data import SettingData
+from interface import *
+from setting_data import *
 
 class BrowserControlData(IBrowserControlData):
     def __init__(self, setting: SettingData, driver: webdriver = None, wait: WebDriverWait = None) -> None:        
         self.__driver = driver \
             if driver != None \
             else create_driver(SettingData.profile_path(), *setting.web_driver_options)
-            
+                        
         self.__wait = wait \
             if wait != None \
             else WebDriverWait(self.__driver, setting.loading_wait_time, 1)

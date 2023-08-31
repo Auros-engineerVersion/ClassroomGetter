@@ -2,9 +2,8 @@ from typing import Callable
 from dataclasses import dataclass
 from selenium.common.exceptions import TimeoutException
 
-from src import my_util
-from src.interface.i_node import INode
-from src.interface.i_browser_control_data import IBrowserControlData
+from interface import *
+from src.my_util import *
 from src.browser.browser_controls import *
 
 @dataclass(frozen=True)
@@ -43,9 +42,9 @@ class SearchParameterPattern:
     text_param: SearchParameter
     link_param: SearchParameter
     
-    text_format: Callable = my_util.do_nothing
-    link_format: Callable = my_util.do_nothing
-    pre_proc:    Callable = my_util.do_nothing
+    text_format: Callable = do_nothing
+    link_format: Callable = do_nothing
+    pre_proc:    Callable = do_nothing
     
     #func:textとlinkのペアに対して行う関数
     #text_filter, link_filter: それぞれのlistに対して行う関数
@@ -53,9 +52,9 @@ class SearchParameterPattern:
         def __functions(acc_f: Callable, filter_f: Callable):
             self.pre_proc((bc_data, node))
             if self.text_param == None or self.link_param == None:
-                return my_util.convert_to_tuple([node.key + 'の授業タブ'], [my_util.to_all_tab_link(node.url)])
+                return convert_to_tuple([node.key + 'の授業タブ'], [to_all_tab_link(node.url)])
             else:
-                return my_util.convert_to_tuple(
+                return convert_to_tuple(
                         self.text_param.next_values(bc_data)(self.text_format)(acc_f)(filter_f),
                         self.link_param.next_values(bc_data)(self.link_format)(acc_f)(filter_f)
                     )
@@ -94,7 +93,7 @@ class SearchParameterContainer:
                 "^.*/c/.{16}$",
                 __get_link
             ),
-            text_format = my_util.text_filter,
+            text_format = text_filter,
             pre_proc=__move
         ),
         

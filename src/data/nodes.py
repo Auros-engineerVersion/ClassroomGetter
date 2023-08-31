@@ -1,11 +1,9 @@
 from __future__ import annotations
-import asyncio
 from typing import Coroutine, Callable
 
-from src.data.routine_data import RoutineData
-from src.interface.i_node import INode
-from src.interface.i_comparable import IComparale
-from src.data.serach_parameter_container import SearchParameterContainer
+from interface import *
+from routine_data import *
+from serach_parameter_container import *
 
 class Node(INode, IComparale):
     Nodes: set[INode] = set() #全てのノードの集合
