@@ -1,13 +1,10 @@
 from __future__ import annotations
 import pickle
 from pathlib import Path
-import asyncio
 
-from src.data.serach_parameter_container import SearchParameterContainer
-from src.browser.browser_controls import *
-from src.interface.i_browser_control_data import IBrowserControlData as IBrowserControlData
-from src.data.setting_data import SettingData
-from src.data.nodes import Node
+from ..browser import *
+from ..interface import *
+from ..data import *
 
 class Settings:
     TARGET_URL = 'https://classroom.google.com/' #固定値
