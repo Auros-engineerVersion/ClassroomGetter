@@ -4,7 +4,7 @@ import asyncio
 import tkinter as tk
 from typing import Callable
 
-from src.interface.i_node import INode
+from src.interface import INode
 
 RUN = '実行'
 LOADING = '更新中'

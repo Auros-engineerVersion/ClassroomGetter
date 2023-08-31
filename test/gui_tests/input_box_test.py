@@ -4,7 +4,7 @@ sys.path.append(os.path.abspath('.'))
 import unittest
 import tkinter as tk
 
-from src.gui.custum_widgets.info_boxes.input_boxes import *
+from src.gui.custum_widgets.info_boxes import *
 
 class InputTest(unittest.TestCase):
     def setUp(self) -> None:

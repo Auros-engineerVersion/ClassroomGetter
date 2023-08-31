@@ -1,10 +1,10 @@
 import tkinter as tk
 from tkinter import font
 
-from src.gui.literals import *
-from src.my_util import identity, size_to_geometory
-from src.setting.settings import Settings, SettingData
-from src.gui.custum_widgets.info_boxes.input_boxes import box_factory, InputBox
+from ...my_util import size_to_geometory
+from ..literals import *
+from ...setting import *
+from .info_boxes.input_boxes import *
 
 class DescBox(tk.Frame):
     def __init__(self, master: tk.Misc, box: InputBox = ..., text: str = ..., font_size: int = 8):

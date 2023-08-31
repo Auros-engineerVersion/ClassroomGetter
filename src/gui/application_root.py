@@ -2,11 +2,9 @@ import tkinter as tk
 from tkinter import ttk
 import asyncio
 
-from literals import *
-from src.gui.custum_widgets.front_frame import *
-from src.gui.custum_widgets.setting_frame import *
-from src.data.browser_control_data import BrowserControlData as bc_data
-from src.gui.custum_widgets.info_boxes.input_boxes import ProfileForm
+from .literals import *
+from .custum_widgets import * 
+from ..data import BrowserControlData as bc_data
 from src.setting.settings import Settings, SettingData
 
 class ApplicationRoot(tk.Tk):

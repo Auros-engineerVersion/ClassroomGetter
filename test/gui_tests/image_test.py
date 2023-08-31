@@ -2,16 +2,16 @@ import sys, os
 sys.path.append(os.path.abspath('.'))
 
 import unittest
-from unittest.mock import patch, MagicMock
+from pathlib import Path
 import tkinter as tk
-import caputer
 
-from my_util import *
-from src.data.setting_data import SettingData
-from src.data.nodes import Node
+from .caputer import caputuer
+from src.my_util import all_class_in_dir
+from src.data import SettingData, Node
 
-IMAGE_PATH = Path('test/gui_tests/images')
-SAVE_PATH = Path('test/gui_tests/save')
+current_path = lambda folder: Path(__file__).parent.joinpath(folder).resolve()
+IMAGE_PATH = current_path('image')
+SAVE_PATH = current_path('save')
 WHITE_LIST = ['SettingFrame', 'FrontFrame']
 
 class ImageTest(unittest.TestCase):
@@ -42,7 +42,7 @@ class ImageTest(unittest.TestCase):
         for cls in filter(lambda cls: cls.__name__ in WHITE_LIST, all_class_in_dir(Path('src/gui'))):
             ins = cls(*map(lambda x: self.__create_placeholder(x), cls.__init__.__annotations__.values()))
             ins.pack()
-            caputer.caputuer(ins, IMAGE_PATH.joinpath(f'{cls.__name__}.png'), overwrite=True)
-                
+            caputuer(ins, IMAGE_PATH.joinpath(f'{cls.__name__}.png'), overwrite=True)
+                            
 if __name__ == '__main__':
     unittest.main()

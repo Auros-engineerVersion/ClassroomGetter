@@ -1,10 +1,8 @@
 import tkinter as tk
 
-from src.gui.literals import CONFIGURE
-from src.my_util import size_to_geometory
-from src.interface.i_node import INode
-from src.gui.custum_widgets.base.infomations import *
-from src.gui.custum_widgets.base.scrollable_frame import ScrollableFrame
+from ...my_util import size_to_geometory
+from ...interface import INode
+from ..custum_widgets.base import *
 
 class FrontFrame(tk.Frame):
     def __init__(self, master: tk.Misc, root: INode = None):

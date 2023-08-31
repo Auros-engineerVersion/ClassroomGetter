@@ -4,8 +4,8 @@ from tkinter import messagebox
 from pathlib import Path
 from abc import ABCMeta, abstractmethod
 
-from src.gui.literals import *
-from src.my_util import do_nothing
+from ...literals import *
+from ....my_util import do_nothing
 
 def box_factory(key_name, value):
     if type(value) == str:

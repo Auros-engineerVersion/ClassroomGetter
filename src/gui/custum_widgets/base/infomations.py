@@ -1,10 +1,8 @@
 import tkinter as tk
 import asyncio
 
-from src.gui.literals import *
-from src.data.routine_data import RoutineData, timedelta
-from src.gui.custum_widgets.info_boxes.node_box import NodeBox
-from src.gui.custum_widgets.info_boxes.input_boxes import SpinInput
+from ....data import *
+from ..info_boxes import *
 
 class NodeInfoFrame(tk.Frame):
     def __init__(self, master: tk.Misc, watching_box: NodeBox = None):
