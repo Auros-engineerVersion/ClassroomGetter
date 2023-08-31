@@ -3,6 +3,8 @@ from unittest.mock import Mock
 
 from src.my_util import *
 
+class DummyClass: pass
+
 class MyUtilTest(unittest.TestCase):
     def test_convert_to_tuple(self):
         x = [0, 1, 2]
@@ -23,3 +25,8 @@ class MyUtilTest(unittest.TestCase):
         length = 10
         result = randstr(length)
         self.assertEqual(length, len(result))
+        
+    def test_all_cls_in_dir(self):        
+        result = all_class_in_dir(Path(__file__).parent)
+        self.assertIn(MyUtilTest, result)
+        self.assertIn(DummyClass, result)

@@ -88,6 +88,7 @@ def size_to_geometory(width: int, height: int) -> str:
 
 #exec関数を用いて指定したフォルダ内のすべてのファイルをimportする
 #importした後、クラスを名前とペアでdictとして返す関数
+@tail_recursion
 def __directory_import(path: Path) -> dict[str, object]:
     '''戻り値: {ファイル名: モジュール}'''
     from importlib import machinery
