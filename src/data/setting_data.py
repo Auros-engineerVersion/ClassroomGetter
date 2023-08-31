@@ -18,7 +18,7 @@ class SettingData:
     loading_wait_time: int = 5
     
     #----------------高度なデータ------------------------
-    web_driver_options: str = '''
+    web_driver_options_data: str = '''
         --headless,
         --disable-gpu,
         --blink-settings=imagesEnabled=false,
@@ -64,6 +64,10 @@ class SettingData:
     def profile(self, other: tuple[str, str]):
         self.user_email = other[0]
         self.user_password = other[1]
+        
+    @property
+    def web_driver_options(self):
+        return self.web_driver_options_data.replace(' ', '').replace('\n', '').split(',')
         
     def is_current_data(self):
         return\
