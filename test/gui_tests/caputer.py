@@ -2,9 +2,9 @@ import tkcap
 from tkinter import Widget
 from pathlib import Path
 import PIL.Image
+from time import sleep
 
 def caputuer(target: Widget, path: Path, overwrite: bool = False) -> Path:
-    from time import sleep
     target.update_idletasks()
     sleep(0.2) #widgetが読み込まれて表示されるまで待機
     tkcap.CAP(target.winfo_toplevel()).capture(str(path), overwrite)
