@@ -35,7 +35,12 @@ class MyUtilTest(unittest.TestCase):
         result = iterable_depth(x)
         self.assertEqual(3, result)
         
-    def test_pipe(self):
-        x = 0
-        result = pipe(x, lambda x: x + 1)
-        self.assertEqual(1, result)
+    def test_infix(self):
+        add = Infix(lambda x, y: x + y)
+        x = 1
+        result = x |add| x |add| x
+        self.assertEqual(x*3, result)
+        
+        div = Infix(lambda x, y: x / y)
+        x = 1
+        self.assertRaises(ZeroDivisionError, lambda: x |div| 0)
