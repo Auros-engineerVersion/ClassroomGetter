@@ -5,16 +5,15 @@ import unittest
 from unittest.mock import patch
 
 from src.browser.browser_controls import *
-from src.data.browser_control_data import BrowserControlData
-from src.data.setting_data import SettingData
+from src.data import *
 from src.my_util import do_nothing
 
 #このページは有志の方が作成されたスクレイピングテスト用のページです。
 TARGET_URL = 'https://tonari-it.com/scraping-test/'
 
-class BrowserControlsTest(unittest.TestCase):
+class BrowserControlsTest(unittest.TestCase):    
     def setUp(self):
-        self.__data = SettingData(loading_wait_time=1)
+        self.__data = SettingData(loading_wait_time=CommentableObj(1))
         self.__bc = BrowserControlData(self.__data)
         move(self.__bc, TARGET_URL)
         
@@ -22,20 +21,17 @@ class BrowserControlsTest(unittest.TestCase):
         del self.__bc
     
     def test_serch_elements(self):
-        xpathes = [
-            '//div[@id="hoge"]',
-            'qwryioplkjhgdsazxvnm',
-            '//div[@class="13-.,,""@[]/;/"]'
-        ]
+        def elem_get(xpath):
+            return search_element(self.__bc, xpath).get_attribute('id')
+            
+        current_xpath = '//div[@id="hoge"]'
+        self.assertEqual(elem_get(current_xpath), 'hoge')
         
-        excepted_results = ['hoge', None, None]
+        invailed_xpath = randstr(10)
+        self.assertRaises(ValueError, elem_get, invailed_xpath)
         
-        results = map(
-            lambda elem: elem.get_attribute('id') if elem != None else None,
-            map(lambda xpath: search_element(self.__bc, xpath), xpathes)
-        )
-        
-        self.assertListEqual(list(results), excepted_results)
+        timeout_xpath = '//div[@id="fuga"]'
+        self.assertRaises(ValueError, elem_get, timeout_xpath)
     
     def test_elements_filter_test(self):
         target = ['1', do_nothing, -3.000, 1024, 'hoge', 'fuga', '硫化水素']

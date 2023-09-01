@@ -17,9 +17,9 @@ def search_element(bc: IBrowserControlData, xpath: str) -> WebElement:
     try:
         return bc.wait.until(EC.presence_of_element_located((By.XPATH, xpath)))
     except TimeoutException:
-        return None
+        raise ValueError(f'Not found xpath: {xpath}')
     except InvalidSelectorException:
-        return None
+        raise ValueError(f'Invalid xpath: {xpath}')
 
 def search_element_all(bc: IBrowserControlData, xpath: str) -> list[WebElement]:
     try:
