@@ -126,8 +126,8 @@ class Infix:
     def __call__(self, value1, value2):
         return self.function(value1, value2)
             
-pipe = Infix(lambda x, func: func(x))
-arrow = Infix(lambda x, func: identity(x)(func))
+pipe = Infix(lambda x, func: func(x)) #関数の返値を次の関数の引数にするもの
+arrow = Infix(lambda x, func: identity(x)(func)) #最初に指定された対象を常にいじるもの
 
 class CommentableObj:
     def __init__(self, value, comment = '') -> None:
