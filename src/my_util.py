@@ -3,7 +3,8 @@ from functools import wraps
 from re import sub
 from random import choice
 from string import ascii_letters, digits
-from typing import Callable, Iterable, SupportsInt
+import types
+from typing import Any, Callable, Iterable, SupportsInt
 from pathlib import Path
 import inspect
 
@@ -106,50 +107,6 @@ def get_geometory(widget) -> str:
 def size_to_geometory(width: int, height: int) -> str:
     return f'{width}x{height}'
 
-#exec関数を用いて指定したフォルダ内のすべてのファイルをimportする
-#importした後、クラスを名前とペアでdictとして返す関数
-def __directory_import(path: Path) -> dict[str, object]:
-    '''戻り値: {ファイル名: モジュール}'''
-    from importlib import machinery
-    modules = {}
-    def loop(path: Path):
-        if not path.is_dir():
-            return {}
-    
-        #path内のファイルをすべてimportする
-        for file in path.iterdir():
-            if file.suffix == '.py' and modules.__contains__(file.stem) == False:
-                module_name = file.stem
-                module = machinery.SourceFileLoader(module_name, str(file)).load_module()
-                modules.update({module_name: module})
-            else:
-                try:
-                    modules.update(__directory_import(file))
-                except ImportError:
-                    sys.path.append(file.parent.absolute().as_posix())
-                    modules.update(__directory_import(file))
-            
-    loop(path)
-    return modules
-
-def __menbers(module) -> list[str]:
-    return [name for name, _ in inspect.getmembers(module, inspect.isclass)]
-
-def __get_class(module: object, class_name: str, *args, **kwargs) -> object:
-    cls = getattr(module, class_name)
-    return cls
-
-def all_class_in_dir(path: Path):
-    result = []
-    for v in __directory_import(path).items():
-        for name in __menbers(v[1]):
-            result.append(__get_class(v[1], name))
-        
-    return result
-
-def argments_size(func):
-    return len(inspect.signature(func).parameters)
-
 class Infix:
     def __init__(self, function):
         self.function = function
@@ -168,21 +125,26 @@ class Infix:
 
     def __call__(self, value1, value2):
         return self.function(value1, value2)
-    
+            
 pipe = Infix(lambda x, func: func(x))
+arrow = Infix(lambda x, func: identity(x)(func))
 
 class CommentableObj:
     def __init__(self, value, comment = '') -> None:
         super().__init__()
         self.__value = value
         self.__comment = comment
-        
-    def __call__(self):
-        return self.__value
     
-    def items(self):
-        return self.__value, self.__comment
-    
+    def __eq__(self, other):
+        return self.__value == other
+
+    def __or__(self, other):
+        return self.__value or other
+
+    @property
+    def value(self):
+        return self.__value    
+
     @property
     def comment(self) -> str:
         return self.__comment

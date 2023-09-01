@@ -26,7 +26,16 @@ class MyUtilTest(unittest.TestCase):
         result = randstr(length)
         self.assertEqual(length, len(result))
         
-    def test_all_cls_in_dir(self):        
-        result = all_class_in_dir(Path(__file__).parent)
-        self.assertIn(MyUtilTest, result)
-        self.assertIn(DummyClass, result)
+    def test_iterable_depth(self):
+        x = [0, 1, 2]
+        result = iterable_depth(x)
+        self.assertEqual(1, result)
+        
+        x = [0, [[1], 2]]
+        result = iterable_depth(x)
+        self.assertEqual(3, result)
+        
+    def test_pipe(self):
+        x = 0
+        result = pipe(x, lambda x: x + 1)
+        self.assertEqual(1, result)
