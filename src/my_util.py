@@ -75,11 +75,24 @@ def identity(x):
         return x
     return func
 
-def flatten(x) -> list:
-    if type(x) is list:
-        return [a for i in x for a in flatten(i)]
+def iterable_depth(x) -> int:
+    if not x:
+        return 0
     else:
+        if type(x) is list:
+            return 1 + max(map(iterable_depth, x))
+        else:
+            return 0
+    
+def flatten(x, depth = 0) -> Iterable:
+    if iterable_depth(x) <= depth:
         return x
+    else:
+        for i in x:
+            if type(i) is list:
+                yield from flatten(i, depth)
+            else:
+                yield i
 
 def public_vars(x) -> filter:
     return filter(lambda x: '__' not in x[0], vars(x).items())
@@ -136,3 +149,40 @@ def all_class_in_dir(path: Path):
 
 def argments_size(func):
     return len(inspect.signature(func).parameters)
+
+class Infix:
+    def __init__(self, function):
+        self.function = function
+
+    def __ror__(self, other):
+        return Infix(lambda x, self=self, other=other: self.function(other, x))
+
+    def __or__(self, other):
+        return self.function(other)
+
+    def __rlshift__(self, other):
+        return Infix(lambda x, self=self, other=other: self.function(other, x))
+
+    def __rshift__(self, other):
+        return self.function(other)
+
+    def __call__(self, value1, value2):
+        return self.function(value1, value2)
+    
+pipe = Infix(lambda x, func: func(x))
+
+class CommentableObj:
+    def __init__(self, value, comment = '') -> None:
+        super().__init__()
+        self.__value = value
+        self.__comment = comment
+        
+    def __call__(self):
+        return self.__value
+    
+    def items(self):
+        return self.__value, self.__comment
+    
+    @property
+    def comment(self) -> str:
+        return self.__comment
