@@ -6,18 +6,23 @@ from unittest.mock import patch, Mock
 from pathlib import Path
 
 from src.data.setting_data import SettingData
+from src.my_util import CommentableObj
 
 class SettingDataTest(unittest.TestCase):
     def test_is_current(self):
         invailed_data1 = SettingData()
         self.assertFalse(invailed_data1.is_current_data())
         
-        invailed_data2 = SettingData('hoge', 'hoge')
+        commentable_obj = CommentableObj('hoge')
+        invailed_data2 = SettingData(commentable_obj, commentable_obj)
         self.assertFalse(invailed_data2.is_current_data())
         
         sets = set()
         sets.add('Hoge')
         sets.add('bar')
-        directory = Path('.')
-        current_data = SettingData('hogehoge@gmail.com', 'hogehoge', nodes=sets, save_folder_path=directory)
+        current_data = SettingData(
+            CommentableObj('hogehoge@gmail.com'),
+            CommentableObj('hogehoge'),
+            nodes=sets,
+            save_folder_path=CommentableObj(Path('.')))
         self.assertTrue(current_data.is_current_data())

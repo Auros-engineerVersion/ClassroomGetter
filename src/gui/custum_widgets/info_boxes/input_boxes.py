@@ -87,11 +87,8 @@ class ProfileForm(tk.Frame):
     def __init__(self, master: tk.Misc):
         tk.Frame.__init__(self, master)
         
-        padx_size = (5, 10)
-        width = 30
-
-        self.__email    = EntryInput(self, width=width, padx=padx_size, title='email')
-        self.__password = EntryInput(self, width=width, padx=padx_size, title='password')
+        self.__email    = EntryInput(self, title='email')
+        self.__password = EntryInput(self, title='password')
         complete_button = tk.Button(self, text=COMPLETE, command=self.quit)
         master.protocol(WM_DELETE_WINDOW, lambda: self.__stop_or_continue(master))
         
