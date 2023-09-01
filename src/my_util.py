@@ -1,3 +1,4 @@
+import sys
 from functools import wraps
 from re import sub
 from random import choice
@@ -74,6 +75,12 @@ def identity(x):
         return x
     return func
 
+def flatten(x) -> list:
+    if type(x) is list:
+        return [a for i in x for a in flatten(i)]
+    else:
+        return x
+
 def public_vars(x) -> filter:
     return filter(lambda x: '__' not in x[0], vars(x).items())
 
@@ -88,23 +95,28 @@ def size_to_geometory(width: int, height: int) -> str:
 
 #exec関数を用いて指定したフォルダ内のすべてのファイルをimportする
 #importした後、クラスを名前とペアでdictとして返す関数
-@tail_recursion
 def __directory_import(path: Path) -> dict[str, object]:
     '''戻り値: {ファイル名: モジュール}'''
     from importlib import machinery
-    
-    #pathがフォルダでない場合はエラーを返す
-    if not path.is_dir():
-        raise ValueError('pathはフォルダである必要があります')
-    
     modules = {}
-    #path内のファイルをすべてimportする
-    for file in path.iterdir():
-        if file.suffix == '.py':
-            module_name = file.stem
-            module = machinery.SourceFileLoader(module_name, str(file)).load_module()
-            modules[module_name] = module
+    def loop(path: Path):
+        if not path.is_dir():
+            return {}
+    
+        #path内のファイルをすべてimportする
+        for file in path.iterdir():
+            if file.suffix == '.py' and modules.__contains__(file.stem) == False:
+                module_name = file.stem
+                module = machinery.SourceFileLoader(module_name, str(file)).load_module()
+                modules.update({module_name: module})
+            else:
+                try:
+                    modules.update(__directory_import(file))
+                except ImportError:
+                    sys.path.append(file.parent.absolute().as_posix())
+                    modules.update(__directory_import(file))
             
+    loop(path)
     return modules
 
 def __menbers(module) -> list[str]:
