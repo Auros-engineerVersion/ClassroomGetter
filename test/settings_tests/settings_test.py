@@ -5,7 +5,7 @@ import unittest
 from unittest.mock import patch, Mock
 from pathlib import Path
 
-from src.setting.settings import Settings, SettingData
+from src.setting import *
 
 class SettingTest(unittest.TestCase):
     def setUp(self) -> None:
@@ -19,19 +19,19 @@ class SettingTest(unittest.TestCase):
     def test_save_and_load(self):
         target_1 = SettingData('いろはにほへと')
         
-        Settings.save(self.__test_folder_path, target_1)
-        result = Settings.load(self.__test_folder_path)
+        save(self.__test_folder_path, target_1)
+        result = load(self.__test_folder_path)
         self.assertEqual(result, target_1)
         
         #上書き
         target_2 = SettingData('ちりぬるお')
-        Settings.save(self.__test_folder_path, target_1)
-        Settings.save(self.__test_folder_path, target_2)
-        result = Settings.load(self.__test_folder_path)
+        save(self.__test_folder_path, target_1)
+        save(self.__test_folder_path, target_2)
+        result = load(self.__test_folder_path)
         self.assertEqual(result, target_2)
         
     def test_no_such_file(self):
-        self.assertEqual(Settings.load(self.__test_folder_path), SettingData())
+        self.assertEqual(load(self.__test_folder_path), SettingData())
     
 if __name__ == '__main__':
     unittest.main()
