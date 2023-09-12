@@ -1,35 +1,28 @@
 from __future__ import annotations
 from pathlib import Path
 from typing import ClassVar
-import dataclasses
+from dataclasses import *
 
 from ..my_util import CommentableObj
 
 NO_DATA = 'No Data'
 
-@dataclasses.dataclass
+@dataclass
 class SettingData:    
     #----------------通常のデータ------------------------
-    user_email: CommentableObj = CommentableObj(NO_DATA, 'ユーザーのメールアドレス')
-    user_password: CommentableObj = CommentableObj(NO_DATA, 'ユーザーアカウントのパスワード')
+    user_email: CommentableObj = field(default_factory=lambda:CommentableObj(NO_DATA, 'ユーザーのメールアドレス'))
+    user_password: CommentableObj = field(default_factory=lambda:CommentableObj(NO_DATA, 'ユーザーアカウントのパスワード'))
 
     #セーブフォルダの場所
-    save_folder_path: CommentableObj = CommentableObj(Path('./Save').absolute(), '入手したファイルを保存する場所')
+    save_folder_path: CommentableObj = field(default_factory=lambda:CommentableObj(Path('./Save').absolute(), '入手したファイルを保存する場所'))
     
     #ページの読み込みを待つ時間
-    loading_wait_time: CommentableObj = CommentableObj(5, 'ページの読み込みを待つ時間')
+    loading_wait_time: CommentableObj = field(default_factory=lambda:CommentableObj(5, 'ページの読み込みを待つ時間'))
     
-    web_driver_options_data: CommentableObj = CommentableObj('''
-        --headless,
-        --disable-gpu,
-        --blink-settings=imagesEnabled=false,
-        --ignore-certificate-error,
-        --ignore-certificate-error
-    ''',
-    'Web Driverが起動する際のオプション')
+    web_driver_options_data: CommentableObj = field(default_factory=lambda:CommentableObj('--headless, --disable-gpu, --blink-settings=imagesEnabled=false, --ignore-certificate-error, --ignore-certificate-error', 'Web Driverが起動する際のオプション'))
     
     #----------------保存されたデータ--------------------
-    nodes: set = dataclasses.field(default_factory=set)
+    nodes: set = field(default_factory=set)
     
 #region 定数
     SETTINGFOLDER_PATH: ClassVar[Path] = Path('./Setting')
