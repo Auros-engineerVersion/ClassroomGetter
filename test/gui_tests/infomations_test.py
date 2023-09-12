@@ -19,6 +19,8 @@ class TimerTest(unittest.TestCase):
     def setUp(self) -> None:
         self.root = tk.Tk()
         
-    @patch('...src.gui.custum_widgets.info_boxes.node_box.NodeBox', spec=NodeBox)
+    @patch('src.gui.custum_widgets.info_boxes.node_box.NodeBox', spec=NodeBox)
     def test_update_clock(self, m_node_box):
+        m_node_box.time = RoutineData(1/60)
         timer = Timer(self.root, m_node_box)
+        timer.update_clock(m_node_box, 1)

@@ -35,8 +35,14 @@ def load(folder_path: Path) -> SettingData:
     else:
         return data
     
-def setup_data(cfg = load(SettingData.SETTINGFOLDER_PATH)):
-    def browser_control_data(bc_data = BrowserControlData(setting=cfg)):
+def setup_data(cfg = None):
+    if cfg is None:
+        cfg = load(SettingData.SETTINGFOLDER_PATH)
+        
+    def browser_control_data(bc_data = None):
+        if bc_data is None:
+            bc_data = BrowserControlData(setting=cfg)
+
         SearchParameterContainer.browser_control_data = bc_data #初期値を設定
         if not cfg.is_current_nodes():
             #プロファイルが指定されているかどうか

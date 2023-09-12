@@ -12,11 +12,11 @@ class BrowserControlData(IBrowserControlData):
     def __init__(self, setting: SettingData, driver: webdriver = None, wait: WebDriverWait = None) -> None:        
         self.__driver = driver \
             if driver != None \
-            else create_driver(SettingData.profile_path(), *setting.web_driver_options)
+            else create_driver(SettingData.profile_path(), *setting.web_driver_options.value)
                         
         self.__wait = wait \
             if wait != None \
-            else WebDriverWait(self.__driver, setting.loading_wait_time, 1)
+            else WebDriverWait(self.__driver, setting.loading_wait_time.value, 1)
     
     def __del__(self):
         del self.__wait

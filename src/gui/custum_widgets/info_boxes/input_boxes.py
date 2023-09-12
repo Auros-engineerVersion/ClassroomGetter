@@ -130,6 +130,6 @@ class ProfileForm(tk.Frame):
             profile = form.value()
             root.destroy()
         except tk.TclError as e:
-            pass
+            raise e
             
         return profile

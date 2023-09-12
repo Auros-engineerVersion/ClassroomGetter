@@ -2,7 +2,7 @@ import sys, os
 sys.path.append(os.path.abspath('.'))
 
 import unittest
-from unittest.mock import patch, Mock
+from unittest.mock import patch, MagicMock
 from pathlib import Path
 
 from src.setting import *
@@ -32,6 +32,9 @@ class SettingTest(unittest.TestCase):
         
     def test_no_such_file(self):
         self.assertEqual(load(self.__test_folder_path), SettingData())
+        
+    def test_setup_data(self):
+        self.assertEqual(setup_data(MagicMock()), lambda x: x)
     
 if __name__ == '__main__':
     unittest.main()

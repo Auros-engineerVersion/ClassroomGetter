@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import font
 
-from ...my_util import size_to_geometory
+from ...my_util import *
 from ..literals import *
 from ...setting import *
 from .info_boxes.input_boxes import *
@@ -12,27 +12,24 @@ class DescBox(tk.Frame):
         box.pack(side=tk.TOP, anchor=tk.W)
         self.update_idletasks()
 
-        text_box = tk.Text(self, 
-            width=font_size * 4,
-            height=2,
-            relief=tk.FLAT,
-            background=master[BACKGROUND],
-            font=(font.nametofont(TK_DEFAULT_FONT), font_size)
-        )
-        
-        text_box.insert(tk.END, text)
-        text_box.configure(state='disabled')
-        text_box.pack(side=tk.LEFT, anchor=tk.W, fill=tk.X, expand=True)
+        #説明文
+        tk.Text(self, width=font_size * 4, height=2, relief=tk.FLAT, background=master[BACKGROUND], font=(font.nametofont(TK_DEFAULT_FONT), font_size))\
+            |arrow| (lambda t: t.insert(tk.END, text))\
+            |arrow| (lambda t: t.configure(state='disabled'))\
+            |arrow| (lambda t: t.pack(side=tk.LEFT, anchor=tk.W, fill=tk.X, expand=True))
         
 class SettingGroup(tk.Frame):
-    def __init__(self, master: tk.Misc, values, desc_dic):
+    def __init__(self, master: tk.Misc, key_commentobj):
         tk.Frame.__init__(self, master, relief=tk.GROOVE, bd=1, background=master[BACKGROUND], padx=5, pady=5)
         
         self.__boxes = []
-        for value in values: #変数を取得、それを元にInputBoxを作成、さらにそれに基づくDescBoxを作成
-            input_box = box_factory(*value)(self)
-            DescBox(self, input_box, desc_dic[value[0]], font_size=8).pack(side=tk.TOP, anchor=tk.W, padx=5, pady=5)
-            self.__boxes.append(input_box)
+        for key, commentobj in key_commentobj:
+            input_box = box_factory(key, commentobj.value)(self)\
+                |arrow| (lambda b: b.set(commentobj.value))\
+                |arrow| (lambda b: self.__boxes.append(b))
+                            
+            DescBox(self, input_box, commentobj.comment, font_size=8)\
+                .pack(side=tk.TOP, anchor=tk.W, padx=5, pady=5)
             
     @property
     def boxes(self) -> list[InputBox]:
@@ -56,24 +53,23 @@ class SettingFrame(tk.Frame):
         tk.Frame.__init__(self, master)
         
         self.__boxes = []
-        count = 0
-        for v in data.normal_data(), data.advanced_data():
-            group = SettingGroup(self, values=v, desc_dic=SettingData.DESCRIPTIONS)
-            group.pack(side=tk.LEFT, anchor=tk.NW, padx=(1, 25), pady=4)
-            self.__boxes.extend(group.boxes)
+        SettingGroup(self, data.editable_data.items())\
+            |arrow| (lambda g: g.pack(side=tk.LEFT, anchor=tk.NW, padx=(25, 1), pady=4))\
+            |arrow| (lambda g: self.__boxes.extend(g.boxes))
         
-        setting_pop_label = tk.Label(self)
-        set_button = tk.Button(self, text=SETTING, command=lambda: self.__save_and_reset_message_show(data.nodes, self.__boxes, setting_pop_label))
-        
-        setting_pop_label.pack(side=tk.BOTTOM, anchor=tk.E)
-        set_button.pack(side=tk.BOTTOM, anchor=tk.E)
+        label = tk.Label(self)\
+            |arrow| (lambda l: l.pack(side=tk.BOTTOM, anchor=tk.E, padx=5, pady=5))
+            
+        tk.Button(self, text=SETTING)\
+            |arrow| (lambda b: b.pack(side=tk.BOTTOM, anchor=tk.E, padx=5, pady=5))\
+            |arrow| (lambda b: b.bind(BUTTON_PRESS, lambda e: self.__save_and_reset_message_show(data.nodes, self.__boxes, label)))        
         
         self.set(self.__boxes, data)
         
     def resize(self, width: int = 800, height: int = 600):
-        root = self.winfo_toplevel()
-        root.resizable(width=False, height=False)
-        root.geometry(size_to_geometory(width, height))
+        self.winfo_toplevel()\
+            |arrow| (lambda r: r.resizable(width=False, height=False))\
+            |arrow| (lambda r: r.geometry(size_to_geometory(width, height)))
         
     def set(self, targets: list, data: SettingData):
         data_set = map(
