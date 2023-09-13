@@ -27,7 +27,9 @@ class Node(INode, IComparale):
         else:
             self.__edges.add(node)
             node.__parent = self
-            Node.Nodes.add(node)
+            
+            if node not in Node.Nodes:
+                Node.Nodes.add(node)
         
     @property
     def key(self):
@@ -45,6 +47,10 @@ class Node(INode, IComparale):
     def next_init_time(self):
         return self.__next_init_time
     
+    @property
+    def parent(self):
+        return self.__parent
+    
     def __str__(self) -> str:
         return str.format('{0}:{1}', self.__tree_height, self.__key)
     
@@ -58,7 +64,7 @@ class Node(INode, IComparale):
             return all([x[0] == x[1] for x in zip(vars(self).values(), vars(other).values())])
 
     def __hash__(self) -> int:
-        return hash(*vars(self).values())
+        return hash(vars(self).values())
     
     def __del__(self) -> None:
         self.dispose()
@@ -74,7 +80,9 @@ class Node(INode, IComparale):
             
             if self in node.edges:
                 node.edges.remove(self)
-                self.__parent = None
+                
+            if self is node.parent:
+                node.__parent = None
     
     def serach(self, bfs = True) -> Coroutine[Callable[[Callable], None]]:
         """
@@ -90,8 +98,7 @@ class Node(INode, IComparale):
                 node = list.pop(0) if bfs == True else list.pop()
                 func(node)
 
-                for child in node.edges:
-                    list.append(child)
+                list.extend(node.edges)
                     
         return __do_serch
                 
