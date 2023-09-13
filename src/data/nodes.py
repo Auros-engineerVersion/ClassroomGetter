@@ -14,6 +14,7 @@ class Node(INode, IComparale):
         self.__url = url
         self.__tree_height = abs(tree_height) #負の値が入れられないように
         self.__next_init_time = next_init_time if next_init_time != None else RoutineData()
+        self.__parent = None
         Node.Nodes.add(self)
         
     @property
@@ -25,6 +26,7 @@ class Node(INode, IComparale):
             return None
         else:
             self.__edges.add(node)
+            node.__parent = self
             Node.Nodes.add(node)
         
     @property
@@ -53,18 +55,10 @@ class Node(INode, IComparale):
         if (other == None):
             return False
         else:
-            return \
-                self.tree_height == other.tree_height and\
-                self.key         == other.key         and\
-                self.url         == other.url         and\
-                self.edges     == other.edges
-    
+            return all([x[0] == x[1] for x in zip(vars(self).values(), vars(other).values())])
+
     def __hash__(self) -> int:
-        key_hash    = hash(self.key)
-        url_hash    = hash(self.url)
-        height_hash = hash(self.tree_height)
-        
-        return hash((key_hash, url_hash, height_hash))
+        return hash(*vars(self).values())
     
     def __del__(self) -> None:
         self.dispose()
@@ -75,11 +69,12 @@ class Node(INode, IComparale):
             
         #それぞれのedgeから削除
         for node in Node.Nodes:
-            if (self is node):
+            if self is node:
                 continue
             
-            if (self in node.edges):
+            if self in node.edges:
                 node.edges.remove(self)
+                self.__parent = None
     
     def serach(self, bfs = True) -> Coroutine[Callable[[Callable], None]]:
         """
@@ -92,19 +87,19 @@ class Node(INode, IComparale):
             while(len(list) > 0):
                 #出す場所が0なら幅優先探索, queueの振る舞いをする
                 #何もないのであれば幅優先探索, stackの振る舞いをする
-                value = list.pop(0) if bfs == True else list.pop()
-                func(value)
+                node = list.pop(0) if bfs == True else list.pop()
+                func(node)
 
-                for child in value.edges:
+                for child in node.edges:
                     list.append(child)
                     
         return __do_serch
                 
     #幅優先探索
-    def initialize_tree(root):
+    def initialize_tree(self):
         def __next(node: INode):
             tuples = SearchParameterContainer.elements(node)
             for tuple in tuples:
                 node.add_edge(Node(*tuple, node.tree_height + 1))
             
-        root.serach()(__next)
+        self.serach()(__next)
