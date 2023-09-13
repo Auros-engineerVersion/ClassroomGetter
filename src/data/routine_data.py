@@ -25,6 +25,9 @@ class RoutineData:
     def __str__(self) -> str:
         return str(self.next().strftime("%Y-%m-%d %H:%M:%S"))
     
+    def __hash__(self) -> int:
+        return hash(self.week * self.day * self.hour * self.minute)
+    
     def __now(self):
         return datetime.now().replace(microsecond=0)
     

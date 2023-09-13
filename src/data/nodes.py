@@ -64,7 +64,7 @@ class Node(INode, IComparale):
             return all([x[0] == x[1] for x in zip(vars(self).values(), vars(other).values())])
 
     def __hash__(self) -> int:
-        return hash(vars(self).values())
+        return hash((self.__key, self.__url, self.__tree_height, self.__next_init_time))
     
     def __del__(self) -> None:
         self.dispose()
@@ -110,3 +110,15 @@ class Node(INode, IComparale):
                 node.add_edge(Node(*tuple, node.tree_height + 1))
             
         self.serach()(__next)
+        
+    def to_path(self) -> Path:
+        if len(Node.Nodes) == 0:
+            raise ValueError('ノードが存在しません')
+        
+        def loop(node):
+            if node.parent is None:
+                return Path(node.key)
+            else:
+                return loop(node.parent).joinpath(node.key)
+            
+        return loop(self)
