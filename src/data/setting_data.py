@@ -61,7 +61,7 @@ class SettingData:
             'user_password': self.user_password,
             'save_folder_path': self.save_folder_path,
             'loading_wait_time': self.loading_wait_time,
-            'web_driver_options': self.web_driver_options
+            'web_driver_options': self.web_driver_options_data
         }
         
     def is_current_data(self):
