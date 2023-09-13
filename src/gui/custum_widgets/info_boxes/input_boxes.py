@@ -5,7 +5,7 @@ from pathlib import Path
 from abc import ABCMeta, abstractmethod
 
 from ...literals import *
-from ....my_util import do_nothing
+from ....my_util import do_nothing, arrow
 
 def box_factory(key_name, value):
     if type(value) == str:
@@ -17,71 +17,54 @@ def box_factory(key_name, value):
     else: #Pathなら
         return lambda master: DialogInput(master, default_path=value, title=key_name)
 
-class InputBox(tk.Frame, metaclass=ABCMeta):
-    def __init__(self, master: tk.Misc, padx: tuple = (1, 1), title: str = TITLE) -> None:
-        tk.Frame.__init__(self, master)
-        label = tk.Label(self, text=title)
-        label.pack(side=tk.LEFT, anchor=tk.W, padx=padx)
+class InputBox(tk.Frame):
+    def __init__(self, **kw) -> None:
+        tk.Frame.__init__(self, kw.get('master', tk.Tk))
+        tk.Label(self, text=kw.get('title', self.__class__.__name__)).pack(side=tk.LEFT, anchor=tk.W)
         
-    @abstractmethod
+    def __box(self):
+        boxes = list(filter(lambda x: isinstance(x, (tk.Entry, tk.Spinbox)), self.children.values()))
+        if len(boxes) < 1:
+            raise ValueError('InputBoxの子供が見つかりませんでした')
+        elif len(boxes) > 1:
+            raise ValueError('InputBoxの子供が複数見つかりました')
+        else:
+            return boxes[0]
+        
     def set(self, value) -> None:
-        raise NotImplementedError
+        self.__box()\
+            |arrow| (lambda b: b.delete(0, tk.END))\
+            |arrow| (lambda b: b.insert(0, value))
     
-    @abstractmethod
-    def value(self) -> str | int | Path:
-        raise NotImplementedError
+    def get(self):
+        return self.__box().get()
 
 class EntryInput(InputBox):
-    def __init__(self, master: tk.Misc, padx: tuple = (1, 1), title: str = TITLE) -> None:
-        super().__init__(master, padx, title)
-        self.__entry = tk.Entry(self)
-        self.__entry.pack(side=tk.LEFT, anchor=tk.W)
-    
-    def set(self, value):
-        self.__entry.delete(0, tk.END)
-        self.__entry.insert(0, value)
-        
-    def value(self) -> str:
-        return self.__entry.get()
-    
+    def __init__(self, **kw) -> None:
+        super().__init__(**kw)
+        tk.Entry(self).pack(side=tk.LEFT, anchor=tk.W)
+
 class SpinInput(InputBox):
-    def __init__(self, master: tk.Misc, from_to: tuple[int, int], padx: tuple = (1, 1), title: str = 'title') -> None:
-        super().__init__(master, padx, title)
-        
-        self.__spin = tk.Spinbox(self, from_=from_to[0], to=from_to[1])
-        self.__spin.pack(side=tk.LEFT, anchor=tk.W)
-        
-    def set(self, value: int) -> None:
-        self.__spin.delete(0, tk.END)
-        self.__spin.insert(0, value)
-            
-    def value(self) -> int:
-        return int(self.__spin.get())
+    def __init__(self, from_to: tuple[int, int], **kw) -> None:
+        super().__init__(**kw)
+        tk.Spinbox(self, from_=from_to[0], to=from_to[1]).pack(side=tk.LEFT, anchor=tk.W)
             
 class DialogInput(InputBox):
-    def __init__(self, master: tk.Misc, default_path: Path, padx: tuple = (1, 1), title: str = TITLE):
-        super().__init__(master, padx, title)
-        self.__entry = tk.Entry(self)
-        brows_button = tk.Button(self, text=BROWS, command=self.folder_dialog)
+    def __init__(self, default_path: Path, **kw):      
+        super().__init__(**kw)
+        tk.Entry(self)\
+            |arrow| (lambda b: b.pack(side=tk.LEFT, anchor=tk.W))\
+            |arrow| (lambda _: self.set(default_path.absolute()))
         
-        self.__entry.pack(side=tk.LEFT, anchor=tk.W)
-        brows_button.pack(side=tk.LEFT, anchor=tk.E, padx=padx)
-
-        self.__default_path = default_path
+        #brows_button
+        tk.Button(self, text=BROWS, command=self.folder_dialog).pack(side=tk.LEFT, anchor=tk.E, padx=kw.get('padx', 0))
         
     def folder_dialog(self):
         folder_name = filedialog.askdirectory()
         if len(folder_name) > 0:
-            self.input_box.set(folder_name)
+            self.__box().set(folder_name)
         else:
-            self.input_box.set(self.__default_path.absolute())
-            
-    def set(self, path: Path):
-        self.__entry.delete(0, tk.END)
-        self.__entry.insert(0, path)
-        
-    def value(self):
-        return self.__entry.get()
+            self.__box().set(self.__default_path.absolute())
     
 class ProfileForm(tk.Frame):
     def __init__(self, master: tk.Misc):
@@ -114,7 +97,7 @@ class ProfileForm(tk.Frame):
         self.__password.set(password)
         
     def value(self) -> tuple:
-        return (self.__email.value(), self.__password.value())
+        return (self.__email.get(), self.__password.get())
     
     @staticmethod
     def pop_up(title: str):
