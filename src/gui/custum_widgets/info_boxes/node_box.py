@@ -5,6 +5,8 @@ import tkinter as tk
 from typing import Callable
 
 from src.interface import INode
+from src.my_util import arrow
+from src.gui.custum_widgets.base import Switch
 
 RUN = '実行'
 LOADING = '更新中'
@@ -22,21 +24,21 @@ class NodeBox(tk.Frame):
         self.__is_expand: bool = False
         self.__nextboxes: list[NodeBox] = []
         
-        drop_button = tk.Button(self, command=self.expand, width=self.winfo_height())
-        height_label = tk.Label(self, text=str(node.tree_height) + ':')
-        height_label.bind(BUTTON_PRESS, self.on_frame_click)
+        #dropdown
+        tk.Button(self, command=self.expand, width=self.winfo_height())\
+            |arrow| (lambda b: b.pack(side=tk.LEFT))
+
+        #tree_height
+        tk.Label(self, text=str(node.tree_height) + ':')\
+            |arrow| (lambda b: b.bind(BUTTON_PRESS, self.on_frame_click))\
+            |arrow| (lambda b: b.pack(side=tk.LEFT))
         
-        key_label = tk.Label(self, text=str(node.key))        
-        key_label.bind(BUTTON_PRESS, self.on_frame_click)
-        
-#region pack
-        drop_button.pack(side=tk.LEFT)
-        height_label.pack(side=tk.LEFT)
-        key_label.pack(side=tk.LEFT)
+        #node_key
+        key_label = tk.Label(self, text=str(node.key))\
+            |arrow| (lambda l: l.bind(BUTTON_PRESS, self.on_frame_click))\
+            |arrow| (lambda l: l.pack(side=tk.LEFT))\
         
         self.pack(anchor=tk.W, padx=(node.tree_height*20, 1), after=self.__parent_box)
-#endregion
-        
         self.text = key_label[TEXT]
         self.url = node.url
         
