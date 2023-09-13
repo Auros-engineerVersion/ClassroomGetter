@@ -3,6 +3,7 @@ from tkinter import filedialog
 from tkinter import messagebox
 from pathlib import Path
 from abc import ABCMeta, abstractmethod
+from typing import Any
 
 from ...literals import *
 from ....my_util import do_nothing, arrow
@@ -16,8 +17,17 @@ def box_factory(key_name, value):
         return lambda master: None #この使われていないmasterは他のlambda関数と規格を合わせるために必要である
     else: #Pathなら
         return lambda master: DialogInput(master, default_path=value, title=key_name)
+    
+class InputBase(metaclass=ABCMeta):
+    @abstractmethod
+    def set(self, value) -> None:
+        raise NotImplementedError
+    
+    @abstractmethod
+    def get(self):
+        raise NotImplementedError
 
-class InputBox(tk.Frame):
+class InputBox(tk.Frame, InputBase):
     def __init__(self, **kw) -> None:
         tk.Frame.__init__(self, kw.get('master', tk.Tk))
         tk.Label(self, text=kw.get('title', self.__class__.__name__)).pack(side=tk.LEFT, anchor=tk.W)
@@ -42,18 +52,18 @@ class InputBox(tk.Frame):
 class EntryInput(InputBox):
     def __init__(self, **kw) -> None:
         super().__init__(**kw)
-        tk.Entry(self).pack(side=tk.LEFT, anchor=tk.W)
+        tk.Entry(self).pack(side=tk.RIGHT, anchor=tk.E, fill=tk.X)
 
 class SpinInput(InputBox):
     def __init__(self, from_to: tuple[int, int], **kw) -> None:
         super().__init__(**kw)
-        tk.Spinbox(self, from_=from_to[0], to=from_to[1]).pack(side=tk.LEFT, anchor=tk.W)
+        tk.Spinbox(self, from_=from_to[0], to=from_to[1]).pack(side=tk.RIGHT, anchor=tk.E, fill=tk.X)
             
 class DialogInput(InputBox):
     def __init__(self, default_path: Path, **kw):      
         super().__init__(**kw)
         tk.Entry(self)\
-            |arrow| (lambda b: b.pack(side=tk.LEFT, anchor=tk.W))\
+            |arrow| (lambda b: b.pack(side=tk.RIGHT, anchor=tk.E, fill=tk.X))\
             |arrow| (lambda _: self.set(default_path.absolute()))
         
         #brows_button
@@ -66,20 +76,27 @@ class DialogInput(InputBox):
         else:
             self.__box().set(self.__default_path.absolute())
     
-class ProfileForm(tk.Frame):
-    def __init__(self, master: tk.Misc):
-        tk.Frame.__init__(self, master)
+class ProfileForm(tk.Frame, InputBase):
+    def __init__(self, master: tk.Misc = None):
+        if master == None:
+            master = tk.Tk()
+            tk.Frame.__init__(self, master)
+            self.pack()
+        else:
+            tk.Frame.__init__(self, master)
         
-        self.__email    = EntryInput(self, title='email')
-        self.__password = EntryInput(self, title='password')
-        complete_button = tk.Button(self, text=COMPLETE, command=self.quit)
+        self.__email = EntryInput(master=self, title='email')\
+            |arrow| (lambda e: e.pack(side=tk.TOP, anchor=tk.W, fill=tk.X))
+
+        self.__password = EntryInput(master=self, title='password')\
+            |arrow| (lambda p: p.pack(side=tk.TOP, anchor=tk.W, fill=tk.X))
+            
+        #完了ボタン
+        tk.Button(self, text=COMPLETE)\
+            |arrow| (lambda b: b.pack(side=tk.BOTTOM, anchor=tk.E, padx=5, pady=5))\
+            |arrow| (lambda b: b.bind(BUTTON_PRESS, lambda _: self.quit()))
+            
         master.protocol(WM_DELETE_WINDOW, lambda: self.__stop_or_continue(master))
-        
-#region pack
-        self.__email.pack(side=tk.TOP, anchor=tk.W, fill=tk.X)
-        self.__password.pack(side=tk.TOP, anchor=tk.W, fill=tk.X)
-        complete_button.pack(side=tk.BOTTOM, anchor=tk.E, padx=5, pady=5)
-#endregion
     
     def __stop_or_continue(self, target: tk.Misc):
         ok_cancel = messagebox.askokcancel(
@@ -96,23 +113,12 @@ class ProfileForm(tk.Frame):
         self.__email.set(email)
         self.__password.set(password)
         
-    def value(self) -> tuple:
+    def get(self) -> tuple:
         return (self.__email.get(), self.__password.get())
     
-    @staticmethod
-    def pop_up(title: str):
-        root = tk.Tk()
-        root.title(title)
-        form = ProfileForm(root)
-        form.pack()
-        
-        form.mainloop()
-
-        profile = None
-        try:
-            profile = form.value()
-            root.destroy()
-        except tk.TclError as e:
-            raise e
+    def pop_up(self, loop = lambda x: x.winfo_toplevel().mainloop()):
+        loop(self)
+        profile = self.get()
+        self.destroy()
             
         return profile

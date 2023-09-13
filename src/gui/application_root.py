@@ -36,7 +36,7 @@ class ApplicationRoot(tk.Tk):
     def setup() -> tuple[SettingData, bc_data]:
         cfg = load(SettingData.SETTINGFOLDER_PATH)
         if cfg.is_default():
-            cfg.profile = ProfileForm.pop_up('ProfileForm')
+            cfg.profile = ProfileForm().pop_up('ProfileForm')
 
         bc = bc_data(setting=cfg)
         return setup_data(cfg, bc)
