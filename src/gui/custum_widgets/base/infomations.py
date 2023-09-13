@@ -101,7 +101,7 @@ class TimeSetters(tk.Frame):
             box.pack()
                     
     def values(self) -> RoutineData:
-        return RoutineData(*map(lambda box: box.get(), self.__boxes))
+        return RoutineData(*map(lambda box: int(box.get()), self.__boxes))
         
     def set(self, time: RoutineData):
         tmp = map(
