@@ -32,15 +32,6 @@ class ApplicationRoot(tk.Tk):
     def resize(self, note: ttk.Notebook):
         note.nametowidget(note.select()).resize()
         
-    @staticmethod
-    def setup() -> tuple[SettingData, bc_data]:
-        cfg = load(SettingData.SETTINGFOLDER_PATH)
-        if cfg.is_default():
-            cfg.profile = ProfileForm().pop_up('ProfileForm')
-
-        bc = bc_data(setting=cfg)
-        return setup_data(cfg, bc)
-            
     def stop(self, cfg: SettingData, bc: bc_data):
         del bc
         self.destroy()

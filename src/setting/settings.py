@@ -5,6 +5,7 @@ from pathlib import Path
 from ..browser import *
 from ..interface import *
 from ..data import *
+from ..gui.custum_widgets.info_boxes.input_boxes import ProfileForm
 
 TARGET_URL = 'https://classroom.google.com/' #固定値
     
@@ -19,11 +20,6 @@ def save(folder_path: Path, data: SettingData) -> None:
         save(data) #Directoryが無ければもう一度行う
     
 def load(folder_path: Path) -> SettingData:
-    #def __create_and_save() -> SettingData:
-    #    data = Settings.new_data()
-    #    Settings.save(data)
-    #    return data
-        
     data = None
     file_path = folder_path.joinpath('save.pkl')
     if file_path.exists():
@@ -31,27 +27,31 @@ def load(folder_path: Path) -> SettingData:
             data = pickle.load(f)
             
     if data == None or type(data) != SettingData:
-        return SettingData()
+        return None
     else:
         return data
     
-def setup_data(cfg = None):
-    if cfg is None:
-        cfg = load(SettingData.SETTINGFOLDER_PATH)
+def setup_data(default_get_func = lambda: load(SettingData.SETTINGFOLDER_PATH)):
+    def popup_and_return_cfg():
+        profile = ProfileForm().pop_up()
+        return SettingData(user_email=CommentableObj(profile[0]), user_password=CommentableObj(profile[1]))
+    
+    cfg = default_get_func()
+    if cfg is None or not cfg.is_current_data():
+        return setup_data(popup_and_return_cfg)
+    else:
+        return cfg
+    
+def setup_state(cfg: SettingData):
+    bc_data = BrowserControlData(cfg)
+    if not cfg.is_current_nodes():
+        #プロファイルが指定されているかどうか
+        #されていなければログインして指定する
+        move(bc_data, TARGET_URL)
+        if TARGET_URL not in bc_data.driver.current_url and not cfg.is_default():
+            login_classroom(bc_data, cfg)
+            
+        cfg.nodes = Node('Classroom', TARGET_URL, 0).Nodes
         
-    def browser_control_data(bc_data = None):
-        if bc_data is None:
-            bc_data = BrowserControlData(setting=cfg)
-
-        SearchParameterContainer.browser_control_data = bc_data #初期値を設定
-        if not cfg.is_current_nodes():
-            #プロファイルが指定されているかどうか
-            #されていなければログインして指定する
-            move(bc_data, TARGET_URL)
-            if TARGET_URL not in bc_data.driver.current_url and not cfg.is_default():
-                login_classroom(bc_data, cfg)
-
-            cfg.nodes = Node('Classroom', TARGET_URL, 0).Nodes
-        
-        return (cfg, bc_data)
-    return browser_control_data
+    SearchParameterContainer.browser_control_data = bc_data
+    return cfg

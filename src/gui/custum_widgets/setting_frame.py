@@ -4,6 +4,7 @@ from tkinter import font
 from ...my_util import *
 from ..literals import *
 from ...setting import *
+from ...data.setting_data import *
 from .info_boxes.input_boxes import *
 
 class DescBox(tk.Frame):
@@ -84,4 +85,4 @@ class SettingFrame(tk.Frame):
         
     def __save_and_reset_message_show(self, nodes: list, boxes: list, label: tk.Label):
         label[TEXT] = SETTING_RESET_MESSAGE
-        Settings.save(SettingData.SETTINGFOLDER_PATH, self.values(nodes, boxes))
+        save(SettingData.SETTINGFOLDER_PATH, self.values(nodes, boxes))

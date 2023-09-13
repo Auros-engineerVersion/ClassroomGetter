@@ -5,6 +5,7 @@ import unittest
 from unittest.mock import patch, MagicMock
 from pathlib import Path
 
+from src.data.nodes import *
 from src.setting import *
 
 class SettingTest(unittest.TestCase):
@@ -31,10 +32,19 @@ class SettingTest(unittest.TestCase):
         self.assertEqual(result, target_2)
         
     def test_no_such_file(self):
-        self.assertEqual(load(self.__test_folder_path), SettingData())
+        self.assertIsNone(load(Path('.')))
         
-    def test_setup_data(self):
-        self.assertEqual(setup_data(MagicMock()), lambda x: x)
-    
-if __name__ == '__main__':
-    unittest.main()
+    def test_save_node(self):
+        target = SettingData()
+        target.nodes = Node('key', 'url', 0).Nodes
+        
+        save(self.__test_folder_path, target)
+        result = load(self.__test_folder_path)
+        self.assertEqual(result, target)
+        
+    @patch('src.setting.settings.ProfileForm')
+    def test_set_up(self, form_mock):
+        side_effect = [('', ''), ('hoge', 'pass'), ('hoge_@mail', 'hoge_password')]
+        form_mock.return_value.pop_up.side_effect = side_effect
+        self.assertTrue(setup_data().is_current_data())
+        self.assertEqual(form_mock.return_value.pop_up.call_count, len(side_effect))
