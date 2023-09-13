@@ -21,5 +21,5 @@ NOTEBOOK_TAB_CHANGED = '<<NotebookTabChanged>>'
 CONFIGURE = '<Configure>'
 
 #文章
-STOP_OR_CONTINUE = '入力の途中で閉じようとしています。\n閉じますか?'
+STOP_OR_CONTINUE = '入力の途中で閉じようとしています。'
 SETTING_RESET_MESSAGE = '設定を適用するには再起動が必要です。'
