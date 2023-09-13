@@ -1,8 +1,6 @@
 from __future__ import annotations
 import gc
-import asyncio
 import tkinter as tk
-from typing import Callable
 
 from src.interface import INode
 from src.my_util import arrow
@@ -21,12 +19,13 @@ class NodeBox(tk.Frame):
         self.__master = master
         self.__parent_box = parent
         self.__node = node
-        self.__is_expand: bool = False
         self.__nextboxes: list[NodeBox] = []
         
         #dropdown
-        tk.Button(self, command=self.expand, width=self.winfo_height())\
-            |arrow| (lambda b: b.pack(side=tk.LEFT))
+        Switch(master=self, default_state=False, width=self.winfo_height())\
+            |arrow| (lambda s: s.on_active(self.expand))\
+            |arrow| (lambda s: s.on_not_active(self.close))\
+            |arrow| (lambda s: s.pack(side=tk.LEFT))
 
         #tree_height
         tk.Label(self, text=str(node.tree_height) + ':')\
@@ -68,20 +67,16 @@ class NodeBox(tk.Frame):
     def initialize_node(self):
         self.__node.edges.clear()
         self.__node.initialize_tree()
-        self.__is_expand = False
                     
     def expand(self):
-        #反転する
-        self.__is_expand = not self.__is_expand
-        
+        self.pack(anchor=tk.W)
+        for node in self.__node.edges:
+            new_box = NodeBox(self.__master, node, self)
+            self.__nextboxes.append(new_box)
+                
+    def close(self):
         #子を初期化する
         for next in self.__nextboxes:
             next.dispose()
         self.__nextboxes.clear()
         gc.collect()
-        
-        if self.__is_expand:
-            self.pack(anchor=tk.W)
-            for node in self.__node.edges:
-                new_box = NodeBox(self.__master, node, self)
-                self.__nextboxes.append(new_box)
