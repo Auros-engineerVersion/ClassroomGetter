@@ -9,14 +9,14 @@ from ...literals import *
 from ....my_util import do_nothing, arrow
 
 def box_factory(key_name, value):
-    if type(value) == str:
-        return lambda master: EntryInput(master, title=key_name)
-    elif type(value) == int:
-        return lambda master: SpinInput(master, from_to=(0, 256), title=key_name)
-    elif type(value) == None or type(value) == set:
+    if isinstance(value, str):
+        return lambda master: EntryInput(master=master, title=key_name)
+    elif isinstance(value, int):
+        return lambda master: SpinInput(from_to=(0, 256), master=master, title=key_name)
+    elif isinstance(value, set):
         return lambda master: None #この使われていないmasterは他のlambda関数と規格を合わせるために必要である
     else: #Pathなら
-        return lambda master: DialogInput(master, default_path=value, title=key_name)
+        return lambda master: DialogInput(default_path=value, master=master, title=key_name)
     
 class InputBase(metaclass=ABCMeta):
     @abstractmethod

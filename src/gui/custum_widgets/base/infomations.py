@@ -92,7 +92,7 @@ class TimeSetters(tk.Frame):
         tk.Frame.__init__(self, master)
         self.__boxes = list(
             map(
-                lambda items, range: SpinInput(self, range, title=items[0]),
+                lambda items, range: SpinInput(from_to=range, master=self, title=items[0]),
                 vars(RoutineData()).items(), RoutineData.time_range
             )
         )
