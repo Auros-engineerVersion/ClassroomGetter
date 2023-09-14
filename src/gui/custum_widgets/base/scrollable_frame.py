@@ -1,5 +1,7 @@
 import tkinter as tk
+
 from ...literals import CONFIGURE
+
 
 class ScrollableFrame(tk.Frame):
     def __init__(self, master: tk.Misc, relief: str = tk.SUNKEN, padx: int = 1, pady: int = 1, bar_x = True, bar_y = True):

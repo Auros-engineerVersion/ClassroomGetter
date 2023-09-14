@@ -1,12 +1,15 @@
-import sys, os
+import os
+import sys
+
 sys.path.append(os.path.abspath('.'))
 
 import unittest
-from unittest.mock import MagicMock
 from random import randint
+from unittest.mock import MagicMock
 
-from src.data.nodes import *
 from src.browser.browser_controls import *
+from src.data import *
+
 
 class NodeTest(unittest.TestCase):
     def setUp(self) -> None:
@@ -69,15 +72,14 @@ class NodeTest(unittest.TestCase):
     
     def test_search(self):
         root = Node('key_0', 'url_0', 0)
-        range(randint(1, 10))
-        for x in [Node(f'key_{i}', f'url_{i}', i) for i in range(2)]:
+        for x in [Node(f'key_{i}', f'url_{i}', i) for i in range(randint(1, 10))]:
             root.add_edge(x)
         
         call_mock = MagicMock()
         root.serach()(call_mock)
         
         #すべての配列において呼び出しが発生しているかどうか
-        self.assertEqual(call_mock.call_count, len(Node.Nodes) - 1)
+        self.assertEqual(call_mock.call_count, len(Node.Nodes))
         
     def test_null_controls(self):
         self.assertRaises(TypeError, Node, 'hoge', 0)
@@ -101,3 +103,6 @@ class NodeTest(unittest.TestCase):
         branch.add_edge(fruit)
         
         self.assertEqual(fruit.to_path(), Path('stem/branch/fruit'))
+        
+if __name__ == '__main__':
+    unittest.main()

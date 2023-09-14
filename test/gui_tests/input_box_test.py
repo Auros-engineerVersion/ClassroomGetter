@@ -1,12 +1,15 @@
-import sys, os
+import os
+import sys
+
 sys.path.append(os.path.abspath('.'))
 
-import unittest
-from unittest.mock import patch
 import tkinter as tk
+import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from src.gui.custum_widgets.info_boxes import *
+
 
 class InputTest(unittest.TestCase):
     def test_set_and_get(self):

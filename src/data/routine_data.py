@@ -1,8 +1,9 @@
 from dataclasses import dataclass
-from typing import SupportsInt, ClassVar
 from datetime import datetime, timedelta
+from typing import ClassVar, SupportsInt
 
-from src.my_util import public_vars
+from ..my_util import public_vars
+
 
 @dataclass
 class RoutineData:

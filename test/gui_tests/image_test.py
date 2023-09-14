@@ -1,13 +1,16 @@
-import sys, os
+import os
+import sys
+
 sys.path.append(os.path.abspath('.'))
 
+import tkinter as tk
 import unittest
 from pathlib import Path
-import tkinter as tk
+
+from src.data import Node, SettingData
+from src.my_util import *
 
 from .caputer import *
-from src.my_util import *
-from src.data import SettingData, Node
 
 current_path = lambda folder: Path(__file__).parent.joinpath(folder).resolve()
 IMAGE_PATH = current_path('image')

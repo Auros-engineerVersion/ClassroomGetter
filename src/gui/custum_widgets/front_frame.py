@@ -1,8 +1,9 @@
 import tkinter as tk
 
-from ...my_util import size_to_geometory
 from ...interface import INode
+from ...my_util import size_to_geometory
 from ..custum_widgets.base import *
+
 
 class FrontFrame(tk.Frame):
     def __init__(self, master: tk.Misc, root: INode = None):

@@ -3,6 +3,7 @@ from unittest.mock import Mock
 
 from src.my_util import *
 
+
 class DummyClass: pass
 
 class MyUtilTest(unittest.TestCase):

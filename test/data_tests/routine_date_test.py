@@ -1,11 +1,14 @@
-import sys, os
+import os
+import sys
+
 sys.path.append(os.path.abspath('.'))
-import unittest
-from unittest.mock import patch
 import time
+import unittest
 from datetime import datetime, timedelta
+from unittest.mock import patch
 
 from src.data.routine_data import RoutineData
+
 
 class Routine_data_Test(unittest.TestCase):
     def test_reset(self):

@@ -1,10 +1,10 @@
-from typing import Callable
 from dataclasses import dataclass
-from selenium.common.exceptions import TimeoutException
+from typing import Callable
 
+from ..browser import *
 from ..interface import *
 from ..my_util import *
-from ..browser.browser_controls import *
+
 
 @dataclass(frozen=True)
 class SearchParameter:

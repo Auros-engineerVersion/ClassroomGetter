@@ -1,12 +1,12 @@
 import tkinter as tk
-from tkinter import filedialog
-from tkinter import messagebox
-from pathlib import Path
 from abc import ABCMeta, abstractmethod
+from pathlib import Path
+from tkinter import filedialog, messagebox
 from typing import Any
 
+from ....my_util import arrow, do_nothing, CommentableObj
 from ...literals import *
-from ....my_util import do_nothing, arrow
+
 
 def box_factory(key_name, value):
     if isinstance(value, str):

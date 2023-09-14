@@ -1,8 +1,10 @@
-import tkcap
-from tkinter import Widget
 from pathlib import Path
-import PIL.Image
 from time import sleep
+from tkinter import Widget
+
+import PIL.Image
+import tkcap
+
 
 def caputuer(target: Widget, path: Path, overwrite: bool = False) -> Path:
     target.update_idletasks()

@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import *
 
+
 class Switch(tk.Button):
     def __init__(self, default_state=False, **kw) -> None:
         super().__init__(**kw)

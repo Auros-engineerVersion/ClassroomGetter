@@ -1,12 +1,15 @@
-import sys, os
+import os
+import sys
+
 sys.path.append(os.path.abspath('.'))
 
 import unittest
-from unittest.mock import patch, MagicMock
 from pathlib import Path
+from unittest.mock import MagicMock, patch
 
-from src.data.nodes import *
+from src.data import *
 from src.setting import *
+
 
 class SettingTest(unittest.TestCase):
     def setUp(self) -> None:
@@ -48,3 +51,6 @@ class SettingTest(unittest.TestCase):
         form_mock.return_value.pop_up.side_effect = side_effect
         self.assertTrue(setup_data().is_current_data())
         self.assertEqual(form_mock.return_value.pop_up.call_count, len(side_effect))
+        
+if __name__ == '__main__':
+    unittest.main()

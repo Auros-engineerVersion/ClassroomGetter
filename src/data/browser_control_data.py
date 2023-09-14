@@ -1,18 +1,18 @@
-from selenium import webdriver
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.chrome.service import Service
-from selenium.common.exceptions import InvalidArgumentException
-from webdriver_manager.chrome import ChromeDriverManager
 from pathlib import Path
 
+from selenium import webdriver
+from selenium.common.exceptions import InvalidArgumentException
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.support.ui import WebDriverWait
+from webdriver_manager.chrome import ChromeDriverManager
+
 from ..interface import *
-from .setting_data import *
 
 class BrowserControlData(IBrowserControlData):
-    def __init__(self, setting: SettingData, driver: webdriver = None, wait: WebDriverWait = None) -> None:        
+    def __init__(self, setting: ISettingData, driver: webdriver = None, wait: WebDriverWait = None) -> None:        
         self.__driver = driver \
             if driver != None \
-            else create_driver(SettingData.profile_path(), *setting.web_driver_options.value)
+            else create_driver(setting.profile_path(), *setting.web_driver_options.value)
                         
         self.__wait = wait \
             if wait != None \

@@ -1,8 +1,9 @@
-import tkinter as tk
 import asyncio
+import tkinter as tk
 
 from ....data import *
 from ..info_boxes import *
+
 
 class NodeInfoFrame(tk.Frame):
     def __init__(self, master: tk.Misc, watching_box: NodeBox = None):

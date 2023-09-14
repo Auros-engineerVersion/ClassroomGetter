@@ -1,11 +1,14 @@
-import sys, os
+import os
+import sys
+
 sys.path.append(os.path.abspath('.'))
 
+import tkinter as tk
 import unittest
 from unittest.mock import patch
-import tkinter as tk
 
 from src.gui.custum_widgets import *
+
 
 class TimeSettersTest(unittest.TestCase):
     def test_is_current_value(self):

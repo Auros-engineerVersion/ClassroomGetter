@@ -1,10 +1,13 @@
-import sys, os
+import os
+import sys
+
 sys.path.append(os.path.abspath('.'))
 
 import unittest
 from pathlib import Path
 
 from src.data import *
+
 
 class BrowserControlDataTest(unittest.TestCase):
     def test_create_driver_invailed_options(self):

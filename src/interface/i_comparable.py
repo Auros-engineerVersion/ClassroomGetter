@@ -1,6 +1,8 @@
 from __future__ import annotations
+
 from abc import ABCMeta, abstractmethod, abstractproperty
-from typing import Coroutine, Callable
+from typing import Callable, Coroutine
+
 
 class IComparale(metaclass=ABCMeta):
     @abstractmethod

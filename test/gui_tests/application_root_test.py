@@ -1,12 +1,15 @@
-import sys, os
+import os
+import sys
+
 sys.path.append(os.path.abspath('.'))
 
 import unittest
 from unittest.mock import patch
 
+from src.browser import BrowserControlData
 from src.gui.application_root import ApplicationRoot
 from src.setting.settings import SettingData, Settings
-from src.browser import BrowserControlData
+
 
 class ApplicationRootTest(unittest.TestCase):
     @patch('src.setting.settings.Settings.load')

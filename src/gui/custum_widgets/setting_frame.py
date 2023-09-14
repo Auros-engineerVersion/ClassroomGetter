@@ -1,11 +1,12 @@
 import tkinter as tk
 from tkinter import font
 
-from ...my_util import *
-from ..literals import *
-from ...setting import *
 from ...data.setting_data import *
+from ...my_util import *
+from ...setting import *
+from ..literals import *
 from .info_boxes.input_boxes import *
+
 
 class DescBox(tk.Frame):
     def __init__(self, master: tk.Misc, box: InputBox = ..., text: str = ..., font_size: int = 8):

@@ -1,10 +1,11 @@
 from __future__ import annotations
+
 import gc
 import tkinter as tk
 
-from src.interface import INode
-from src.my_util import arrow
-from src.gui.custum_widgets.base import Switch
+from ....interface import INode
+from ....my_util import arrow
+from ..base.switch import Switch
 
 RUN = '実行'
 LOADING = '更新中'

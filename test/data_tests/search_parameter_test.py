@@ -1,14 +1,17 @@
-import sys, os
+import os
+import sys
+
 sys.path.append(os.path.abspath('.'))
 
-import unittest
-from unittest.mock import patch, MagicMock
 import asyncio
+import unittest
 from random import randint
+from unittest.mock import MagicMock, patch
 
-from src.my_util import do_nothing, randstr
-from src.interface.i_node import INode
 from src.data.serach_parameter_container import *
+from src.interface.i_node import INode
+from src.my_util import do_nothing, randstr
+
 
 def add_str(x, y, z):
     def __add(func):
