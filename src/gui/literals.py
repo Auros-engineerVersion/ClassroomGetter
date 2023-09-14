@@ -19,7 +19,9 @@ TK_DEFAULT_FONT = 'TkDefaultFont'
 BACKGROUND = 'background'
 NOTEBOOK_TAB_CHANGED = '<<NotebookTabChanged>>'
 CONFIGURE = '<Configure>'
+GUEST_MODE = 'ゲストモード'
 
 #文章
 STOP_OR_CONTINUE = '入力の途中で閉じようとしています。'
 SETTING_RESET_MESSAGE = '設定を適用するには再起動が必要です。'
+PROFILE_WARNING = '入力した値が正しくありません。再入力してください。'

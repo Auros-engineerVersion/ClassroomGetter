@@ -45,8 +45,8 @@ class ImageTest(unittest.TestCase):
             IMAGE_PATH.mkdir()
         
     def test_caputuer(self):
-        from src.gui.custum_widgets import FrontFrame, SettingFrame
-        caputuer_list = [FrontFrame, SettingFrame]
+        from src.gui.custum_widgets import FrontFrame, SettingFrame, ProfileForm
+        caputuer_list = [FrontFrame, SettingFrame, ProfileForm]
         for cls in caputuer_list:
             with self.subTest(cls.__name__):
                 try:

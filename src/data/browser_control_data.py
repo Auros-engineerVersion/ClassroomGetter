@@ -9,14 +9,14 @@ from webdriver_manager.chrome import ChromeDriverManager
 from ..interface import *
 
 class BrowserControlData(IBrowserControlData):
-    def __init__(self, setting: ISettingData, driver: webdriver = None, wait: WebDriverWait = None) -> None:        
-        self.__driver = driver \
+    def __init__(self, cfg: ISettingData, driver: webdriver = None, wait: WebDriverWait = None) -> None:        
+        self.__driver = driver\
             if driver != None \
-            else create_driver(setting.profile_path(), *setting.web_driver_options.value)
+            else create_driver(cfg)
                         
         self.__wait = wait \
             if wait != None \
-            else WebDriverWait(self.__driver, setting.loading_wait_time.value, 1)
+            else WebDriverWait(self.__driver, cfg.loading_wait_time.value, 1)
     
     def __del__(self):
         del self.__wait
@@ -31,10 +31,14 @@ class BrowserControlData(IBrowserControlData):
     def wait(self) -> WebDriverWait:
         return self.__wait
         
-def create_driver(profile: Path, *optional_args) -> webdriver.Chrome:
+def create_driver(cfg: ISettingData) -> webdriver.Chrome:
     options = webdriver.ChromeOptions()
-    option_list = [f'--user-data-dir={profile.parent}', f'--profile-directory={profile.name}', *list(optional_args)]
-    for option in option_list:
+    optional_args = cfg.web_driver_options.value
+    if not cfg.is_guest():
+        optional_args.extend([f'--user-data-dir={cfg.profile_path().parent}', 
+                              f'--profile-directory={cfg.profile_path().name}'])
+        
+    for option in optional_args:
         if type(option) is str:
             options.add_argument(option)
         else:
@@ -43,5 +47,5 @@ def create_driver(profile: Path, *optional_args) -> webdriver.Chrome:
     try:
         driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
     except InvalidArgumentException:
-        raise ValueError(f'Invalid options: {option_list}')
+        raise ValueError(f'Invalid options: {optional_args}')
     return driver

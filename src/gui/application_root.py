@@ -1,13 +1,19 @@
 import tkinter as tk
+from tkinter import messagebox
 from tkinter import ttk
 
+from ..my_util import pipe, do_nothing
+from ..data import BrowserControlData as bc_data, SearchParameterContainer as spc
+from ..interface import ISettingData
+from .custum_widgets import FrontFrame, SettingFrame
+from .custum_widgets.info_boxes import ProfileForm
 from .literals import *
-from .custum_widgets import * 
-from ..data import BrowserControlData as bc_data
-from ..setting import *
+
 
 class ApplicationRoot(tk.Tk):
-    def __init__(self, cfg: SettingData, bc: bc_data, size: tuple) -> None:
+    def __init__(self, cfg: ISettingData, size: tuple) -> None:
+        cfg = self.__set_spc(self.__setup_profile(cfg))
+        
         tk.Tk.__init__(self)
         
         self.title(ROOT_TITLE)
@@ -19,8 +25,7 @@ class ApplicationRoot(tk.Tk):
         
         note.bind(NOTEBOOK_TAB_CHANGED, lambda e: self.resize(note))
         
-        self.__cfg = cfg #状態を持たせるために必要
-        self.protocol(WM_DELETE_WINDOW, lambda: self.stop(self.__cfg, bc))
+        self.protocol(WM_DELETE_WINDOW, self.stop)
 
 #region pack
         note.add(main_frame, text=MAIN)
@@ -32,6 +37,18 @@ class ApplicationRoot(tk.Tk):
     def resize(self, note: ttk.Notebook):
         note.nametowidget(note.select()).resize()
         
-    def stop(self, cfg: SettingData, bc: bc_data):
-        del bc
+    def stop(self):
+        del spc.browser_control_data
         self.destroy()
+        
+    def __setup_profile(self, cfg: ISettingData, warning = lambda: do_nothing(1)):
+        if cfg.is_current_user() or cfg.is_guest():
+            return cfg
+        else:
+            warning()
+            cfg.profile = ProfileForm().pop_up()
+            return self.__setup_profile(cfg, lambda: messagebox.showwarning(title=WARNING, message=PROFILE_WARNING))
+    
+    def __set_spc(self, cfg: ISettingData):
+        spc.browser_control_data = bc_data(cfg)
+        return cfg

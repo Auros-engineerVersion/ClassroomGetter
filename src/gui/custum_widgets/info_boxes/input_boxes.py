@@ -79,10 +79,12 @@ class DialogInput(InputBox):
 class ProfileForm(tk.Frame, InputBase):
     def __init__(self, master: tk.Misc = None):
         if master == None:
-            master = tk.Tk()
+            master = tk.Tk()\
+                |arrow| (lambda m: m.title('ProfileForm'))
             tk.Frame.__init__(self, master)
             self.pack()
         else:
+            master.title('ProfileForm')
             tk.Frame.__init__(self, master)
         
         self.__email = EntryInput(master=self, title='email')\
@@ -91,10 +93,19 @@ class ProfileForm(tk.Frame, InputBase):
         self.__password = EntryInput(master=self, title='password')\
             |arrow| (lambda p: p.pack(side=tk.TOP, anchor=tk.W, fill=tk.X))
             
+        #ボタンフレーム
+        button_frame = tk.Frame(self)\
+            |arrow| (lambda f: f.pack(side=tk.TOP, anchor=tk.W, fill=tk.X))
+            
         #完了ボタン
-        tk.Button(self, text=COMPLETE)\
-            |arrow| (lambda b: b.pack(side=tk.BOTTOM, anchor=tk.E, padx=5, pady=5))\
+        tk.Button(button_frame, text=COMPLETE)\
+            |arrow| (lambda b: b.pack(side=tk.RIGHT, anchor=tk.E, padx=5, pady=5))\
             |arrow| (lambda b: b.bind(BUTTON_PRESS, lambda _: self.quit()))
+            
+        #ゲストモード
+        tk.Button(button_frame, text=GUEST_MODE)\
+            |arrow| (lambda b: b.pack(side=tk.RIGHT, anchor=tk.E, padx=5, pady=5))\
+            |arrow| (lambda b: b.bind(BUTTON_PRESS, lambda _: self.set('guest', 'guest') |arrow| (lambda _: self.quit())))
             
         master.protocol(WM_DELETE_WINDOW, lambda: self.__stop_or_continue(master))
     
@@ -106,8 +117,6 @@ class ProfileForm(tk.Frame, InputBase):
         
         if ok_cancel:
             target.destroy()
-        else:
-            do_nothing()
     
     def set(self, email: str, password: str):
         self.__email.set(email)
@@ -118,7 +127,12 @@ class ProfileForm(tk.Frame, InputBase):
     
     def pop_up(self, loop = lambda x: x.winfo_toplevel().mainloop()):
         loop(self)
+        
+        #途中で終了していたら
+        if len(self.children) < 1:
+            raise ChildProcessError
+        
         profile = self.get()
-        self.destroy()
-            
+        self.winfo_toplevel().destroy()
+
         return profile
