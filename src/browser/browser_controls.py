@@ -8,7 +8,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as EC
 
-from src.interface import *
+from ..interface import *
 
 
 def move(bc: IBrowserControlData, url: str):

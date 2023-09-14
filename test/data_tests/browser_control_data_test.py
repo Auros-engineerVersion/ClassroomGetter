@@ -4,6 +4,7 @@ import sys
 sys.path.append(os.path.abspath('.'))
 
 import unittest
+from unittest.mock import MagicMock, patch
 from pathlib import Path
 
 from src.data import *
@@ -11,10 +12,10 @@ from src.data import *
 
 class BrowserControlDataTest(unittest.TestCase):
     def test_create_driver_invailed_options(self):
-        profile_path = Path(__file__).parent.joinpath('test_browser/Profile 1')
         for option in [123456, None, type]:
-            with self.subTest(msg=f'option: {option}', option=option):
-                self.assertRaises(ValueError, create_driver, profile_path, *list(('--headless', option)))
+            with self.subTest(msg=f'option: {option}', option=option), patch('src.interface.ISettingData') as cfg_mock:
+                cfg_mock.web_driver_options.value = ['--headless', option]
+                self.assertRaises(ValueError, create_driver, cfg_mock)
                 
 if __name__ == '__main__':
     unittest.main()
