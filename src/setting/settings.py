@@ -1,15 +1,15 @@
 from __future__ import annotations
+
 import pickle
 from pathlib import Path
 
 from ..browser import *
+from ..data import BrowserControlData, SettingData
 from ..interface import *
-from ..data import *
-from ..gui.custum_widgets.info_boxes.input_boxes import ProfileForm
 
 TARGET_URL = 'https://classroom.google.com/' #固定値
     
-def save(folder_path: Path, data: SettingData) -> None:
+def save(folder_path: Path, data: ISettingData) -> None:
     #directoryが存在していれば
     if (folder_path.exists()):
         file_name = 'save.pkl'
@@ -19,30 +19,25 @@ def save(folder_path: Path, data: SettingData) -> None:
         folder_path.mkdir(parents=True, exist_ok=True)
         save(data) #Directoryが無ければもう一度行う
     
-def load(folder_path: Path) -> SettingData:
+def load(folder_path: Path) -> ISettingData:
     data = None
     file_path = folder_path.joinpath('save.pkl')
     if file_path.exists():
         with open(file_path, 'rb') as f:
             data = pickle.load(f)
             
-    if data == None or type(data) != SettingData:
-        return None
+    if data == None or data.is_current_data() or isinstance(data, ISettingData) == False:
+        raise TypeError('データが不正です')
     else:
         return data
     
-def setup_data(default_get_func = lambda: load(SettingData.SETTINGFOLDER_PATH)):
-    def popup_and_return_cfg():
-        profile = ProfileForm().pop_up()
-        return SettingData(user_email=CommentableObj(profile[0]), user_password=CommentableObj(profile[1]))
+def try_load(folder_path: Path = ISettingData.SETTINGFOLDER_PATH) -> ISettingData:
+    try:
+        return load(folder_path)
+    except TypeError:
+        return SettingData()
     
-    cfg = default_get_func()
-    if cfg is None or not cfg.is_current_data():
-        return setup_data(popup_and_return_cfg)
-    else:
-        return cfg
-    
-def setup_state(cfg: SettingData):
+def setup_state(cfg: ISettingData):
     bc_data = BrowserControlData(cfg)
     if not cfg.is_current_nodes():
         #プロファイルが指定されているかどうか
@@ -51,7 +46,4 @@ def setup_state(cfg: SettingData):
         if TARGET_URL not in bc_data.driver.current_url and not cfg.is_default():
             login_classroom(bc_data, cfg)
             
-        cfg.nodes = Node('Classroom', TARGET_URL, 0).Nodes
-        
-    SearchParameterContainer.browser_control_data = bc_data
     return cfg
