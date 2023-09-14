@@ -6,10 +6,9 @@ from typing import ClassVar
 
 from .nodes import Node
 from ..interface import ISettingData
-from ..my_util import CommentableObj
+from ..my_util import CommentableObj, pipe
 
 NO_DATA = 'No Data'
-TARGET_URL = 'https://classroom.google.com/' #固定値
 
 @dataclass
 class SettingData(ISettingData):
@@ -26,11 +25,7 @@ class SettingData(ISettingData):
     web_driver_options_data: CommentableObj = field(default_factory=lambda:CommentableObj('--headless, --disable-gpu, --blink-settings=imagesEnabled=false, --ignore-certificate-error, --ignore-certificate-error', 'Web Driverが起動する際のオプション'))
     
     #----------------保存されたデータ--------------------
-    nodes: set = field(default_factory=set)
-    
-#region 定数
-    SETTINGFOLDER_PATH: ClassVar[Path] = Path('./Setting')
-#endregion
+    nodes: set = field(default_factory=lambda:set([Node('Classroom', ISettingData.TARGET_URL, 0)]))
         
     def __add__(self: SettingData, other: SettingData) -> SettingData:
         args = list(
@@ -42,9 +37,6 @@ class SettingData(ISettingData):
         )
         
         return SettingData(*args)
-    
-    def __post_init__(self):
-        self.nodes.add(Node('Classroom', TARGET_URL, 0))
     
     @property
     def profile(self):
@@ -88,6 +80,9 @@ class SettingData(ISettingData):
     def is_default(self):
         return NO_DATA in self.user_email.value + self.user_password.value
     
+    def is_guest(self):
+        return self.user_email.value == 'guest' and self.user_password.value == 'guest'
+    
     @staticmethod
     def profile_path():
-        return Path(SettingData.SETTINGFOLDER_PATH).absolute().joinpath('./ProfileData/Profile 1')
+        return ISettingData.SETTINGFOLDER_PATH.absolute().joinpath('./ProfileData/Profile 1')

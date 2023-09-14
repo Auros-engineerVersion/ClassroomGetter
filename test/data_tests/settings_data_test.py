@@ -9,9 +9,15 @@ from unittest.mock import Mock, patch
 
 from src.data.setting_data import SettingData
 from src.my_util import CommentableObj
+from src.interface import ISettingData, INode
 
 
 class SettingDataTest(unittest.TestCase):
+    def test_constructor(self):
+        data = SettingData()
+        self.assertIsInstance(data.nodes, set)
+        self.assertIsInstance(data.nodes.pop(), INode)
+    
     def test_is_current(self):
         invailed_data1 = SettingData()
         self.assertFalse(invailed_data1.is_current_data())
