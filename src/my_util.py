@@ -141,7 +141,11 @@ class CommentableObj:
 
     @property
     def value(self):
-        return self.__value    
+        return self.__value
+    
+    @value.setter
+    def value(self, other):
+        self.__value = other
 
     @property
     def comment(self) -> str:

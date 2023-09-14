@@ -40,7 +40,7 @@ class SettingTest(unittest.TestCase):
         self.assertIsInstance(try_load(self.__test_folder_path), SettingData)
         
     def test_no_such_file(self):
-        self.assertIsNone(load(Path('.')))
+        self.assertRaises(TypeError, load, Path('.'))
         
     def test_save_node(self):
         target = SettingData()

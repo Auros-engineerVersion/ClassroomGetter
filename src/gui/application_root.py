@@ -20,7 +20,7 @@ class ApplicationRoot(tk.Tk):
         self.geometry(f'{size[0]}x{size[1]}')
         
         note = ttk.Notebook(self, width=size[0], height=size[1])
-        main_frame = FrontFrame(note, min(cfg.nodes) if len(cfg.nodes) > 0 else None) #頂点を探して設定する
+        main_frame = FrontFrame(note, min(cfg.nodes)) #頂点を探して設定する
         setting_frame = SettingFrame(note, cfg)
         
         note.bind(NOTEBOOK_TAB_CHANGED, lambda e: self.resize(note))
