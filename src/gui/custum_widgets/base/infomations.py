@@ -3,6 +3,7 @@ import tkinter as tk
 
 from ....data import *
 from ..info_boxes import *
+from ....my_util import arrow, is_none
 
 
 class NodeInfoFrame(tk.Frame):
@@ -10,20 +11,19 @@ class NodeInfoFrame(tk.Frame):
         tk.Frame.__init__(self, master, background='green')
         self.__watching_box = watching_box
         
-        self.__node_name_label = tk.Label(self, text=watching_box.text if watching_box != None else NO_DATA)
-        self.__node_url_label = tk.Label(self, text=watching_box.url if watching_box != None else NO_DATA)
-        self.__time_box = Timer(self, watching_box=self.__watching_box)
-        
+        self.__node_name_label = tk.Label(self, text=is_none(watching_box.text, NO_DATA))\
+            |arrow| (lambda l: l.pack(side=tk.TOP, anchor=tk.CENTER, padx=5, pady=5))
+            
+        self.__node_url_label = tk.Label(self, text=is_none(watching_box.url, NO_DATA))\
+            |arrow| (lambda l: l.pack(side=tk.TOP))
+            
         #ボタンが押されたら、監視中のNodeBoxからinitialize_treeを実行する
-        self.__init_button = tk.Button(self, text=RUN)
-        self.__init_button.bind(BUTTON_PRESS, lambda event: self.__watching_box.initialize_node())
-        
-#region pack
-        self.__node_name_label.pack(side=tk.TOP, anchor=tk.CENTER, padx=5, pady=5)
-        self.__node_url_label.pack(side=tk.TOP)
-        self.__init_button.pack(side=tk.BOTTOM, fill=tk.X)
-        self.__time_box.pack(side=tk.BOTTOM)
-#endregion
+        self.__init_button = tk.Button(self, text=RUN)\
+            |arrow| (lambda b: b.pack(side=tk.BOTTOM, fill=tk.X))\
+            |arrow| (lambda b: b.bind(BUTTON_PRESS, lambda _: self.__watching_box.initialize_tree()))
+            
+        self.__time_box = Timer(self, watching_box=self.__watching_box)\
+            |arrow| (lambda t: t.pack(side=tk.TOP))
         
     def set_box(self, box: NodeBox):
         self.__node_name_label[TEXT] = box.text
@@ -45,28 +45,34 @@ class Timer(tk.Frame):
     def __init__(self, master: tk.Misc, watching_box: NodeBox):
         tk.Frame.__init__(self, master, background='yellow')
         self.__watching_box = watching_box
-        clock_frame = tk.Frame(self)
-        clock_view  = tk.Label(clock_frame, text='次の更新まで')
-        self.clock_label = tk.Label(clock_frame, text=NO_DATA)
+        
+        clock_frame = tk.Frame(self)\
+            |arrow| (lambda f: f.pack())
+            
+        #時計の表示の文字
+        tk.Label(clock_frame, text='次の更新まで')\
+            |arrow| (lambda l: l.pack(side=tk.TOP))
+            
+        self.clock_label = tk.Label(clock_frame, text=NO_DATA)\
+            |arrow| (lambda l: l.pack(side=tk.TOP))
                 
-        time_set_frame = tk.Frame(self)
-        self.__time_setters = TimeSetters(self)
-        set_button = tk.Button(time_set_frame, text='この時間に指定する')
-        set_button.bind(BUTTON_PRESS, lambda event: self.__watching_box.set_time(RoutineData(*self.__time_setters.values())))
+        time_set_frame = tk.Frame(self)\
+            |arrow| (lambda f: f.pack())
+            
+        #時間の設定ボタン群
+        self.__time_setters = TimeSetters(self)\
+            |arrow| (lambda t: t.pack(side=tk.LEFT))
         
-        reset_button = tk.Button(time_set_frame, text=RESET)
-        reset_button.bind(BUTTON_PRESS, self.__watching_box.time_reset)
+        #時間指定ボタン    
+        tk.Button(time_set_frame, text='この時間に指定する')\
+            |arrow| (lambda b: b.pack(side=tk.RIGHT))\
+            |arrow| (lambda b: b.bind(BUTTON_PRESS, 
+                lambda _: self.__watching_box.set_time(RoutineData(*self.__time_setters.values()))))
         
-#region pack
-        clock_frame.pack()
-        clock_view.pack(side=tk.TOP)
-        self.clock_label.pack(side=tk.TOP)
-        
-        time_set_frame.pack()
-        self.__time_setters.pack()
-        set_button.pack(side=tk.LEFT)
-        reset_button.pack(side=tk.RIGHT)
-#endregion
+        #時間のリセット
+        tk.Button(time_set_frame, text=RESET)\
+            |arrow| (lambda b: b.pack(side=tk.RIGHT))\
+            |arrow| (lambda b: b.bind(BUTTON_PRESS, self.__watching_box.time_reset))
         
     @property
     def watching_box(self):
