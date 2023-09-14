@@ -1,12 +1,15 @@
-import sys, os
+import os
+import sys
+
 sys.path.append(os.path.abspath('.'))
 
 import unittest
-from unittest.mock import patch, Mock
 from pathlib import Path
+from unittest.mock import Mock, patch
 
 from src.data.setting_data import SettingData
 from src.my_util import CommentableObj
+
 
 class SettingDataTest(unittest.TestCase):
     def test_is_current(self):

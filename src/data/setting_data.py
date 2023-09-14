@@ -1,14 +1,18 @@
 from __future__ import annotations
+
+from dataclasses import *
 from pathlib import Path
 from typing import ClassVar
-from dataclasses import *
 
+from .nodes import Node
+from ..interface import ISettingData
 from ..my_util import CommentableObj
 
 NO_DATA = 'No Data'
+TARGET_URL = 'https://classroom.google.com/' #固定値
 
 @dataclass
-class SettingData:    
+class SettingData(ISettingData):
     #----------------通常のデータ------------------------
     user_email: CommentableObj = field(default_factory=lambda:CommentableObj(NO_DATA, 'ユーザーのメールアドレス'))
     user_password: CommentableObj = field(default_factory=lambda:CommentableObj(NO_DATA, 'ユーザーアカウントのパスワード'))
@@ -39,14 +43,17 @@ class SettingData:
         
         return SettingData(*args)
     
+    def __post_init__(self):
+        self.nodes.add(Node('Classroom', TARGET_URL, 0))
+    
     @property
     def profile(self):
         return self.user_email, self.user_password
     
     @profile.setter
     def profile(self, other: tuple[str, str]):
-        self.user_email = other[0]
-        self.user_password = other[1]
+        self.user_email.value = other[0]
+        self.user_password.value = other[1]
         
     @property
     def web_driver_options(self):

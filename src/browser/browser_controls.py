@@ -1,14 +1,15 @@
-from typing import Callable, Iterable
 from re import search
+from typing import Callable, Iterable
+
+from selenium.common.exceptions import (InvalidSelectorException,
+                                        TimeoutException)
 from selenium.webdriver.common.action_chains import ActionChains
-from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.common.by import By
-from selenium.common.exceptions import TimeoutException
-from selenium.common.exceptions import InvalidSelectorException
+from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as EC
 
-from ..interface import *
-from ..data import *
+from src.interface import *
+
 
 def move(bc: IBrowserControlData, url: str):
     bc.driver.get(url)
@@ -63,7 +64,7 @@ def click_all_sections(bc: IBrowserControlData):
     except TimeoutException:
         return
     
-def login_college_form(bc: IBrowserControlData, setting: SettingData):
+def login_college_form(bc: IBrowserControlData, setting: ISettingData):
     befor_at_index = setting.user_email.find('@')
     user_name = setting.user_email[:befor_at_index]
     
@@ -74,7 +75,7 @@ def login_college_form(bc: IBrowserControlData, setting: SettingData):
     search(bc, "//input[@id='j_password']").send_keys(setting.user_password)
     search(bc, "//button[@type='submit']").click()
 
-def login_google(bc: IBrowserControlData, setting: SettingData):
+def login_google(bc: IBrowserControlData, setting: ISettingData):
     #1:emailを入力する
     #2:続行を押す
     #3:大学のフォームにログイン
@@ -84,7 +85,7 @@ def login_google(bc: IBrowserControlData, setting: SettingData):
     login_college_form(bc, setting)
     search(bc, "//div[@jsname='Njthtb']")       .click()
     
-def login_classroom(bc: IBrowserControlData, setting: SettingData):
+def login_classroom(bc: IBrowserControlData, setting: ISettingData):
     #1:ログイン画面に移動する
     #2:Googleにログインする
     #3:プロファイルを設定する
