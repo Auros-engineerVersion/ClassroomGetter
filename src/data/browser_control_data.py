@@ -6,17 +6,13 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support.ui import WebDriverWait
 from webdriver_manager.chrome import ChromeDriverManager
 
+from ..my_util import is_none
 from ..interface import *
 
 class BrowserControlData(IBrowserControlData):
     def __init__(self, cfg: ISettingData, driver: webdriver = None, wait: WebDriverWait = None) -> None:        
-        self.__driver = driver\
-            if driver != None \
-            else create_driver(cfg)
-                        
-        self.__wait = wait \
-            if wait != None \
-            else WebDriverWait(self.__driver, cfg.loading_wait_time.value, 1)
+        self.__driver = is_none(driver, create_driver(cfg))
+        self.__wait = is_none(wait, WebDriverWait(self.__driver, cfg.loading_wait_time.value, 1))
     
     def __del__(self):
         del self.__wait

@@ -150,3 +150,9 @@ class CommentableObj:
     @property
     def comment(self) -> str:
         return self.__comment
+    
+def is_none(default, fail_case):
+    if default is None:
+        return fail_case
+    else:
+        return default
