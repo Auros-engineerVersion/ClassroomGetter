@@ -3,10 +3,11 @@ from datetime import datetime, timedelta
 from typing import ClassVar, SupportsInt
 
 from ..my_util import public_vars
+from ..interface import IRoutineData
 
 
 @dataclass
-class RoutineData:
+class RoutineData(IRoutineData):
     week: SupportsInt = 0
     day: SupportsInt = 0
     hour: SupportsInt = 0

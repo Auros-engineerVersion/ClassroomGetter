@@ -4,6 +4,7 @@ import tkinter as tk
 from ....data import *
 from ..info_boxes import *
 from ....my_util import arrow, is_none
+from ....interface import *
 
 
 class NodeInfoFrame(tk.Frame):
@@ -22,7 +23,7 @@ class NodeInfoFrame(tk.Frame):
             |arrow| (lambda b: b.pack(side=tk.BOTTOM, fill=tk.X))\
             |arrow| (lambda b: b.bind(BUTTON_PRESS, lambda _: self.__watching_box.initialize_tree()))
             
-        self.__time_box = Timer(self, watching_box=self.__watching_box)\
+        self.__time_box: Timer = Timer(self, watching_box=self.__watching_box)\
             |arrow| (lambda t: t.pack(side=tk.TOP))
         
     def set_box(self, box: NodeBox):
@@ -39,7 +40,7 @@ class NodeInfoFrame(tk.Frame):
     async def run_clock_async(self, target: NodeBox):
         self.__watching_box = target
         self.__time_box.watching_box = target
-        await self.__time_box.update_clock(target)
+        await self.__time_box.update_clock(target.time, target.initialize_tree, 1)
         
 class Timer(tk.Frame):
     def __init__(self, master: tk.Misc, watching_box: NodeBox):
@@ -83,14 +84,23 @@ class Timer(tk.Frame):
         self.__watching_box = box
         self.__time_setters.set(box.time)
         
-    async def update_clock(self, box: NodeBox, interval: int):
+    #
+    #interval: 
+    async def update_clock(self, dead_line: IRoutineData, complete_func, interval: int):
+        """boxの時間を監視し、時間が来たらboxのinitialize_treeを実行する
+
+        Args:
+            dead_line (IRoutineData): 残り時間
+            complete_func (Callable): 時間が来た時に実行する関数
+            interval (int): 監視する間隔
+        """
         try:
-            while not box.time.should_init():
-                self.clock_label[TEXT] = box.time.remaine()
+            while not dead_line.should_init():
+                self.clock_label[TEXT] = dead_line.remaine()
                 await asyncio.sleep(interval)
                 
             else:
-                box.initialize_node()
+                complete_func()
         except asyncio.CancelledError:
             return
 
