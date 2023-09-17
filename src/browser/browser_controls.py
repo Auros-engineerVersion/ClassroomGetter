@@ -1,5 +1,6 @@
 from re import search
 from typing import Callable, Iterable
+from time import sleep
 
 from selenium.common.exceptions import (InvalidSelectorException,
                                         TimeoutException)
@@ -9,7 +10,6 @@ from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as EC
 
 from ..interface import *
-
 
 def move(bc: IBrowserControlData, url: str):
     bc.driver.get(url)
@@ -64,30 +64,46 @@ def click_all_sections(bc: IBrowserControlData):
     except TimeoutException:
         return
     
-def login_college_form(bc: IBrowserControlData, setting: ISettingData):
-    befor_at_index = setting.user_email.find('@')
-    user_name = setting.user_email[:befor_at_index]
+def login_college_form(bc: IBrowserControlData, email: str, password: str):
+    user_name = email[:email.find('@')]
     
     #1:emailの@以前をユーザー名に送る
     #2:passwordを送る
     #3:ログインボタンを押す
-    search(bc, "//input[@id='j_username']").send_keys(user_name)
-    search(bc, "//input[@id='j_password']").send_keys(setting.user_password)
-    search(bc, "//button[@type='submit']").click()
+    search_element(bc, "//input[@id='j_username']").send_keys(user_name)
+    search_element(bc, "//input[@id='j_password']").send_keys(password)
+    search_element(bc, "//button[@type='submit']").click()
 
-def login_google(bc: IBrowserControlData, setting: ISettingData):
+def login_google(bc: IBrowserControlData, email: str, password: str):
     #1:emailを入力する
     #2:続行を押す
     #3:大学のフォームにログイン
     #4:続行を押す
-    search(bc, "//input[@type='email']")        .send_keys(setting.user_email)
-    search(bc, "//div[@id='identifierNext']")   .click()
-    login_college_form(bc, setting)
-    search(bc, "//div[@jsname='Njthtb']")       .click()
+    search_element(bc, "//input[@type='email']")        .send_keys(email)
+    search_element(bc, "//div[@id='identifierNext']")   .click()
+    login_college_form(bc, email, password)
+    search_element(bc, "//div[@jsname='Njthtb']")       .click()
     
-def login_classroom(bc: IBrowserControlData, setting: ISettingData):
+def login_classroom(bc: IBrowserControlData, email: str, password: str):
+    if bc.driver.current_url != ISettingData.TARGET_URL:
+        move(bc, ISettingData.TARGET_URL)
+    
     #1:ログイン画面に移動する
     #2:Googleにログインする
     #3:プロファイルを設定する
-    move(bc, search(bc, "//a[@class='gfe-button gfe-button--medium-emphasis gfe-button--middle-align']").get_attribute('href'))
-    login_google(bc, setting)
+    move(bc, search_element(bc, "//a[@class='gfe-button gfe-button--medium-emphasis gfe-button--middle-align']").get_attribute('href'))
+    login_google(bc, email, password)
+    bc.wait.until(EC.url_matches(ISettingData.TARGET_URL))
+    
+def donwload(bc: IBrowserControlData, url: str, file_path: Path, timeout: int = 10):
+    bc.driver.get(url)
+    
+    while not file_path.exists() and timeout > 0:
+        sleep(bc.wait._poll)
+        timeout -= bc.wait._poll
+        
+        if timeout <= 0:
+            raise TimeoutError(f'Timeout: {url}')
+        
+        if file_path.exists():
+            return file_path
