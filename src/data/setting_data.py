@@ -4,9 +4,9 @@ from dataclasses import *
 from pathlib import Path
 from typing import ClassVar
 
-from .nodes import Node
 from ..interface import ISettingData
 from ..my_util import CommentableObj, pipe
+from .nodes import Node
 
 NO_DATA = 'No Data'
 

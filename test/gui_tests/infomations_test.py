@@ -1,12 +1,12 @@
+import asyncio
 import os
 import sys
-import asyncio
 
 sys.path.append(os.path.abspath('.'))
 
 import tkinter as tk
 import unittest
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 from src.gui.custum_widgets import *
 

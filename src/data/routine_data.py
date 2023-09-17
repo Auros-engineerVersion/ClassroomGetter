@@ -2,8 +2,8 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import ClassVar, SupportsInt
 
-from ..my_util import public_vars
 from ..interface import IRoutineData
+from ..my_util import public_vars
 
 
 @dataclass

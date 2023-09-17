@@ -1,6 +1,6 @@
 import tkinter as tk
 
-from ...literals import CONFIGURE
+from ....literals import CONFIGURE
 
 
 class ScrollableFrame(tk.Frame):

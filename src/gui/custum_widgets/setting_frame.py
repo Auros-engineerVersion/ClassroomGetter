@@ -2,9 +2,9 @@ import tkinter as tk
 from tkinter import font
 
 from ...data.setting_data import *
+from ...literals import *
 from ...my_util import *
 from ...setting import *
-from ..literals import *
 from .info_boxes.input_boxes import *
 
 

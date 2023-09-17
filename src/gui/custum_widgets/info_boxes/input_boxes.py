@@ -4,8 +4,8 @@ from pathlib import Path
 from tkinter import filedialog, messagebox
 from typing import Any
 
-from ....my_util import arrow, do_nothing, CommentableObj
-from ...literals import *
+from ....literals import *
+from ....my_util import CommentableObj, arrow, do_nothing
 
 
 def box_factory(key_name, value):

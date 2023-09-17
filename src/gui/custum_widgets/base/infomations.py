@@ -2,9 +2,9 @@ import asyncio
 import tkinter as tk
 
 from ....data import *
-from ..info_boxes import *
+from ....literals import *
 from ....my_util import arrow, is_none
-from ....interface import *
+from ..info_boxes import *
 
 
 class NodeInfoFrame(tk.Frame):

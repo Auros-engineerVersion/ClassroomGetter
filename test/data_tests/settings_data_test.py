@@ -8,8 +8,8 @@ from pathlib import Path
 from unittest.mock import Mock, patch
 
 from src.data.setting_data import SettingData
+from src.interface import INode, ISettingData
 from src.my_util import CommentableObj
-from src.interface import ISettingData, INode
 
 
 class SettingDataTest(unittest.TestCase):

@@ -1,9 +1,9 @@
 import unittest
 from unittest.mock import MagicMock, patch
 
+import main
 from src.gui.application_root import ApplicationRoot
 from src.setting import *
-import main
 
 
 class ToplevelTest(unittest.TestCase):

@@ -6,8 +6,9 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support.ui import WebDriverWait
 from webdriver_manager.chrome import ChromeDriverManager
 
-from ..my_util import is_none
 from ..interface import *
+from ..my_util import is_none
+
 
 class BrowserControlData(IBrowserControlData):
     def __init__(self, cfg: ISettingData, driver: webdriver = None, wait: WebDriverWait = None) -> None:        

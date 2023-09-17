@@ -7,8 +7,8 @@ import unittest
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
-from src.my_util import arrow
 from src.data import *
+from src.my_util import arrow
 from src.setting import *
 
 

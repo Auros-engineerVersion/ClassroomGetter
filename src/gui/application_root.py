@@ -1,13 +1,13 @@
 import tkinter as tk
-from tkinter import messagebox
-from tkinter import ttk
+from tkinter import messagebox, ttk
 
-from ..my_util import pipe, do_nothing
-from ..data import BrowserControlData as bc_data, SearchParameterContainer as spc
+from ..data import BrowserControlData as bc_data
+from ..data import SearchParameterContainer as spc
 from ..interface import ISettingData
+from ..literals import *
+from ..my_util import do_nothing, pipe
 from .custum_widgets import FrontFrame, SettingFrame
 from .custum_widgets.info_boxes import ProfileForm
-from .literals import *
 
 
 class ApplicationRoot(tk.Tk):
