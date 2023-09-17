@@ -10,7 +10,7 @@ from unittest.mock import MagicMock, patch
 
 from src.data.serach_parameter_container import *
 from src.interface.i_node import INode
-from src.my_util import do_nothing, randstr
+from src.my_util import identity, randstr
 
 
 def add_str(x, y, z):
@@ -22,7 +22,7 @@ def create_param(string_func, *args):
     return SearchParameter(
         xpath=string_func(*args),
         regex=string_func(*args),
-        attribute_func=do_nothing
+        attribute_func=identity
     )
 
 def pattern_factory(create_count: int = 1):
@@ -56,7 +56,7 @@ class ParameterTest(unittest.TestCase):
         bc = ''
         param = create_param(randstr, 10)
 
-        result = param.next_values(bc)(do_nothing)(add_str)(do_nothing)
+        result = param.next_values(bc)(identity)(add_str)(identity)
         self.assertEqual([bc + param.xpath + param.regex], list(result))
         
 class ParameterPatternTest(unittest.TestCase):
@@ -67,7 +67,7 @@ class ParameterPatternTest(unittest.TestCase):
         node.url = 'URL'
         
         patterns = pattern_factory(randint(1, 10))        
-        result = map(lambda x: x.name_elements_pair(bc, node)(add_str, do_nothing), patterns)
+        result = map(lambda x: x.name_elements_pair(bc, node)(add_str, identity), patterns)
         excepted_result = map(get_from_pattern, patterns)
 
         self.assertListEqual(sum(list(result), start=[]), list(excepted_result))

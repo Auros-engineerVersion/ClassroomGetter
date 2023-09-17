@@ -42,9 +42,9 @@ class SearchParameterPattern:
     text_param: SearchParameter
     link_param: SearchParameter
     
-    text_format: Callable = do_nothing
-    link_format: Callable = do_nothing
-    pre_proc:    Callable = do_nothing
+    text_format: Callable = identity
+    link_format: Callable = identity
+    pre_proc:    Callable = identity
     
     #func:textとlinkのペアに対して行う関数
     #text_filter, link_filter: それぞれのlistに対して行う関数

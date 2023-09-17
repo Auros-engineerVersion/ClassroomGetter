@@ -19,7 +19,7 @@ class MyUtilTest(unittest.TestCase):
         
     def test_identity(self):
         x = 0
-        y = identity(x)(do_nothing)
+        y = left(x)(identity)
         self.assertEqual(x, y)
         
     def test_randstr(self):

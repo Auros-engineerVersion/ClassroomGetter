@@ -5,7 +5,7 @@ from tkinter import filedialog, messagebox
 from typing import Any
 
 from ....literals import *
-from ....my_util import CommentableObj, arrow, do_nothing
+from ....my_util import CommentableObj, arrow, identity
 
 
 def box_factory(key_name, value):

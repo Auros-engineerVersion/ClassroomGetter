@@ -8,7 +8,7 @@ from unittest.mock import patch
 
 from src.browser.browser_controls import *
 from src.data import *
-from src.my_util import do_nothing
+from src.my_util import identity
 
 #このページは有志の方が作成されたスクレイピングテスト用のページです。
 TARGET_URL = 'https://tonari-it.com/scraping-test/'
@@ -36,8 +36,8 @@ class BrowserControlsTest(unittest.TestCase):
         self.assertRaises(ValueError, elem_get, timeout_xpath)
     
     def test_elements_filter_test(self):
-        target = ['1', do_nothing, -3.000, 1024, 'hoge', 'fuga', '硫化水素']
-        self.assertEqual(elements_filter(do_nothing, '[a-z]{4}')(target), ['hoge', 'fuga'])
+        target = ['1', identity, -3.000, 1024, 'hoge', 'fuga', '硫化水素']
+        self.assertEqual(elements_filter(identity, '[a-z]{4}')(target), ['hoge', 'fuga'])
         
 if __name__ == '__main__':
     unittest.main()

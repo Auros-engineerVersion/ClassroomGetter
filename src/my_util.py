@@ -65,14 +65,20 @@ def convert_to_tuple(list_1: Iterable, list_2: Iterable) -> list[tuple]:
         )
     )
     
-def do_nothing(x):
+def identity(x = None):
     return x
     
-def identity(x):
-    def func(f):
+def left(x = None):
+    def func(f = identity):
         f(x)
         return x
     return func
+
+def is_none(default, fail_case):
+    if default is None:
+        return fail_case
+    else:
+        return default
 
 def iterable_depth(x) -> int:
     if not x:
@@ -125,7 +131,7 @@ class Infix:
         return self.function(value1, value2)
             
 pipe = Infix(lambda x, func: func(x)) #関数の返値を次の関数の引数にするもの
-arrow = Infix(lambda x, func: identity(x)(func)) #最初に指定された対象を常にいじるもの
+arrow = Infix(lambda x, func: left(x)(func)) #最初に指定された対象を常にいじるもの
 
 class CommentableObj:
     def __init__(self, value, comment = '') -> None:
@@ -150,9 +156,3 @@ class CommentableObj:
     @property
     def comment(self) -> str:
         return self.__comment
-    
-def is_none(default, fail_case):
-    if default is None:
-        return fail_case
-    else:
-        return default

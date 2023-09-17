@@ -5,7 +5,7 @@ from ..data import BrowserControlData as bc_data
 from ..data import SearchParameterContainer as spc
 from ..interface import ISettingData
 from ..literals import *
-from ..my_util import do_nothing, pipe
+from ..my_util import identity, pipe
 from .custum_widgets import FrontFrame, SettingFrame
 from .custum_widgets.info_boxes import ProfileForm
 
@@ -41,7 +41,7 @@ class ApplicationRoot(tk.Tk):
         del spc.browser_control_data
         self.destroy()
         
-    def __setup_profile(self, cfg: ISettingData, warning = lambda: do_nothing(1)):
+    def __setup_profile(self, cfg: ISettingData, warning = lambda: identity(1)):
         if cfg.is_current_user() or cfg.is_guest():
             return cfg
         else:
