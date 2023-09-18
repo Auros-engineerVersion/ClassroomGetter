@@ -22,6 +22,17 @@ class MyUtilTest(unittest.TestCase):
         y = left(x)(identity)
         self.assertEqual(x, y)
         
+    def test_is_none(self):
+        excepted = 1
+        self.assertEqual(excepted, is_none(None, excepted))
+        
+        #両方ともNoneの場合
+        self.assertEqual(None, is_none(None, None))
+        
+        #fail_caseが関数の場合
+        self.assertEqual(excepted, is_none(None, lambda: excepted))
+        
+        
     def test_randstr(self):
         length = 10
         result = randstr(length)
