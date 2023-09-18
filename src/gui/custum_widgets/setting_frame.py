@@ -6,6 +6,7 @@ from ...literals import *
 from ...my_util import *
 from ...setting import *
 from .info_boxes.input_boxes import *
+from .base import *
 
 
 class DescBox(tk.Frame):
@@ -52,7 +53,7 @@ class SettingGroup(tk.Frame):
 
 class SettingFrame(tk.Frame):
     def __init__(self, master: tk.Misc, data: SettingData):
-        tk.Frame.__init__(self, master)
+        super().__init__(master=master)
         
         self.__boxes = []
         SettingGroup(self, data.editable_data.items())\
@@ -68,17 +69,12 @@ class SettingFrame(tk.Frame):
         
         self.set(self.__boxes, data)
         
-    def resize(self, width: int = 800, height: int = 600):
-        self.winfo_toplevel()\
-            |arrow| (lambda r: r.resizable(width=False, height=False))\
-            |arrow| (lambda r: r.geometry(size_to_geometory(width, height)))
-        
     def set(self, targets: list, data: SettingData):
-        data_set = map(
-            lambda d, box: box.set(d) if box is not None else None,
-            vars(data).values(), targets
-        )
-        list(data_set)
+        for data, box in zip(vars(data).values(), targets):
+            if box is None:
+                continue
+            else:
+                box.set(data)
         
     def values(self, nodes: list, boxes: list) -> SettingData:
         args = [*map(lambda box: box.value(), filter(lambda box: box is not None, boxes)), nodes]
