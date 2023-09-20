@@ -22,9 +22,7 @@ class ApplicationRoot(tk.Tk):
         note = ttk.Notebook(self, width=size[0], height=size[1])
         main_frame = FrontFrame(note, min(cfg.nodes)) #頂点を探して設定する
         setting_frame = SettingFrame(note, cfg)
-        
-        note.bind(NOTEBOOK_TAB_CHANGED, lambda e: self.resize(note))
-        
+                
         self.protocol(WM_DELETE_WINDOW, self.stop)
 
 #region pack
@@ -32,15 +30,7 @@ class ApplicationRoot(tk.Tk):
         note.add(setting_frame, text=SETTING)
         note.pack(fill=tk.BOTH, expand=True)
 #endregion
-        
-    #NoteBookを引数にとる。そのNoteBoolのページが遷移した際、windowのサイズを変更する関数
-    def resize(self, note: ttk.Notebook):
-        note.nametowidget(note.select()).resize()
-        
-    def stop(self):
-        del spc.browser_control_data
-        self.destroy()
-        
+
     def __setup_profile(self, cfg: ISettingData, warning = lambda: identity(1)):
         if cfg.is_current_user() or cfg.is_guest():
             return cfg
@@ -52,3 +42,7 @@ class ApplicationRoot(tk.Tk):
     def __set_spc(self, cfg: ISettingData):
         spc.browser_control_data = bc_data(cfg)
         return cfg
+        
+    def stop(self):
+        del spc.browser_control_data
+        self.destroy()

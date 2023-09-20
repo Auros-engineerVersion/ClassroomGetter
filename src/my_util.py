@@ -79,9 +79,15 @@ def left(x = None):
 
 def is_none(default, fail_case):
     if default is None:
-        return fail_case
+        if isinstance(fail_case, Callable):
+            return is_none(fail_case(), None)
+        else:
+            return fail_case
     else:
-        return default
+        if isinstance(default, Callable):
+            return is_none(default(), fail_case)
+        else:
+            return default
 
 def iterable_depth(x) -> int:
     if not x:
