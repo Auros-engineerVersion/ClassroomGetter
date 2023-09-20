@@ -10,6 +10,7 @@ from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as EC
 
 from ..interface import *
+from ..my_util import arrow
 
 def move(bc: IBrowserControlData, url: str):
     bc.driver.get(url)
@@ -30,18 +31,13 @@ def search_element_all(bc: IBrowserControlData, xpath: str) -> list[WebElement]:
     except InvalidSelectorException:
         return []
     
-def elements_filter(filter_func: Callable, pattern: str = ''):
-    def __get_hrefs(target: Iterable) -> list:
-        current_values = filter(
-            lambda string: search(pattern, string=str(string)) != None,
-            filter(
-                lambda obj: type(obj) == str,
-                map(filter_func, target)
-            )
-        )
-        
-        return list(current_values)
-    return __get_hrefs
+def elems_sifter(target, sifter: Callable, reg: str = ''):
+    result = []
+    for x in [sifter(x) for x in target]:
+        if isinstance(x, str) and search(reg, x) != None:
+            result.append(x)
+            
+    return result
 
 def click_all_sections(bc: IBrowserControlData):
     def __check_loaded(xpath) -> bool:

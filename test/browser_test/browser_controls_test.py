@@ -13,7 +13,7 @@ from src.my_util import identity, arrow
 #このページは有志の方が作成されたスクレイピングテスト用のページです。
 TARGET_URL = 'https://tonari-it.com/scraping-test/'
 
-class BrowserControlsTest(unittest.TestCase):    
+class BrowserControlsTest(unittest.TestCase):
     def setUp(self):
         self.__data = SettingData(loading_wait_time=CommentableObj(1))
         self.__bc = BrowserControlData(self.__data)
@@ -37,7 +37,9 @@ class BrowserControlsTest(unittest.TestCase):
     
     def test_elements_filter_test(self):
         target = ['1', identity, -3.000, 1024, 'hoge', 'fuga', '硫化水素']
-        self.assertEqual(elements_filter(identity, '[a-z]{4}')(target), ['hoge', 'fuga'])
+        result = elems_sifter(target, identity, '[a-z]{4}')
+        excepted = ['hoge', 'fuga']
+        self.assertEqual(result, excepted)
         
     def test_download(self):        
         self.__bc.wait._poll = 0.1
