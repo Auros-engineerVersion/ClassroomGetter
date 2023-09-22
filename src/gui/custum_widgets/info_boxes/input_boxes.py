@@ -29,7 +29,7 @@ class InputBase(metaclass=ABCMeta):
 
 class InputBox(tk.Frame, InputBase):
     def __init__(self, **kw) -> None:
-        tk.Frame.__init__(self, kw.get('master', tk.Tk))
+        super().__init__(self, kw.get('master', tk.Tk))
         tk.Label(self, text=kw.get('title', self.__class__.__name__)).pack(side=tk.LEFT, anchor=tk.W)
         
     def __box(self):

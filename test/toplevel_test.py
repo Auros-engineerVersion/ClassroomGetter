@@ -3,6 +3,7 @@ from unittest.mock import MagicMock, patch
 
 import main
 from src.gui.application_root import ApplicationRoot
+from src.gui.custum_widgets import FrontFrame, SettingFrame
 from src.setting import *
 
 
@@ -16,6 +17,9 @@ class ToplevelTest(unittest.TestCase):
         form_mock().pop_up.side_effect = [ChildProcessError]
         self.assertRaises(ChildProcessError, ApplicationRoot, try_load(self.__test_folder_path), (400, 300))
         
+class FrontFrameTest(unittest.TestCase):
+    def test_running(self):
+        main.main()
     #@patch('src.gui.application_root.ProfileForm')
     #def test_complete_running(self, form_mock):
     #    form_mock().pop_up.side_effect = [('guest', 'guest')]
