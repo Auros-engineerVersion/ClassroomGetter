@@ -12,8 +12,8 @@ from ..my_util import is_none
 
 class BrowserControlData(IBrowserControlData):
     def __init__(self, cfg: ISettingData, driver: webdriver = None, wait: WebDriverWait = None) -> None:        
-        self.__driver = is_none(driver, create_driver(cfg))
-        self.__wait = is_none(wait, WebDriverWait(self.__driver, cfg.loading_wait_time.value, 1))
+        self.__driver = is_none(driver, lambda:create_driver(cfg))
+        self.__wait = is_none(wait, lambda:WebDriverWait(self.__driver, cfg.loading_wait_time.value, 1))
     
     def __del__(self):
         del self.__wait
