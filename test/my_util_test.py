@@ -11,17 +11,7 @@ from src.my_util import *
 class DummyClass: pass
 
 class MyUtilTest(unittest.TestCase):
-    def test_convert_to_tuple(self):
-        x = [0, 1, 2]
-        y = ['a', 'b', 'c']
-        
-        result = convert_to_tuple(x, y)
-        self.assertEqual([(0, 'a'), (1, 'b'), (2, 'c')], result)
-        
-        result = convert_to_tuple([1], [2])
-        self.assertEqual([(1, 2)], result)
-        
-    def test_identity(self):
+    def test_left(self):
         x = 0
         y = left(x)(identity)
         self.assertEqual(x, y)
@@ -41,15 +31,6 @@ class MyUtilTest(unittest.TestCase):
         length = 10
         result = randstr(length)
         self.assertEqual(length, len(result))
-        
-    def test_iterable_depth(self):
-        x = [0, 1, 2]
-        result = iterable_depth(x)
-        self.assertEqual(1, result)
-        
-        x = [0, [[1], 2]]
-        result = iterable_depth(x)
-        self.assertEqual(3, result)
         
     def test_infix(self):
         add = Infix(lambda x, y: x + y)

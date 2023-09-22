@@ -4,6 +4,7 @@ from random import choice
 from re import sub
 from string import ascii_letters, digits
 from typing import Any, Callable, Iterable, SupportsInt
+from itertools import groupby
 
 
 #末尾再帰の最適化
@@ -50,21 +51,7 @@ def text_filter(value: str) -> str:
         return value
     else:
         return __remove(value, all_pattern)
-    
-def to_tab_link(url: str):
-    return str(url).replace('/c/', '/w/')
 
-def to_all_tab_link(url: str):
-    return to_tab_link(url) + '/t/all'
-
-def convert_to_tuple(list_1: Iterable, list_2: Iterable) -> list[tuple]:
-    return list(
-        map(
-            lambda x, y: (x, y),
-            list_1, list_2
-        )
-    )
-    
 def identity(*x):
     if len(x) == 1:
         return x[0]
@@ -89,25 +76,10 @@ def is_none(default, fail_case):
         else:
             return default
 
-def iterable_depth(x) -> int:
-    if not x:
-        return 0
-    else:
-        if type(x) is list:
-            return 1 + max(map(iterable_depth, x))
-        else:
-            return 0
-    
-def flatten(x, depth = 0) -> Iterable:
-    if iterable_depth(x) <= depth:
-        return x
-    else:
-        for i in x:
-            if type(i) is list:
-                yield from flatten(i, depth)
-            else:
-                yield i
-
+def splitparN(iterable, N=3):
+    for _, item in groupby(enumerate(iterable), lambda x: x[0] // N):
+        yield (x[1] for x in item)
+                
 def public_vars(x) -> filter:
     return filter(lambda x: '__' not in x[0], vars(x).items())
 
