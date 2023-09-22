@@ -41,8 +41,20 @@ def create_driver(cfg: ISettingData) -> webdriver.Chrome:
         else:
             raise ValueError(f'Invalid option: {option}')
     
+    options.add_experimental_option('prefs', {
+        "download.default_directory":str(cfg.save_folder_path.value.absolute()),
+        "plugins.always_open_pdf_externally": True
+    })
+    
     try:
         driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+        
+        #ヘッドレスモードでダウンロードするために以下の処理が必要
+        driver.command_executor._commands["send_command"] = ("POST", '/session/$sessionId/chromium/send_command')
+        params = {'cmd': 'Page.setDownloadBehavior', 
+                  'params': {'behavior': 'allow', 
+                             'downloadPath': str(cfg.save_folder_path.value.absolute())}}
+        driver.execute("send_command", params)
     except InvalidArgumentException:
         raise ValueError(f'Invalid options: {optional_args}')
     return driver

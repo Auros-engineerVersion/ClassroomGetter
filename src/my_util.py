@@ -65,8 +65,11 @@ def convert_to_tuple(list_1: Iterable, list_2: Iterable) -> list[tuple]:
         )
     )
     
-def identity(x = None):
-    return x
+def identity(*x):
+    if len(x) == 1:
+        return x[0]
+    else:
+        return x
     
 def left(x = None):
     def func(f = identity):

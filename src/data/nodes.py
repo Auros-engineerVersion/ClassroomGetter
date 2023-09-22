@@ -108,9 +108,9 @@ class Node(INode, IComparale):
     #幅優先探索
     def initialize_tree(self):
         def __next(node: INode):
-            tuples = SearchParameterContainer.elements(node)
-            for tuple in tuples:
-                node.add_edge(Node(*tuple, node.tree_height + 1))
+            tuples = SearchParameterContainer.next_key_url(node)
+            for key_nodes in tuples:
+                node.add_edge(Node(*key_nodes, node.tree_height + 1))
             
         self.serach()(__next)
         
