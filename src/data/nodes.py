@@ -6,33 +6,30 @@ from typing import Callable, Coroutine
 from ..interface import *
 from .routine_data import RoutineData
 from .serach_parameter_container import SearchParameterContainer
+from .minimalist_db import *
 
 
 class Node(INode, IComparale):
-    Nodes: set[INode] = set() #全てのノードの集合
+    Nodes: MinimalistDB = MinimalistDB()
 
     def __init__(self, key: str, url: str, tree_height: int, next_init_time: RoutineData = None) -> None:        
-        self.__edges: set[INode] = set()
+        self.__id: MinimalistID = self.Nodes.add(self)
+        
         self.__key = key
         self.__url = url
         self.__tree_height = abs(tree_height) #負の値が入れられないように
         self.__next_init_time = next_init_time if next_init_time != None else RoutineData()
-        self.__parent = None
-        Node.Nodes.add(self)
+        
+        self.__parent: MinimalistID = None
+        self.__edges: list[INode] = []
+                
+    @property
+    def id(self):
+        return self.__id
         
     @property
     def edges(self):
         return self.__edges
-    
-    def add_edge(self, node: INode) -> set[INode]:
-        if node in self.__edges:
-            return None
-        else:
-            self.__edges.add(node)
-            node.__parent = self
-            
-            if node not in Node.Nodes:
-                Node.Nodes.add(node)
         
     @property
     def key(self):
@@ -54,6 +51,10 @@ class Node(INode, IComparale):
     def parent(self):
         return self.__parent
     
+    @parent.setter
+    def parent(self, id: MinimalistID):
+        self.__parent = id
+    
     def __str__(self) -> str:
         return str.format('{0}:{1}', self.__tree_height, self.__key)
     
@@ -72,35 +73,69 @@ class Node(INode, IComparale):
     def __del__(self) -> None:
         self.dispose()
     
+    def add_edge(self, id: MinimalistID | INode) -> list[INode]:
+        #idにINodeを入れてしまった場合
+        if isinstance(id, INode):
+            return self.add_edge(id.id)
+        
+        if self.Nodes.get(id) is EmptyRecode:
+            raise ValueError('ノードが存在しません')
+        else:
+            self.__edges.append(id)
+            self.Nodes.get(id)['value'].__parent = self.id
+            
+            return self.__edges
+    
     def dispose(self) -> None:
-        if (self in Node.Nodes):
-            Node.Nodes.remove(self)
+        self.Nodes.remove(self.id)
             
         #それぞれのedgeから削除
-        for node in Node.Nodes:
-            if self is node:
+        for recodes in self.Nodes:
+            if isinstance(recodes, EmptyRecode):
                 continue
+            else:
+                node: INode = recodes['value']
+                if self is node:
+                    continue
+
+                if node.parent is not None and node.parent == self.id:
+                    node.parent = None
+
+                if self.id in node.edges:
+                    node.edges.remove(self.id)
+                    
+    def to_path(self) -> Path:
+        if len(Node.Nodes) == 0:
+            raise ValueError('ノードが存在しません')
+        
+        getting: INode = lambda id: Node.Nodes.get(id)['value']
+        
+        def loop(id: MinimalistID):
+            if id is None:
+                return Path()
+            else:
+                return loop(getting(id).parent).joinpath(getting(id).key)
             
-            if self in node.edges:
-                node.edges.remove(self)
-                
-            if self is node.parent:
-                node.__parent = None
+        return loop(self.id)
     
     def serach(self, bfs = True) -> Coroutine[Callable[[Callable], None]]:
         """
         Args:
             bfs (bool, optional): Trueなら幅優先探索、Falseなら深さ優先探索を行う
         """
+        zero_to_neg = lambda x: -1 if x == False else 0
+        popping = lambda list, bfs: Node.Nodes.get(list.pop(bfs))['value']
+        
         def __do_serch(func):
-            list: list[INode] = [self]
+            list: list[INode] = [self.id]
             
             while(len(list) > 0):
-                #出す場所が0なら幅優先探索, queueの振る舞いをする
+                #出す場所が0なら深さ優先探索, queueの振る舞いをする
                 #何もないのであれば幅優先探索, stackの振る舞いをする
-                node = list.pop(0) if bfs == True else list.pop()
-                func(node)
+                x =  zero_to_neg(bfs)
+                node = popping(list, x)
 
+                func(node)
                 list.extend(node.edges)
                     
         return __do_serch
@@ -113,15 +148,3 @@ class Node(INode, IComparale):
                 node.add_edge(Node(*key_nodes, node.tree_height + 1))
             
         self.serach()(__next)
-        
-    def to_path(self) -> Path:
-        if len(Node.Nodes) == 0:
-            raise ValueError('ノードが存在しません')
-        
-        def loop(node):
-            if node.parent is None:
-                return Path(node.key)
-            else:
-                return loop(node.parent).joinpath(node.key)
-            
-        return loop(self)

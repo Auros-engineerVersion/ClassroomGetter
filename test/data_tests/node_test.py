@@ -5,20 +5,24 @@ sys.path.append(os.path.abspath('.'))
 
 import unittest
 from random import randint
+from pathlib import Path
 from unittest.mock import MagicMock
 
-from src.browser.browser_controls import *
-from src.data import *
+from src.my_util import splitparN
+from src.data import Node, EmptyRecode
 
 
 class NodeTest(unittest.TestCase):
-    def setUp(self) -> None:
-        self.__bc_mock = MagicMock(spec=BrowserControlData)
-        Node.BrowserControl = self.__bc_mock
-    
     def tearDown(self) -> None:
-        while len(Node.Nodes) > 0:
-            Node.Nodes.pop()
+        Node.Nodes.clear()
+        return super().tearDown()
+    
+    def test_constructor(self):
+        id_1 = Node('key', 'url', 0)
+        self.assertEqual(id_1.id, 0)
+        
+        id_2 = Node('key', 'url', 0)
+        self.assertEqual(id_2.id, 1)
             
     def test_eq(self):
         x = Node('key', 'url', 0)
@@ -27,48 +31,64 @@ class NodeTest(unittest.TestCase):
         y = Node('hoge', 'hoge', 1)
         self.assertNotEqual(x, y)
         
+        #idが異なるため
         z = Node('key', 'url', 0)
-        self.assertEqual(x, z)
+        self.assertNotEqual(x, z)
     
     def test_edges(self):
         parent = Node('parent', 'parent', 0)
         child =  Node('child', 'child', 1)
         
-        parent.add_edge(child)
+        parent.add_edge(child.id)
         self.assertIn(child, parent.edges)
 
         grandchild = Node('grandchild', 'grandchild', 2)
         child.add_edge(grandchild)
         self.assertIn(grandchild, child.edges)
         
-        self.assertCountEqual(Node.Nodes, [parent, child, grandchild])
+        self.assertEqual(len(Node.Nodes), 3)
         
-    def test_destructor(self):
-        def __create():
-            parent = Node('parent', 'parent', 0)
-            child = Node('child', 'child', 1)
-            parent.add_edge(child)
-            
-            return (parent, child)
-            
-        nodes = __create()
-        for target_node in nodes:
-            with self.subTest(target_node.key + ' delete'):
-                target_node.dispose()
-
-                #全体集合から削除されているかどうか
-                self.assertNotIn(target_node, Node.Nodes)
-                
     def test_parent(self):
         parent = Node('parent', 'parent', 0)
         self.assertIsNone(parent.parent)
         
         child = Node('child', 'child', 1)
         parent.add_edge(child)
-        self.assertEqual(child.parent, parent)
+        self.assertEqual(child.parent, parent.id)
         
-        parent.dispose()
-        self.assertIsNone(child.parent)
+    def test_destructor(self):
+        def node_env_set():
+            Node.Nodes.clear()
+            
+            n_gen = lambda i: Node(f'key_{i}', f'url_{i}', i)
+        
+            n_0 = n_gen(0)
+            n_1 = n_gen(1)
+            n_2 = n_gen(2)
+            n_3 = n_gen(3)
+
+            n_0.add_edge(n_1)
+            n_1.add_edge(n_2)
+            n_2.add_edge(n_3)
+        
+        #n_0を削除
+        node_env_set()
+        Node.Nodes[0]['value'].dispose()
+        self.assertIsInstance(Node.Nodes[0], EmptyRecode)
+        self.assertIsNone(Node.Nodes[1]['value'].parent)
+        
+        #中間を削除
+        node_env_set()
+        Node.Nodes[1]['value'].dispose()
+        self.assertIsInstance(Node.Nodes[1], EmptyRecode)
+        self.assertCountEqual(Node.Nodes[0]['value'].edges, [])
+        self.assertIsNone(Node.Nodes[2]['value'].parent)
+        
+        #末端を削除
+        node_env_set()
+        Node.Nodes[3]['value'].dispose()
+        self.assertIsInstance(Node.Nodes[3], EmptyRecode)
+        self.assertCountEqual(Node.Nodes[2]['value'].edges, [])
     
     def test_search(self):
         root = Node('key_0', 'url_0', 0)
