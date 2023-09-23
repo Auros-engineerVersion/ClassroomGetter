@@ -16,13 +16,12 @@ class InputTest(unittest.TestCase):
         root = tk.Tk()
         entry = EntryInput(master=root, title='a')
         spin = SpinInput(from_to=(1,1), master=root, title='b')
-        dialog = DialogInput(default_path=Path('.'), master=root, title='c')
+        dialog = DialogInput(master=root, title='c')
         
         inputs = {
             entry: 'test',
             spin: '1',
-            dialog: 'NoData'
-        }
+            dialog: 'NoData'}
 
         for input, value in inputs.items():
             with self.subTest(input=input, value=value):

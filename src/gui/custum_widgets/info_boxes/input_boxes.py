@@ -6,15 +6,15 @@ from ....literals import *
 from ....my_util import arrow
 from ....interface import InputBase
 
-def box_factory(key_name, value):
+def box_factory(master, key_name, value):
     if isinstance(value, str):
-        return lambda master: EntryInput(master=master, title=key_name)
+        return EntryInput(master=master, title=key_name, default=value)
     elif isinstance(value, int):
-        return lambda master: SpinInput(from_to=(0, 256), master=master, title=key_name)
+        return SpinInput(from_to=(0, 256), master=master, title=key_name, default=value)
     elif isinstance(value, set):
-        return lambda master: None #この使われていないmasterは他のlambda関数と規格を合わせるために必要である
+        return None
     else: #Pathなら
-        return lambda master: DialogInput(default_path=value, master=master, title=key_name)
+        return DialogInput(master=master, title=key_name, default=value)
 
 class InputBox(tk.Frame, InputBase):
     def __init__(self, title, **kw) -> None:
@@ -39,21 +39,22 @@ class InputBox(tk.Frame, InputBase):
         return self.__box().get()
 
 class EntryInput(InputBox):
-    def __init__(self, title, **kw) -> None:
+    def __init__(self, title, default=NO_DATA, **kw) -> None:
         super().__init__(title, **kw)
         tk.Entry(self).pack(side=tk.RIGHT, anchor=tk.E, fill=tk.X)
+        self.set(default)
 
 class SpinInput(InputBox):
-    def __init__(self, title, from_to: tuple[int, int], **kw) -> None:
+    def __init__(self, title, from_to: tuple[int, int], default=NO_DATA, **kw) -> None:
         super().__init__(title, **kw)
         tk.Spinbox(self, from_=from_to[0], to=from_to[1]).pack(side=tk.RIGHT, anchor=tk.E, fill=tk.X)
+        self.set(default)
             
 class DialogInput(InputBox):
-    def __init__(self, title, default_path: Path, **kw):      
+    def __init__(self, title, default=NO_DATA, **kw):      
         super().__init__(title, **kw)
-        tk.Entry(self)\
-            |arrow| (lambda b: b.pack(side=tk.RIGHT, anchor=tk.E, fill=tk.X))\
-            |arrow| (lambda _: self.set(default_path.absolute()))
+        tk.Entry(self).pack(side=tk.RIGHT, anchor=tk.E, fill=tk.X)
+        self.set(default)
         
         #brows_button
         tk.Button(self, text=BROWS, command=self.folder_dialog).pack(side=tk.LEFT, anchor=tk.E, padx=kw.get('padx', 0))
