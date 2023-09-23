@@ -14,14 +14,12 @@ from .caputer import *
 
 current_path = lambda folder: Path(__file__).parent.joinpath(folder).resolve()
 IMAGE_PATH = current_path('image')
-SAVE_PATH = current_path('save')
-WHITE_LIST = ['SettingFrame', 'FrontFrame']
 
-def create_placeholder(annotation):
+def create_arguments(annotation):
     if annotation is tk.Misc:
         return tk.Tk(screenName='test', baseName='testbase', className='testclass', useTk=1)
     elif annotation is SettingData:
-        return SettingData(save_folder_path=CommentableObj(SAVE_PATH))
+        return SettingData()
     elif annotation is Node:
         return Node('key', 'url', 1)
     elif annotation is str:
@@ -31,12 +29,12 @@ def create_placeholder(annotation):
     else:
         if len(annotation.__subclasses__()) > 0:
             for cls in annotation.__subclasses__():
-                return create_placeholder(cls)
+                return create_arguments(cls)
         else:
-            return annotation(*map(lambda x: create_placeholder(x), annotation.__init__.__annotations__.values()))
+            return annotation(*map(lambda x: create_arguments(x), annotation.__init__.__annotations__.values()))
                             
 def instance_of(cls):
-    args = [create_placeholder(annotation) for annotation in cls.__init__.__annotations__.values()]
+    args = [create_arguments(annotation) for annotation in cls.__init__.__annotations__.values()]
     return cls(*args)
 
 class ImageTest(unittest.TestCase):    
