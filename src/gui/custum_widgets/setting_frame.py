@@ -4,59 +4,51 @@ from tkinter import font
 from ...data.setting_data import *
 from ...literals import *
 from ...my_util import *
-from ...setting import *
+from ...settings import *
 from .info_boxes.input_boxes import *
 from .base import *
 
 
 class DescBox(tk.Frame):
-    def __init__(self, master: tk.Misc, box: InputBox = ..., text: str = ..., font_size: int = 8):
-        tk.Frame.__init__(self, master, relief=tk.GROOVE, bd=1, background=master[BACKGROUND], padx=1, pady=1)
-        box.pack(side=tk.TOP, anchor=tk.W)
+    def __init__(self, master: tk.Misc, key: str, value: str, description: str, font_size: int = 10):
+        super().__init__(master=master)
         self.update_idletasks()
-
+        
+        box_factory(self, key, value)\
+            |arrow| (lambda b: b.pack(side=tk.TOP))
+            
         #説明文
-        tk.Text(self, width=font_size * 4, height=2, relief=tk.FLAT, background=master[BACKGROUND], font=(font.nametofont(TK_DEFAULT_FONT), font_size))\
-            |arrow| (lambda t: t.insert(tk.END, text))\
-            |arrow| (lambda t: t.configure(state='disabled'))\
-            |arrow| (lambda t: t.pack(side=tk.LEFT, anchor=tk.W, fill=tk.X, expand=True))
+        tk.Text(self, width=font_size * 4, height=2, relief=tk.FLAT, font=(font.nametofont(TK_DEFAULT_FONT), font_size), background=master[BACKGROUND])\
+            |arrow| (lambda t: t.pack(side=tk.TOP, anchor=tk.W, fill=tk.X, expand=True))\
+            |arrow| (lambda t: t.insert(tk.END, description))\
+            |arrow| (lambda t: t.configure(state='disabled'))
+            
+    @property
+    def box(self) -> InputBox:
+        for w in self.winfo_children():
+            if type(w) is InputBox:
+                return w
         
-class SettingGroup(tk.Frame):
-    def __init__(self, master: tk.Misc, key_commentobj):
-        tk.Frame.__init__(self, master, relief=tk.GROOVE, bd=1, background=master[BACKGROUND], padx=5, pady=5)
+class SettingGroup(tk.LabelFrame):
+    def __init__(self, master: tk.Misc, key_values: dict, label_title:str=SETTING):
+        tk.LabelFrame.__init__(self, master=master, text=label_title)
         
-        self.__boxes = []
-        for key, commentobj in key_commentobj:
-            input_box = box_factory(key, commentobj.value)(self)\
-                |arrow| (lambda b: b.set(commentobj.value))\
-                |arrow| (lambda b: self.__boxes.append(b))
-                            
-            DescBox(self, input_box, commentobj.comment, font_size=8)\
-                .pack(side=tk.TOP, anchor=tk.W, padx=5, pady=5)
+        for key, value_desc in key_values.items():
+            value, desc = value_desc.values()
+            DescBox(self, key, value, desc)\
+                |arrow| (lambda d: d.pack(side=tk.TOP, anchor=tk.W))
             
     @property
     def boxes(self) -> list[InputBox]:
-        descs = []
-        #子のDescBoxを取得
-        for box in self.winfo_children():
-            if type(box) is DescBox:
-                descs.append(box)
-                
-        result = []
-        #DescBoxの子のInputBoxを取得
-        for desc in descs:
-            for box in desc.winfo_children():
-                if type(box) is InputBox:
-                    result.append(box)
-        
-        return result
+        for w in [b for b in self.winfo_children() if type(b) is DescBox]:
+            yield w.box
 
 class SettingFrame(tk.Frame):
     def __init__(self, master: tk.Misc, data: SettingData):
         super().__init__(master=master)
         
         self.__boxes = []
-        SettingGroup(self, data.editable_data.items())\
+        SettingGroup(self, data.editable_data)\
             |arrow| (lambda g: g.pack(side=tk.LEFT, anchor=tk.NW, padx=(25, 1), pady=4))\
             |arrow| (lambda g: self.__boxes.extend(g.boxes))
         

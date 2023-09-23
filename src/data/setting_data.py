@@ -63,28 +63,31 @@ class SettingData(ISettingData):
     
     @property
     def profile(self):
-        return self.user_email, self.user_password
+        return self.user_email[VALUE], self.user_password[VALUE]
     
     @profile.setter
     def profile(self, other: tuple[str, str]):
-        self.user_email.value = other[0]
-        self.user_password.value = other[1]
+        self.user_email[VALUE] = other[0]
+        self.user_password[VALUE] = other[1]
         
     @property
     def web_driver_options(self):
         return {
-            VALUE:self.web_driver_options_data.value.replace(' ', '').replace('\n', '').split(','), 
-            DESCRIPTION:self.web_driver_options_data.comment}
+            VALUE: self.web_driver_options_data[VALUE].replace(' ', '').replace('\n', '').split(','), 
+            DESCRIPTION: WEB_DRIVER_OPTIONS_DESC}
     
     @property
     def editable_data(self):
         return {
-            'user_email': {self.user_email.value, self.user_email.comment},
-            'user_password': {self.user_password.value, self.user_password.comment},
-            'save_folder_path': {self.save_folder_path.value, self.save_folder_path.comment},
-            'loading_wait_time': {self.loading_wait_time.value, self.loading_wait_time.comment},
-            'web_driver_options': {self.web_driver_options_data.value, self.web_driver_options_data.comment}
-        }
+            'user_email': self.user_email,
+            'user_password': self.user_password,
+            'save_folder_path': self.save_folder_path,
+            'loading_wait_time': self.loading_wait_time,
+            'web_driver_options': self.web_driver_options_data}
+    
+    @property
+    def profile_path(self):
+        return ISettingData.SETTINGFOLDER_PATH.absolute().joinpath('./ProfileData/Profile 1')
         
     def is_current_data(self):
         return\
@@ -105,7 +108,3 @@ class SettingData(ISettingData):
     
     def is_guest(self):
         return self.user_email[VALUE] == 'guest' and self.user_password[VALUE] == 'guest'
-    
-    @staticmethod
-    def profile_path():
-        return ISettingData.SETTINGFOLDER_PATH.absolute().joinpath('./ProfileData/Profile 1')

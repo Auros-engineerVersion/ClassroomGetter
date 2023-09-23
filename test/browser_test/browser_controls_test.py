@@ -15,7 +15,7 @@ TARGET_URL = 'https://tonari-it.com/scraping-test/'
 
 class BrowserControlsTest(unittest.TestCase):
     def setUp(self):
-        self.__data = SettingData(loading_wait_time=CommentableObj(1))
+        self.__data = SettingData(loading_wait_time=1)
         self.__bc = BrowserControlData(self.__data)
         move(self.__bc, TARGET_URL)
         

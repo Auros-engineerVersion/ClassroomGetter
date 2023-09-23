@@ -9,7 +9,7 @@ from unittest.mock import MagicMock, patch
 
 from src.data import *
 from src.my_util import arrow
-from src.setting import *
+from src.settings import *
 
 
 class SettingTest(unittest.TestCase):
@@ -26,12 +26,12 @@ class SettingTest(unittest.TestCase):
         self.assertRaises(TypeError, load, self.__test_folder_path)
         
         #読み書きできるか
-        target_1 = SettingData(CommentableObj('いろはにほへと'))
+        target_1 = SettingData('いろはにほへと')
         save(self.__test_folder_path, target_1)
         self.assertEqual(load(self.__test_folder_path), target_1)
         
         #上書き
-        target_2 = SettingData(CommentableObj('ちりぬるお'))
+        target_2 = SettingData('ちりぬるを')
         save(self.__test_folder_path, target_1)
         save(self.__test_folder_path, target_2)
         self.assertEqual(load(self.__test_folder_path), target_2)
@@ -44,7 +44,7 @@ class SettingTest(unittest.TestCase):
         
     def test_save_node(self):
         target = SettingData()
-        target.nodes = Node('key', 'url', 0).Nodes
+        target.nodes = Node('key', 'url', 0).nodes
         
         save(self.__test_folder_path, target)
         result = load(self.__test_folder_path)

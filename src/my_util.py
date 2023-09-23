@@ -113,27 +113,3 @@ class Infix:
             
 pipe = Infix(lambda x, func: func(x)) #関数の返値を次の関数の引数にするもの
 arrow = Infix(lambda x, func: left(x)(func)) #最初に指定された対象を常にいじるもの
-
-class CommentableObj:
-    def __init__(self, value, comment = '') -> None:
-        super().__init__()
-        self.__value = value
-        self.__comment = comment
-    
-    def __eq__(self, other):
-        return self.__value == other
-
-    def __or__(self, other):
-        return self.__value or other
-
-    @property
-    def value(self):
-        return self.__value
-    
-    @value.setter
-    def value(self, other):
-        self.__value = other
-
-    @property
-    def comment(self) -> str:
-        return self.__comment
