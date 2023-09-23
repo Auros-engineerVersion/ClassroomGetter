@@ -9,7 +9,6 @@ from unittest.mock import Mock, patch
 
 from src.data.setting_data import SettingData
 from src.interface import INode, ISettingData
-from src.my_util import CommentableObj
 
 
 class SettingDataTest(unittest.TestCase):
