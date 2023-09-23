@@ -14,9 +14,9 @@ from src.gui.custum_widgets.info_boxes import *
 class InputTest(unittest.TestCase):
     def test_set_and_get(self):
         root = tk.Tk()
-        entry = EntryInput(master=root)
-        spin = SpinInput(from_to=(1,1), master=root)
-        dialog = DialogInput(default_path=Path('.'), master=root)
+        entry = EntryInput(master=root, title='a')
+        spin = SpinInput(from_to=(1,1), master=root, title='b')
+        dialog = DialogInput(default_path=Path('.'), master=root, title='c')
         
         inputs = {
             entry: 'test',

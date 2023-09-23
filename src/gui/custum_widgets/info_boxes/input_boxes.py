@@ -1,12 +1,10 @@
 import tkinter as tk
-from abc import ABCMeta, abstractmethod
 from pathlib import Path
 from tkinter import filedialog, messagebox
-from typing import Any
 
 from ....literals import *
-from ....my_util import CommentableObj, arrow, identity
-
+from ....my_util import arrow
+from ....interface import InputBase
 
 def box_factory(key_name, value):
     if isinstance(value, str):
@@ -17,20 +15,11 @@ def box_factory(key_name, value):
         return lambda master: None #この使われていないmasterは他のlambda関数と規格を合わせるために必要である
     else: #Pathなら
         return lambda master: DialogInput(default_path=value, master=master, title=key_name)
-    
-class InputBase(metaclass=ABCMeta):
-    @abstractmethod
-    def set(self, value) -> None:
-        raise NotImplementedError
-    
-    @abstractmethod
-    def get(self):
-        raise NotImplementedError
 
 class InputBox(tk.Frame, InputBase):
-    def __init__(self, **kw) -> None:
-        super().__init__(self, kw.get('master', tk.Tk))
-        tk.Label(self, text=kw.get('title', self.__class__.__name__)).pack(side=tk.LEFT, anchor=tk.W)
+    def __init__(self, title, **kw) -> None:
+        tk.Frame.__init__(self, **kw)
+        tk.Label(self, text=title).pack(side=tk.LEFT, anchor=tk.W)
         
     def __box(self):
         boxes = list(filter(lambda x: isinstance(x, (tk.Entry, tk.Spinbox)), self.children.values()))
@@ -50,18 +39,18 @@ class InputBox(tk.Frame, InputBase):
         return self.__box().get()
 
 class EntryInput(InputBox):
-    def __init__(self, **kw) -> None:
-        super().__init__(**kw)
+    def __init__(self, title, **kw) -> None:
+        super().__init__(title, **kw)
         tk.Entry(self).pack(side=tk.RIGHT, anchor=tk.E, fill=tk.X)
 
 class SpinInput(InputBox):
-    def __init__(self, from_to: tuple[int, int], **kw) -> None:
-        super().__init__(**kw)
+    def __init__(self, title, from_to: tuple[int, int], **kw) -> None:
+        super().__init__(title, **kw)
         tk.Spinbox(self, from_=from_to[0], to=from_to[1]).pack(side=tk.RIGHT, anchor=tk.E, fill=tk.X)
             
 class DialogInput(InputBox):
-    def __init__(self, default_path: Path, **kw):      
-        super().__init__(**kw)
+    def __init__(self, title, default_path: Path, **kw):      
+        super().__init__(title, **kw)
         tk.Entry(self)\
             |arrow| (lambda b: b.pack(side=tk.RIGHT, anchor=tk.E, fill=tk.X))\
             |arrow| (lambda _: self.set(default_path.absolute()))
