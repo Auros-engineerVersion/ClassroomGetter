@@ -14,24 +14,45 @@ from src.my_util import CommentableObj
 
 class SettingDataTest(unittest.TestCase):
     def test_constructor(self):
-        data = SettingData()
-        self.assertIsInstance(data.nodes, set)
-        self.assertIsInstance(data.nodes.pop(), INode)
+        data1 = SettingData()
+        self.assertIsInstance(data1.nodes, set)
+        self.assertIsInstance(data1.nodes.pop(), INode)
+        
+        data2 = SettingData('test', 'test')
+        self.assertIsInstance(data2.user_email, dict)
     
+    def test_is_current_nodes(self):
+        invailed_data = SettingData()
+        self.assertFalse(invailed_data.is_current_nodes())
+        
+        sets = set()
+        sets.add('Hoge')
+        sets.add('bar')
+        current_data = SettingData(nodes=sets)
+        self.assertTrue(current_data.is_current_nodes())
+        
+    def test_is_current_user(self):
+        invailed_data1 = SettingData()
+        self.assertFalse(invailed_data1.is_current_user())
+        
+        invailed_data2 = SettingData('@', 'admin')
+        self.assertTrue(invailed_data2.is_current_user())
+
+    def test_is_default(self):
+        self.assertTrue(SettingData().is_default())
+        
+        data1 = SettingData('test', 'test')
+        self.assertFalse(data1.is_default())
+
     def test_is_current(self):
         invailed_data1 = SettingData()
         self.assertFalse(invailed_data1.is_current_data())
         
-        commentable_obj = CommentableObj('hoge')
-        invailed_data2 = SettingData(commentable_obj, commentable_obj)
+        invailed_data2 = SettingData('@', 'admin')
         self.assertFalse(invailed_data2.is_current_data())
         
         sets = set()
         sets.add('Hoge')
         sets.add('bar')
-        current_data = SettingData(
-            CommentableObj('hogehoge@gmail.com'),
-            CommentableObj('hogehoge'),
-            nodes=sets,
-            save_folder_path=CommentableObj(Path('.')))
+        current_data = SettingData('hogehoge@gmail.com', 'hogehoge', Path(), 0, nodes=sets)
         self.assertTrue(current_data.is_current_data())

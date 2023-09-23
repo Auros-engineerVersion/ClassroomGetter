@@ -2,39 +2,62 @@ from __future__ import annotations
 
 from dataclasses import *
 from pathlib import Path
-from typing import ClassVar
 
+from ..literals import *
 from ..interface import ISettingData
-from ..my_util import CommentableObj, pipe
 from .nodes import Node
 
-NO_DATA = 'No Data'
 
 @dataclass
 class SettingData(ISettingData):
     #----------------通常のデータ------------------------
-    user_email: CommentableObj = field(default_factory=lambda:CommentableObj(NO_DATA, 'ユーザーのメールアドレス'))
-    user_password: CommentableObj = field(default_factory=lambda:CommentableObj(NO_DATA, 'ユーザーアカウントのパスワード'))
+    user_email: dict = field(default_factory=lambda:{
+        VALUE: NO_DATA, 
+        DESCRIPTION: USER_EMAIL_DESC})
+    
+    user_password: dict = field(default_factory=lambda:{
+        VALUE: NO_DATA, 
+        DESCRIPTION: USER_PASSWORD_DESC})
 
     #セーブフォルダの場所
-    save_folder_path: CommentableObj = field(default_factory=lambda:CommentableObj(Path('./Save').absolute(), '入手したファイルを保存する場所'))
+    save_folder_path: dict = field(default_factory=lambda:{
+        VALUE: Path('./Save').absolute(), 
+        DESCRIPTION: SAVE_FOLDER_PATH_DESC})
     
     #ページの読み込みを待つ時間
-    loading_wait_time: CommentableObj = field(default_factory=lambda:CommentableObj(5, 'ページの読み込みを待つ時間'))
+    loading_wait_time: dict = field(default_factory=lambda:{
+        VALUE: 5,
+        DESCRIPTION: LOADING_WAIT_TIME_DESC})
     
-    web_driver_options_data: CommentableObj = field(default_factory=lambda:CommentableObj('--headless, --disable-gpu, --blink-settings=imagesEnabled=false, --ignore-certificate-error, --ignore-certificate-error', 'Web Driverが起動する際のオプション'))
+    web_driver_options_data: dict = field(default_factory=lambda:{
+        VALUE: '--headless, --disable-gpu, --blink-settings=imagesEnabled=false, --ignore-certificate-error, --ignore-certificate-error',
+        DESCRIPTION: WEB_DRIVER_OPTIONS_DESC})
     
     #----------------保存されたデータ--------------------
     nodes: set = field(default_factory=lambda:set([Node('Classroom', ISettingData.TARGET_URL, 0)]))
         
+    def __post_init__(self):
+        if not isinstance(self.user_email, dict):
+            self.user_email = {VALUE:self.user_email, DESCRIPTION: USER_EMAIL_DESC}
+            
+        if not isinstance(self.user_password, dict):
+            self.user_password = {VALUE:self.user_password, DESCRIPTION: USER_PASSWORD_DESC}
+            
+        if not isinstance(self.save_folder_path, dict):
+            self.save_folder_path = {VALUE:self.save_folder_path, DESCRIPTION: SAVE_FOLDER_PATH_DESC}
+            
+        if not isinstance(self.loading_wait_time, dict):
+            self.loading_wait_time = {VALUE:self.loading_wait_time, DESCRIPTION: LOADING_WAIT_TIME_DESC}
+            
+        if not isinstance(self.web_driver_options_data, dict):
+            self.web_driver_options_data = {VALUE:self.web_driver_options_data, DESCRIPTION: WEB_DRIVER_OPTIONS_DESC}
+            
     def __add__(self: SettingData, other: SettingData) -> SettingData:
         args = list(
             map(
                 lambda value_1, value_2:
                     value_2 or value_1, #右の値を優先する
-                vars(self).values(), vars(other).values()
-            )
-        )
+                vars(self).values(), vars(other).values()))
         
         return SettingData(*args)
     
@@ -49,18 +72,18 @@ class SettingData(ISettingData):
         
     @property
     def web_driver_options(self):
-        return CommentableObj(
-            value=self.web_driver_options_data.value.replace(' ', '').replace('\n', '').split(','), 
-            comment=self.web_driver_options_data.comment)
+        return {
+            VALUE:self.web_driver_options_data.value.replace(' ', '').replace('\n', '').split(','), 
+            DESCRIPTION:self.web_driver_options_data.comment}
     
     @property
     def editable_data(self):
         return {
-            'user_email': self.user_email,
-            'user_password': self.user_password,
-            'save_folder_path': self.save_folder_path,
-            'loading_wait_time': self.loading_wait_time,
-            'web_driver_options': self.web_driver_options_data
+            'user_email': {self.user_email.value, self.user_email.comment},
+            'user_password': {self.user_password.value, self.user_password.comment},
+            'save_folder_path': {self.save_folder_path.value, self.save_folder_path.comment},
+            'loading_wait_time': {self.loading_wait_time.value, self.loading_wait_time.comment},
+            'web_driver_options': {self.web_driver_options_data.value, self.web_driver_options_data.comment}
         }
         
     def is_current_data(self):
@@ -68,20 +91,20 @@ class SettingData(ISettingData):
             not self.is_default()               and\
             self.is_current_nodes()             and\
             self.is_current_user()              and\
-            self.loading_wait_time.value >= 0    and\
-            self.save_folder_path.value.exists()
+            self.loading_wait_time[VALUE] >= 0    and\
+            self.save_folder_path[VALUE].exists()
         
     def is_current_nodes(self):
         return self.nodes != None and len(self.nodes) > 1
             
     def is_current_user(self):
-        return '@' in self.user_email.value and len(self.user_password.value) > 0
+        return '@' in self.user_email[VALUE] and len(self.user_password[VALUE]) > 0
             
     def is_default(self):
-        return NO_DATA in self.user_email.value + self.user_password.value
+        return NO_DATA in self.user_email[VALUE] + self.user_password[VALUE]
     
     def is_guest(self):
-        return self.user_email.value == 'guest' and self.user_password.value == 'guest'
+        return self.user_email[VALUE] == 'guest' and self.user_password[VALUE] == 'guest'
     
     @staticmethod
     def profile_path():
