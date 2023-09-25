@@ -7,21 +7,21 @@ from ..literals import *
 from ..data import *
 
 
+def trim_dict(dic: dict) -> dict:
+    return {sub('^_.*?__', '', k): v for k, v in dic.items()}
+
 class MyClassEncoder(JSONEncoder):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
     def __dic_gen(self, o, type_name: str) -> dict:
         try:
-            return {TYPE: type_name, VALUE: self.__trim_dict(o.__dict__)}
+            return {TYPE: type_name, VALUE: trim_dict(o.__dict__)}
         except AttributeError: #set等の__dict__を持たないオブジェクトの場合
             try:
                 return {TYPE: type_name, VALUE: min(o)}
             except TypeError: #Atomの場合
                 return {TYPE: type_name, VALUE: o}
-            
-    def __trim_dict(self, dic: dict) -> dict:
-        return {sub('^_.*?__', '', k): v for k, v in dic.items()}
     
     def default(self, o):
         match o:
@@ -48,6 +48,6 @@ class MyClassDecoder(JSONDecoder):
                 case 'Node':
                     return Node.factory(**o[VALUE])
                 case 'RoutineData':
-                    return RoutineData(*o[VALUE].values())
+                    return RoutineData.factory(*o[VALUE].values())
 
             return super().object_hook(self, o)
