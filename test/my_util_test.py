@@ -25,8 +25,8 @@ class MyUtilTest(unittest.TestCase):
         self.assertEqual(excepted, is_none(None, lambda: excepted))
         
     def test_public_vars(self):
-        a, b, c = 1, 2, 3
-        arguments = {'a': a, 'b': b, '__c': c}
+        a, b, c, d = 1, 2, 3, 4
+        arguments = {'a': a, 'b': b, '__c': c, 'temp_class__d': d}
         class_x = type('temp_class', (object, ), arguments)
         
         propertys = public_vars(class_x)

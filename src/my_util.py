@@ -1,7 +1,7 @@
 from functools import wraps
 from pathlib import Path
 from random import choice
-from re import sub
+from re import sub, match
 from string import ascii_letters, digits
 from typing import Any, Callable, Iterable, SupportsInt
 from itertools import groupby
@@ -81,7 +81,7 @@ def splitparN(iterable, N=3):
         yield (x[1] for x in item)
                 
 def public_vars(x) -> dict[str, Any]:
-    return dict([(k, v) for k, v in vars(x).items() if not k[0:2] == '__'])
+    return dict([(k, v) for k, v in vars(x).items() if match('.*__', k) is None])
 
 def randstr(length: SupportsInt) -> str:
     return ''.join(choice(ascii_letters + digits) for _ in range(length))
