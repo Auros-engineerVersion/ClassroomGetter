@@ -17,19 +17,39 @@ class Node(INode, IComparale):
         
         self.__key = key
         self.__url = url
+        
         self.__tree_height = abs(tree_height) #負の値が入れられないように
         self.__next_init_time = next_init_time if next_init_time != None else RoutineData()
         
         self.__parent: MinimalistID = None
         self.__edges: list[INode] = []
+
+    #これらの引数の並びは、__init__で定義されている変数群の並びと同じである必要がある
+    @classmethod
+    def factory(cls, id, key, url, tree_height, next_init_time, parent, edges):
+        """Jsonから読み込んだデータを元にノードを作成するためのfactory"""
+        node = cls(key, url, tree_height, next_init_time)
+        node.id = id
+        node.parent = parent
+        node.edges = edges
+        
+        return node
                 
     @property
     def id(self):
         return self.__id
+    
+    @id.setter
+    def id(self, other):
+        self.__id = other
         
     @property
     def edges(self):
         return self.__edges
+    
+    @edges.setter
+    def edges(self, other):
+        self.__edges = other
         
     @property
     def key(self):

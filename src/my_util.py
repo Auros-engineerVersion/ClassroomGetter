@@ -80,8 +80,8 @@ def splitparN(iterable, N=3):
     for _, item in groupby(enumerate(iterable), lambda x: x[0] // N):
         yield (x[1] for x in item)
                 
-def public_vars(x) -> filter:
-    return filter(lambda x: '__' not in x[0], vars(x).items())
+def public_vars(x) -> dict[str, Any]:
+    return dict([(k, v) for k, v in vars(x).items() if not k[0:2] == '__'])
 
 def randstr(length: SupportsInt) -> str:
     return ''.join(choice(ascii_letters + digits) for _ in range(length))

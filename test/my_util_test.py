@@ -8,8 +8,6 @@ from unittest.mock import Mock
 from src.my_util import *
 
 
-class DummyClass: pass
-
 class MyUtilTest(unittest.TestCase):
     def test_left(self):
         x = 0
@@ -26,6 +24,13 @@ class MyUtilTest(unittest.TestCase):
         #fail_caseが関数の場合
         self.assertEqual(excepted, is_none(None, lambda: excepted))
         
+    def test_public_vars(self):
+        a, b, c = 1, 2, 3
+        arguments = {'a': a, 'b': b, '__c': c}
+        class_x = type('temp_class', (object, ), arguments)
+        
+        propertys = public_vars(class_x)
+        self.assertEquals(propertys, {'a': a, 'b': b})
         
     def test_randstr(self):
         length = 10

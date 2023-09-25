@@ -22,6 +22,7 @@ BACKGROUND = 'background'
 GUEST_MODE = 'ゲストモード'
 DESCRIPTION = 'description'
 VALUE = 'value'
+TYPE = '_type'
 
 #文章
 STOP_OR_CONTINUE = '入力の途中で閉じようとしています。'
