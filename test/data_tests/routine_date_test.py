@@ -23,19 +23,19 @@ class Routine_data_Test(unittest.TestCase):
         current_time += timedelta(minutes=add_time)
         self.assertEqual(next, current_time)
         
-    def test_remaine_time(self):
-        zero = RoutineData()
-        self.assertEqual(zero.remaine(), timedelta())
-        
-        plus_one = RoutineData(1)
-        self.assertGreater(plus_one.remaine(), timedelta())
-        
     def test_is_current(self):
         zero = RoutineData()
         self.assertFalse(zero.is_current())
         
         current = RoutineData(minute=1)
         self.assertTrue(current.is_current())
+        
+    def test_remaine_time(self):
+        zero = RoutineData()
+        self.assertEqual(zero.remaine(), timedelta())
+        
+        plus_one = RoutineData(1)
+        self.assertGreater(plus_one.remaine(), timedelta())
         
     def test_should_init(self):
         zero = RoutineData()

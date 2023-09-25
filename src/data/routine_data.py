@@ -21,6 +21,12 @@ class RoutineData(IRoutineData):
     
     time_range: ClassVar[list] = [week_range, day_range, hour_range, minute_range]
     
+    @classmethod
+    def factory(cls, week, day, hour, minute, pre_time):
+        ins = cls(week, day, hour, minute)
+        ins.__pre_time = pre_time
+        return ins
+    
     def __post_init__(self):
         self.__pre_time = datetime.now().replace(microsecond=0)
 
@@ -66,11 +72,8 @@ class RoutineData(IRoutineData):
     
     def is_current(self) -> bool:
         #すべての値が初期値でなければ
-            total = map(
-                lambda x: x[1], public_vars(self)
-            )
-            
-            return sum(total) > 0
+        x = public_vars(self).values()
+        return sum(x) > 0
     
     def should_init(self):
         if self.remaine().total_seconds() <= 0:
