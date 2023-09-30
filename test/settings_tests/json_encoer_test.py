@@ -23,7 +23,7 @@ class JSONEncoderTest(unittest.TestCase):
     def setUp(self) -> None:
         self.maxDiff = None
     
-    def test_decode(self):
+    def test_encode_node(self):
         key, url, tree_height, date = 'key', 'url', 0, RoutineData()
         node = Node(key, url, tree_height, date)
         json_data = json.dumps(node.Nodes, cls=MyClassEncoder)
@@ -37,7 +37,7 @@ class JSONEncoderTest(unittest.TestCase):
             else:
                 self.assertIn(v, json_data)
             
-    def test_encode(self):
+    def test_decode_node(self):
         node = Node('root_key', 'root_url', 0, RoutineData())
         node.add_edge(Node('child_key', 'child_url', 1))
         json_data = json.dumps(node, cls=MyClassEncoder, indent=4)
@@ -45,3 +45,24 @@ class JSONEncoderTest(unittest.TestCase):
         
         self.assertEqual(node, after)
         self.assertIn(node, after.Nodes)
+        
+    def test_encode_setting_data(self):
+        data = SettingData()
+        json_data = json.dumps(data, cls=MyClassEncoder)
+        
+        vars = public_vars(data)
+        excepted = trim_dict(dict([(k, try_cast(v)) for k, v in zip(vars.keys(), vars.values())]))
+        
+        for v in excepted:
+            self.assertIn(v, json_data)
+                
+    def test_decode_setting_data(self):
+        data = SettingData()
+        json_data = json.dumps(data, cls=MyClassEncoder, indent=4)
+        after = json.loads(json_data, cls=MyClassDecoder)
+        
+        self.assertIsInstance(after, SettingData)
+        for key in data.__dict__:
+            self.assertEqual(data.__dict__[key], after.__dict__[key])
+            if isinstance(data.__dict__[key], dict):
+                self.assertEqual(data.__dict__[key], after.__dict__[key])
