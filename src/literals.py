@@ -21,8 +21,6 @@ TK_DEFAULT_FONT = 'TkDefaultFont'
 BACKGROUND = 'background'
 GUEST_MODE = 'ゲストモード'
 DESCRIPTION = 'description'
-VALUE = 'value'
-TYPE = '_type'
 
 #文章
 STOP_OR_CONTINUE = '入力の途中で閉じようとしています。'
@@ -33,3 +31,9 @@ USER_PASSWORD_DESC = 'ユーザーのパスワード'
 SAVE_FOLDER_PATH_DESC = '入手したファイルを保存する場所'
 LOADING_WAIT_TIME_DESC = 'ページの読み込みを待つ時間'
 WEB_DRIVER_OPTIONS_DESC = 'Web Driverが起動する際のオプション'
+
+#json dictionary keys
+VALUE = 'value'
+TYPE = '_type'
+ENCODE = 'encode'
+DECODE = 'decode'

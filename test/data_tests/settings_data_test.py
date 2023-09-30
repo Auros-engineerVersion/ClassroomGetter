@@ -5,17 +5,16 @@ sys.path.append(os.path.abspath('.'))
 
 import unittest
 from pathlib import Path
-from unittest.mock import Mock, patch
 
 from src.data.setting_data import SettingData
-from src.interface import INode, ISettingData
+from src.interface import INode
 
 
 class SettingDataTest(unittest.TestCase):
     def test_constructor(self):
         data1 = SettingData()
-        self.assertIsInstance(data1.nodes, set)
-        self.assertIsInstance(data1.nodes.pop(), INode)
+        self.assertIsInstance(data1.nodes, list)
+        self.assertIsInstance(*data1.nodes.pop().values(), INode)
         
         data2 = SettingData('test', 'test')
         self.assertIsInstance(data2.user_email, dict)

@@ -6,7 +6,7 @@ from pathlib import Path
 from ..literals import *
 from ..interface import ISettingData
 from .nodes import Node
-
+from .minimalist_db import MinimalistDB
 
 @dataclass
 class SettingData(ISettingData):
@@ -21,7 +21,7 @@ class SettingData(ISettingData):
 
     #セーブフォルダの場所
     save_folder_path: dict = field(default_factory=lambda:{
-        VALUE: Path('./Save').absolute(), 
+        VALUE: Path('./Save/save.json').absolute(), 
         DESCRIPTION: SAVE_FOLDER_PATH_DESC})
     
     #ページの読み込みを待つ時間
@@ -34,7 +34,7 @@ class SettingData(ISettingData):
         DESCRIPTION: WEB_DRIVER_OPTIONS_DESC})
     
     #----------------保存されたデータ--------------------
-    nodes: set = field(default_factory=lambda:set([Node('Classroom', ISettingData.TARGET_URL, 0)]))
+    nodes: MinimalistDB = field(default_factory=MinimalistDB)
         
     def __post_init__(self):
         if not isinstance(self.user_email, dict):
@@ -52,14 +52,8 @@ class SettingData(ISettingData):
         if not isinstance(self.web_driver_options_data, dict):
             self.web_driver_options_data = {VALUE:self.web_driver_options_data, DESCRIPTION: WEB_DRIVER_OPTIONS_DESC}
             
-    def __add__(self: SettingData, other: SettingData) -> SettingData:
-        args = list(
-            map(
-                lambda value_1, value_2:
-                    value_2 or value_1, #右の値を優先する
-                vars(self).values(), vars(other).values()))
-        
-        return SettingData(*args)
+        if len(self.nodes) == 0:
+            self.nodes.add(Node('Classroom', ISettingData.TARGET_URL, 0))
     
     @property
     def profile(self):
