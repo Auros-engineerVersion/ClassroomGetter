@@ -28,6 +28,10 @@ class BrowserControlData(IBrowserControlData):
     @property
     def wait(self) -> WebDriverWait:
         return self.__wait
+    
+    @property
+    def current_url(self) -> str:
+        return self.__driver.current_url
         
 def create_driver(cfg: ISettingData) -> webdriver.Chrome:
     options = webdriver.ChromeOptions()

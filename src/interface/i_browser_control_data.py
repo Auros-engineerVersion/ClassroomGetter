@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from abc import ABCMeta, abstractmethod, abstractproperty
-from typing import Callable, Coroutine
 
 
 class IBrowserControlData(metaclass=ABCMeta):
