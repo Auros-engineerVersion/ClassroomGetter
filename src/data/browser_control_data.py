@@ -44,7 +44,7 @@ def create_driver(cfg: ISettingData) -> webdriver.Chrome:
         "plugins.always_open_pdf_externally": True})
     
     try:
-        driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+        driver = webdriver.Chrome(service=Service(), options=options)
         
         #ヘッドレスモードでダウンロードするために以下の処理が必要
         driver.command_executor._commands["send_command"] = ("POST", '/session/$sessionId/chromium/send_command')

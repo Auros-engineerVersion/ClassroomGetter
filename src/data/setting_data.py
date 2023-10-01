@@ -21,7 +21,7 @@ class SettingData(ISettingData):
 
     #セーブフォルダの場所
     save_folder_path: dict = field(default_factory=lambda:{
-        VALUE: Path('./Save/save.json').absolute(), 
+        VALUE: Path('./Save').absolute(), 
         DESCRIPTION: SAVE_FOLDER_PATH_DESC})
     
     #ページの読み込みを待つ時間
