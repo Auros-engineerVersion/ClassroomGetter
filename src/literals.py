@@ -5,10 +5,10 @@ NOTEBOOK_TAB_CHANGED = '<<NotebookTabChanged>>'
 CONFIGURE = '<Configure>'
 TEXT = "text"
 STATE = 'state'
+TK_DEFAULT_FONT = 'TkDefaultFont'
+BACKGROUND = 'background'
 
 #単語
-ROOT_TITLE = 'ClassroomHack'
-TITLE = 'title'
 MAIN = 'メイン'
 RESET = '元に戻す'
 NO_DATA = '未設定'
@@ -17,8 +17,12 @@ RUN = '実行'
 BROWS = '参照'
 COMPLETE = '完了'
 WARNING = '警告'
-TK_DEFAULT_FONT = 'TkDefaultFont'
-BACKGROUND = 'background'
+RUN = '実行'
+LOADING = '更新中'
+
+#UI
+ROOT_TITLE = 'ClassroomHack'
+TITLE = 'title'
 GUEST_MODE = 'ゲストモード'
 DESCRIPTION = 'description'
 

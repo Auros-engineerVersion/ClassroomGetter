@@ -3,14 +3,10 @@ from __future__ import annotations
 import gc
 import tkinter as tk
 
+from ....literals import *
 from ....interface import INode
 from ....my_util import arrow
 from ..base.switch import Switch
-
-RUN = '実行'
-LOADING = '更新中'
-BUTTON_PRESS = "<ButtonPress>"
-TEXT = "text"
 
 class NodeBox(tk.Frame):
     node_info_frame = None
