@@ -22,7 +22,7 @@ class INode(metaclass=ABCMeta):
         raise NotImplementedError
     
     @abstractproperty
-    def edges(self) -> set[INode]:
+    def edges(self) -> list[INode]:
         raise NotImplementedError
     
     @abstractmethod
