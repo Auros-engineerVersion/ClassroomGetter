@@ -49,3 +49,12 @@ class MyUtilTest(unittest.TestCase):
         div = Infix(lambda x, y: x / y)
         x = 1
         self.assertRaises(ZeroDivisionError, lambda: x |div| 0)
+        
+        #pipe
+        mock = Mock()
+        x = 2 |pipe| mock |pipe| mock
+        self.assertEqual(mock.call_count, 2)
+        
+        #arrow
+        x = [] |arrow| (lambda x: x.append(1)) |arrow| (lambda x: x.append(2))
+        self.assertListEqual([1, 2], x)

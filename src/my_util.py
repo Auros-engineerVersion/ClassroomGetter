@@ -102,12 +102,6 @@ class Infix:
     def __or__(self, other):
         return self.function(other)
 
-    def __rlshift__(self, other):
-        return Infix(lambda x, self=self, other=other: self.function(other, x))
-
-    def __rshift__(self, other):
-        return self.function(other)
-
     def __call__(self, value1, value2):
         return self.function(value1, value2)
             
