@@ -12,23 +12,32 @@ TARGET_URL = 'https://classroom.google.com/' #固定値
 
 def save(path: Path, data):
     if path.is_file():
-        with open(path.parent, 'w') as f:
+        with open(path, 'w') as f:
             json.dump(data, f, cls=MyClassEncoder, indent=4)
     else:
         raise FileNotFoundError('指定したパスはファイルではありません')
+    
+def try_save(path: Path, data):
+    try:
+        save(path, data)
+    except FileNotFoundError:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.touch()
+        save(path, data)
                 
 def load(path: Path) -> ISettingData:
     if not path.is_file():
         raise FileNotFoundError('指定したパスはファイルではありません')
     
-    if path.exists() and path.suffix is '.json':
-        return json.load(path, cls=MyClassDecoder)
+    if path.exists() and path.suffix == '.json':
+        with open(path, 'r') as f:
+            return json.load(f, cls=MyClassDecoder)
     else:
-        raise ValueError('指定したパスが存在しないか、jsonファイルではありません')
+        raise FileNotFoundError('指定したパスが存在しないか、jsonファイルではありません')
     
-def try_load(path: Path = ISettingData.SETTINGFOLDER_PATH) -> ISettingData:
+def try_load(path: Path) -> ISettingData:
     try:
-        return load(path.joinpath('setting.json'))
+        return load(path)
     except FileNotFoundError:
         return SettingData()
     
