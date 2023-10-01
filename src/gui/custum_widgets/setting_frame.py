@@ -74,4 +74,5 @@ class SettingFrame(tk.Frame):
         
     def __save_and_reset_message_show(self, nodes: list, boxes: list, label: tk.Label):
         label[TEXT] = SETTING_RESET_MESSAGE
-        save(SettingData.SETTINGFOLDER_PATH, self.values(nodes, boxes))
+        file_path = SettingData.SETTINGFOLDER_PATH.joinpath('setting.json')
+        save(file_path, self.values(nodes, boxes))

@@ -26,10 +26,10 @@ def load(path: Path) -> ISettingData:
     else:
         raise ValueError('指定したパスが存在しないか、jsonファイルではありません')
     
-def try_load(folder_path: Path = ISettingData.SETTINGFOLDER_PATH) -> ISettingData:
+def try_load(path: Path = ISettingData.SETTINGFOLDER_PATH) -> ISettingData:
     try:
-        return load(folder_path)
-    except TypeError:
+        return load(path.joinpath('setting.json'))
+    except FileNotFoundError:
         return SettingData()
     
 def setup_state(cfg: ISettingData):
