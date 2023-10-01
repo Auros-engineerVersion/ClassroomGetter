@@ -13,7 +13,8 @@ def main():
     #gauth.LocalWebserverAuth()h
     
     try:
-        ApplicationRoot(try_load(), (400, 300)).mainloop()
+        path = SettingData.SETTINGFOLDER_PATH.joinpath('setting.json').absolute()
+        ApplicationRoot(try_load(path), (400, 300)).mainloop()
     except NoSuchWindowException or ChildProcessError as e:
             print('\nProcess has finished by Hand')
 

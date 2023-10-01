@@ -26,9 +26,7 @@ def search_element(bc: IBrowserControlData, xpath: str) -> WebElement:
 def search_element_all(bc: IBrowserControlData, xpath: str) -> list[WebElement]:
     try:
         return bc.wait.until(EC.presence_of_all_elements_located((By.XPATH, xpath)))
-    except TimeoutException:
-        return []
-    except InvalidSelectorException:
+    except TimeoutException or InvalidSelectorException:
         return []
     
 def elems_sifter(target, sifter: Callable, reg: str = ''):
@@ -71,17 +69,23 @@ def login_college_form(bc: IBrowserControlData, email: str, password: str):
     search_element(bc, "//button[@type='submit']").click()
 
 def login_google(bc: IBrowserControlData, email: str, password: str):
-    #1:emailを入力する
-    #2:続行を押す
-    #3:大学のフォームにログイン
-    #4:続行を押す
-    search_element(bc, "//input[@type='email']")        .send_keys(email)
-    search_element(bc, "//div[@id='identifierNext']")   .click()
-    login_college_form(bc, email, password)
-    search_element(bc, "//div[@jsname='Njthtb']")       .click()
+    if 'accounts.google.com/signin/v2/identifier' in bc.current_url:
+        #1:emailを入力する
+        #2:続行を押す
+        #3:大学のフォームにログイン
+        #4:続行を押す
+        search_element(bc, "//input[@type='email']")        .send_keys(email)
+        search_element(bc, "//div[@id='identifierNext']")   .click()
+        if 'shibboleth.nihon-u.ac.jp/idp/profile/SAML2/Redirect' in bc.current_url:
+            login_college_form(bc, email, password)
+            
+        search_element(bc, "//div[@jsname='Njthtb']")       .click()
+    else:
+        move(bc, 'https://accounts.google.com/signin/v2/identifier')
+        login_google(bc, email, password)
     
 def login_classroom(bc: IBrowserControlData, email: str, password: str):
-    if bc.driver.current_url != ISettingData.TARGET_URL:
+    if bc.current_url != ISettingData.TARGET_URL:
         move(bc, ISettingData.TARGET_URL)
     
     #1:ログイン画面に移動する
@@ -92,7 +96,7 @@ def login_classroom(bc: IBrowserControlData, email: str, password: str):
     bc.wait.until(EC.url_matches(ISettingData.TARGET_URL))
     
 def donwload(bc: IBrowserControlData, url: str, file_path: Path, timeout: int = 10):
-    bc.driver.get(url)
+    move(bc, url)
     
     while not file_path.exists() and timeout > 0:
         sleep(bc.wait._poll)
@@ -101,5 +105,5 @@ def donwload(bc: IBrowserControlData, url: str, file_path: Path, timeout: int = 
         if timeout <= 0:
             raise TimeoutError(f'Timeout: {url}')
         
-        if file_path.exists():
+        if file_path.exists(): #ダウンロードが完了した場合
             return file_path
