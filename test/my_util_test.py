@@ -24,6 +24,9 @@ class MyUtilTest(unittest.TestCase):
         #fail_caseが関数の場合
         self.assertEqual(excepted, is_none(None, lambda: excepted))
         
+        #関数の入れ子
+        self.assertEqual(excepted, is_none(None, lambda:lambda: excepted))
+        
     def test_public_vars(self):
         a, b, c, d = 1, 2, 3, 4
         arguments = {'a': a, 'b': b, '__c': c, 'temp_class__d': d}
