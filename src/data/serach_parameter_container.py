@@ -1,16 +1,26 @@
-from dataclasses import dataclass
+from dataclasses import *
 from typing import Callable
+from pathlib import Path
+from urllib.parse import *
 
 from ..browser import *
 from ..interface import (IBrowserControlData as IBCD, INode)
 from ..my_util import *
 
 
-class SearchParameter:    
-    def __init__(self, xpath, attribute_selector, sifter):
-        self.__xpath = xpath
-        self.__attribute_selector = attribute_selector
-        self.__sifter = sifter
+@dataclass
+class SearchParameter:
+    xpath: str
+    attribute_selector: Callable[[WebElement], str]
+    sifter: Callable[[str], str]
+    
+    @classmethod
+    def key_parameter(cls, xpath, sifter=identity):
+        return cls(xpath, lambda e: e.text, sifter)
+    
+    @classmethod
+    def url_parameter(cls, xpath):
+        return cls(xpath, lambda e: e.get_attribute('href'), identity)
         
     def get_next_values(self, bc, get) -> list[WebElement]:
         """
@@ -18,15 +28,14 @@ class SearchParameter:
             get (callable): 値を取得する関数, 引数はxpath
             attribute (callable): WebElementから、aタブやtext等を取得するための関数
         """
-        
         result = []
         @tail_recursion
         def loop(elems: Iterable[WebElement]):
             elem = elems.pop(0)
             nonlocal result
             
-            self.__attribute_selector(elem)\
-                |pipe| self.__sifter\
+            self.attribute_selector(elem)\
+                |pipe| self.sifter\
                 |pipe| result.append
 
             if len(elems) == 0:
@@ -34,27 +43,30 @@ class SearchParameter:
             else:
                 return loop(elems)
                     
-        return loop(get(bc, self.__xpath))
-                    
+        return loop(get(bc, self.xpath))
+
+@dataclass
 class SearchParameterPattern:
-    def __init__(self, key_param, url_param, elems_get_proc=search_element_all, pre_proc=identity) -> None:
-        self.__key_param = key_param
-        self.__url_param = url_param
-        self.__elems_get_proc = elems_get_proc
-        self.__pre_proc = pre_proc
+    key_param: SearchParameter = field(default=None)
+    url_param: SearchParameter = field(default=None)
+    elems_get_proc: Callable[[IBCD, str], list[WebElement]] = field(default=search_element_all)
+    pre_proc: Callable[[INode], None] = field(default=identity)
     
     #func:textとlinkのペアに対して行う関数
     #text_filter, link_filter: それぞれのlistに対して行う関数
-    def key_url_pair(self, ibc: INode, node: INode):
+    def key_url_pair(self, ibc: INode, node: INode) -> tuple:
         """獲得したファイルの名前とurlを返す。返り値をNodeのコンストラクタに渡すことを想定している"""        
         #if self.key_param is None or self.url_param is None:
         #    return [*zip([node.key + 'の授業タブ'], [to_all_tab_link(node.url)])]
         #else:
         
-        self.__pre_proc(node)
-        return [*zip(
-            self.__key_param.get_next_values(ibc, self.__elems_get_proc),
-            self.__url_param.get_next_values(ibc, self.__elems_get_proc))]
+        temp = self.pre_proc(node)
+        if self.key_param is None or self.url_param is None:
+            return temp
+        else:
+            return [*zip(
+                self.key_param.get_next_values(ibc, self.elems_get_proc),
+                self.url_param.get_next_values(ibc, self.elems_get_proc))]
         
 class SearchParameterContainer:
     browser_control_data: IBCD = None
@@ -65,54 +77,96 @@ class SearchParameterContainer:
             渡されたnodeのtree_heightを確認し、次のnodeのkeyとurlを返す。\n
             この関数ではwebへのアクセスが生じるため注意
         """
-        #absを取ることで、負の値が入らないように
-        return __parameters[abs(node.tree_height)].key_url_pair(SearchParameterContainer.browser_control_data, node)
+        #負の値が入らないように
+        return parameters[max(0, node.tree_height)].key_url_pair(SearchParameterContainer.browser_control_data, node)
 
-def __get_text(elem: WebElement) -> str:
-    return elem.text
+def __move(url: str):        
+    move(SearchParameterContainer.browser_control_data, url)
 
-def __get_url(elem: WebElement) -> str:
-    return elem.get_attribute('href')
-
-def __move(inode):
-    move(SearchParameterContainer.browser_control_data, inode.url)
-
-def __move_and_click(inode: INode):
-    __move(SearchParameterContainer.browser_control_data, inode)
+def __move_and_click(url: str):
+    __move(url)
     click_all_sections(SearchParameterContainer.browser_control_data)
+    
+def __url(node: INode):
+    return node.url
 
-def __key_parameter(xpath, sifter=identity):
-    return SearchParameter(xpath, __get_text, sifter)
+def __url_parse(f: Callable[[ParseResult], Any]) -> Callable[[Callable[[str], Any]], Any]:
+    def _inner(url: str) -> Any:
+        parse = urlparse(url)
+        return f(parse)
+    return _inner
 
-def __url_parameter(xpath):
-    return SearchParameter(xpath, __get_url, identity)
+def __url_add(object_selector: Callable[[ParseResult], str], add: str) -> Callable[[Callable[[ParseResult], str]], str]:
+    """
+    Args:
+        object_selector (Callable[[ParseResult], str]): ParseResultを受け取り、pathやqueryなど扱いたい部分を返す関数\n
+        add (str): 追加したい文字列。文字列は末尾に追加される
 
-__parameters: list[SearchParameterPattern] = [
+    Returns:
+        Callable: ParseResultを受け取る
+    """
+    def _inner(parse: ParseResult) -> str:
+        return parse._replace(path=object_selector(parse) + add).geturl()
+    return _inner
+
+def __url_replace(object_selector: Callable[[ParseResult], str], old: str, new: str) -> Callable[[Callable[[ParseResult], str]], str]:
+    """
+    Args:
+        object_selector (Callable[[ParseResult], str]): ParseResultを受け取り、pathやqueryなど扱いたい部分を返す関数\n
+        replace (str): 置換したい文字列
+
+    Returns:
+        Callable: ParseResultを受け取る
+    """
+    def _inner(parse: ParseResult) -> str:
+        return parse._replace(path=object_selector(parse).replace(old, new)).geturl()
+    return _inner
+
+def __url_to_drive(x: ParseResult | str) -> str:
+    if isinstance(x, ParseResult):
+        url = x.geturl()
+    else:
+        url = x
+        
+    file_id = url.split('/')[-2]
+    return f'https://drive.google.com/u/1/uc?id={file_id}&export=download'
+
+parameters: list[SearchParameterPattern] = [
     #添字とtree_heightを一致させる
     #root -> 授業一覧
     SearchParameterPattern(
         pre_proc=identity,
-        key_param=__key_parameter("//div[@class='YVvGBb z3vRcc-ZoZQ1']", sifter=text_filter),
-        url_param=__url_parameter("//a[@class='onkcGd ZmqAt Vx8Sxd']")
-    ),
+        key_param=SearchParameter.key_parameter("//div[@class='YVvGBb z3vRcc-ZoZQ1']", sifter=text_filter),
+        url_param=SearchParameter.url_parameter("//a[@class='onkcGd ZmqAt Vx8Sxd']")),
     
     #授業一覧 -> 授業タブ
     SearchParameterPattern(
-        key_param=__key_parameter("//a[contains(@guidedhelpid, 'classworkTab')]"),
-        url_param=__url_parameter("//a[contains(@guidedhelpid, 'classworkTab')]")
-    ),
+        #tupleを返す, return [(key, url)]
+        pre_proc=lambda n:(\
+            n.key + 'の授業タブ',
+            #授業一覧のurlを授業タブのurlに変換
+            #'.../u/1/c/...'
+            #'.../u/1/w/.../t/all'
+            #lambdaでparseを受け取っているため、__addと__replaceの_innerに渡さなければならない
+            __url_parse(lambda parse:
+                __url_add(lambda x: x.path, '/t/all')(parse)
+                    |pipe| __url_parse(identity) #次の関数への繋ぎ
+                    |pipe| __url_replace(lambda x: x.path, old='/c/', new='/w/'))(n.url))),
     
     #授業タブ -> 授業タブのファイル一覧
     SearchParameterPattern(
-        pre_proc=__move_and_click,
-        key_param=__key_parameter("//span[@class='YVvGBb UzbjTd']"),
-        url_param=__url_parameter("//a[contains(@aria-label, '表示')]")
-    ),
+        pre_proc=lambda n:__move_and_click(n.url),
+        key_param=SearchParameter.key_parameter("//span[@class='YVvGBb UzbjTd']"),
+        url_param=SearchParameter.url_parameter("//a[contains(@aria-label, '表示')]")),
     
-    #ファイル一覧
+    #ファイルを取得
     SearchParameterPattern(
-        pre_proc=__move,
-        key_param=__key_parameter("//div[@class='A6dC2c QDKOcc VBEdtc-Wvd9Cc zZN2Lb-Wvd9Cc']"),
-        url_param=__url_parameter("//a[@class='vwNuXe JkIgWb QRiHXd MymH0d maXJsd']")
-    )
+        pre_proc=lambda n:__move(n.url),
+        key_param=SearchParameter.key_parameter("//div[@class='A6dC2c QDKOcc VBEdtc-Wvd9Cc zZN2Lb-Wvd9Cc']"),
+        url_param=SearchParameter.url_parameter("//a[@class='vwNuXe JkIgWb QRiHXd MymH0d maXJsd']")),
+    
+    #urlにアクセスし、ファイルを取得
+    SearchParameterPattern(
+        pre_proc=lambda n:__url_to_drive(n.url)
+            |pipe| __move)
 ]
