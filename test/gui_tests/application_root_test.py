@@ -8,7 +8,7 @@ from unittest.mock import patch
 
 from src.browser import BrowserControlData
 from src.gui.application_root import ApplicationRoot
-from src.setting.settings import SettingData, Settings
+from src.settings.settings import SettingData, Settings
 
 
 class ApplicationRootTest(unittest.TestCase):

@@ -1,11 +1,10 @@
-import asyncio
 import traceback
 
 from pydrive2.auth import GoogleAuth
 from selenium.common.exceptions import NoSuchWindowException
 
 from src.gui.application_root import ApplicationRoot
-from src.setting import *
+from src.settings import *
 
 
 def main():
