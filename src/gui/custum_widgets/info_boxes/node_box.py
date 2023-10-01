@@ -30,17 +30,23 @@ class NodeBox(tk.Frame):
             |arrow| (lambda b: b.pack(side=tk.LEFT))
         
         #node_key
-        key_label = tk.Label(self, text=str(node.key))\
+        tk.Label(self, text=str(node.key))\
             |arrow| (lambda l: l.bind(BUTTON_PRESS, self.on_frame_click))\
-            |arrow| (lambda l: l.pack(side=tk.LEFT))\
+            |arrow| (lambda l: l.pack(side=tk.LEFT))
         
         self.pack(anchor=tk.W, padx=(node.tree_height*20, 1), after=self.__parent_box)
-        self.text = key_label[TEXT]
-        self.url = node.url
         
     @property
     def time(self):
         return self.__node.next_init_time
+    
+    @property
+    def text(self):
+        return self.__node.key
+    
+    @property
+    def url(self):
+        return self.__node.url
     
     def set_time(self, data):
         self.__node.next_init_time = data
@@ -61,8 +67,8 @@ class NodeBox(tk.Frame):
 
             value.destroy()
         
-    def initialize_node(self):
-        self.__node.edges.clear()
+    def initialize(self):
+        self.__node.edges.clear() #子を初期化する
         self.__node.initialize_tree()
                     
     def expand(self):

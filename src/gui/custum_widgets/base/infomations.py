@@ -12,23 +12,26 @@ class NodeInfoFrame(tk.Frame):
         tk.Frame.__init__(self, master, background='green')
         self.__watching_box = watching_box
         
-        self.__node_name_label = tk.Label(self, text=is_none(watching_box.text, NO_DATA))\
+        #keyの表示
+        self.__key_label = tk.Label(self, text=is_none(watching_box.text, NO_DATA))\
             |arrow| (lambda l: l.pack(side=tk.TOP, anchor=tk.CENTER, padx=5, pady=5))
             
-        self.__node_url_label = tk.Label(self, text=is_none(watching_box.url, NO_DATA))\
+        #urlの表示
+        self.__url_label = tk.Label(self, text=is_none(watching_box.url, NO_DATA))\
             |arrow| (lambda l: l.pack(side=tk.TOP))
             
         #ボタンが押されたら、監視中のNodeBoxからinitialize_treeを実行する
         self.__init_button = tk.Button(self, text=RUN)\
             |arrow| (lambda b: b.pack(side=tk.BOTTOM, fill=tk.X))\
-            |arrow| (lambda b: b.bind(BUTTON_PRESS, lambda _: self.__watching_box.initialize_tree()))
-            
+            |arrow| (lambda b: b.bind(BUTTON_PRESS, lambda _: self.__watching_box.initialize()))
+        
+        #次回の更新までの時間を表示する
         self.__time_box: Timer = Timer(self, watching_box=self.__watching_box)\
             |arrow| (lambda t: t.pack(side=tk.TOP))
         
     def set_box(self, box: NodeBox):
-        self.__node_name_label[TEXT] = box.text
-        self.__node_url_label[TEXT] = box.url
+        self.__key_label[TEXT] = box.text
+        self.__url_label[TEXT] = box.url
         self.__watching_box = box
         self.__time_box.watching_box = box
         
