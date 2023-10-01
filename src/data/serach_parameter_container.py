@@ -168,5 +168,8 @@ parameters: list[SearchParameterPattern] = [
     #urlにアクセスし、ファイルを取得
     SearchParameterPattern(
         pre_proc=lambda n:__url_to_drive(n.url)
-            |pipe| __move)
+            |pipe| (lambda url: donwload(
+                SearchParameterContainer.browser_control_data, 
+                url,
+                n.to_path())))
 ]
