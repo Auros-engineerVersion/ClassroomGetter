@@ -9,8 +9,9 @@ from .serach_parameter_container import SearchParameterContainer
 from .minimalist_db import *
 
 
-class Node(INode, IComparale):
+class Node(INode, IComparable):
     Nodes: MinimalistDB = MinimalistDB()
+    SearchDepth: int = 0
 
     def __init__(self, key: str, url: str, tree_height: int, next_init_time: RoutineData = None) -> None:        
         self.__id: MinimalistID = self.Nodes.add(self)
@@ -18,7 +19,7 @@ class Node(INode, IComparale):
         self.__key = key
         self.__url = url
         
-        self.__tree_height = abs(tree_height) #負の値が入れられないように
+        self.__tree_height = abs(int(tree_height)) #負の値が入れられないように
         self.__next_init_time = next_init_time if next_init_time != None else RoutineData()
         
         self.__parent: MinimalistID = None
@@ -34,7 +35,8 @@ class Node(INode, IComparale):
         node.edges = edges
         
         return node
-                
+
+#region property
     @property
     def id(self):
         return self.__id
@@ -74,6 +76,7 @@ class Node(INode, IComparale):
     @parent.setter
     def parent(self, id: MinimalistID):
         self.__parent = id
+#endregion
     
     def __str__(self) -> str:
         return str.format('{0}:{1}', self.__tree_height, self.__key)
@@ -138,7 +141,7 @@ class Node(INode, IComparale):
             
         return loop(self.id)
     
-    def serach(self, bfs = True) -> Coroutine[Callable[[Callable], None]]:
+    def serach(self, bfs = True, search_depth: int = 0) -> Coroutine[Callable[[Callable], None]]:
         """
         Args:
             bfs (bool, optional): Trueなら幅優先探索、Falseなら深さ優先探索を行う
@@ -147,6 +150,7 @@ class Node(INode, IComparale):
         popping = lambda list, bfs: Node.Nodes.get(list.pop(bfs))['value']
         
         def __do_serch(func):
+            nonlocal search_depth
             list: list[INode] = [self.id]
             
             while(len(list) > 0):
@@ -155,16 +159,17 @@ class Node(INode, IComparale):
                 x =  zero_to_neg(bfs)
                 node = popping(list, x)
 
-                func(node)
-                list.extend(node.edges)
+                if search_depth > 0:
+                    search_depth -= 1
+                    func(node)
+                    list.extend(node.edges)
                     
         return __do_serch
                 
     #幅優先探索
-    def initialize_tree(self):
+    def initialize_tree(self) -> None:
         def __next(node: INode):
-            tuples = SearchParameterContainer.next_key_url(node)
-            for key_nodes in tuples:
-                node.add_edge(Node(*key_nodes, node.tree_height + 1))
+            for key, url in SearchParameterContainer.next_key_url(node):
+                node.add_edge(Node(key, url, node.tree_height + 1))
             
-        self.serach()(__next)
+        self.serach(search_depth=Node.SearchDepth)(__next)

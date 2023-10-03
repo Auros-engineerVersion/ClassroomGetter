@@ -11,27 +11,19 @@ from .minimalist_db import MinimalistDB
 @dataclass
 class SettingData(ISettingData):
     #----------------通常のデータ------------------------
-    user_email: dict = field(default_factory=lambda:{
-        VALUE: NO_DATA, 
-        DESCRIPTION: USER_EMAIL_DESC})
-    
-    user_password: dict = field(default_factory=lambda:{
-        VALUE: NO_DATA, 
-        DESCRIPTION: USER_PASSWORD_DESC})
+    user_email: dict = NO_DATA
+    user_password: dict = NO_DATA
 
     #セーブフォルダの場所
-    save_folder_path: dict = field(default_factory=lambda:{
-        VALUE: Path('./Save').absolute(), 
-        DESCRIPTION: SAVE_FOLDER_PATH_DESC})
+    save_folder_path: dict = field(default_factory=Path('./Save').absolute)
     
     #ページの読み込みを待つ時間
-    loading_wait_time: dict = field(default_factory=lambda:{
-        VALUE: 5,
-        DESCRIPTION: LOADING_WAIT_TIME_DESC})
+    loading_wait_time: dict = 5
+
+    web_driver_options_data: dict = '--headless=new, --window-size=1280,720'
     
-    web_driver_options_data: dict = field(default_factory=lambda:{
-        VALUE: '--headless=new, --window-size=1280,720',
-        DESCRIPTION: WEB_DRIVER_OPTIONS_DESC})
+    #探索を行う際の深度
+    search_depth: int = field(default=1)
     
     #----------------保存されたデータ--------------------
     nodes: MinimalistDB = field(default_factory=MinimalistDB)
@@ -52,9 +44,16 @@ class SettingData(ISettingData):
         if not isinstance(self.web_driver_options_data, dict):
             self.web_driver_options_data = {VALUE:self.web_driver_options_data, DESCRIPTION: WEB_DRIVER_OPTIONS_DESC}
             
+        if not isinstance(self.search_depth, dict):
+            self.search_depth = {VALUE:int(self.search_depth), DESCRIPTION: SEARCH_DEPTH_DESC}
+            
         if len(self.nodes) == 0:
             self.nodes = Node.Nodes
-            Node('Classroom', ISettingData.TARGET_URL, 0)
+            Node.SearchDepth = self.search_depth[VALUE]
+            
+            #ノードが一つもない場合は、デフォルトのノードを作成する
+            if len(self.nodes) == 0:
+                Node('Classroom', ISettingData.TARGET_URL, 0)
     
     @property
     def profile(self):
@@ -78,7 +77,8 @@ class SettingData(ISettingData):
             'user_password': self.user_password,
             'save_folder_path': self.save_folder_path,
             'loading_wait_time': self.loading_wait_time,
-            'web_driver_options': self.web_driver_options_data}
+            'web_driver_options': self.web_driver_options_data,
+            'search_depth': self.search_depth}
     
     @property
     def profile_path(self):
@@ -86,9 +86,9 @@ class SettingData(ISettingData):
         
     def is_current_data(self):
         return\
-            not self.is_default()               and\
-            self.is_current_nodes()             and\
-            self.is_current_user()              and\
+            not self.is_default()                 and\
+            self.is_current_nodes()               and\
+            self.is_current_user()                and\
             self.loading_wait_time[VALUE] >= 0    and\
             self.save_folder_path[VALUE].exists()
         

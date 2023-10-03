@@ -6,11 +6,15 @@ sys.path.append(os.path.abspath('.'))
 import unittest
 from pathlib import Path
 
-from src.data.setting_data import SettingData
+from src.data import Node, SettingData
 from src.interface import INode
 
 
 class SettingDataTest(unittest.TestCase):
+    def tearDown(self) -> None:
+        Node.Nodes.clear()
+        return super().tearDown()
+    
     def test_constructor(self):
         data1 = SettingData()
         self.assertIsInstance(data1.nodes, list)
@@ -54,3 +58,8 @@ class SettingDataTest(unittest.TestCase):
         sets.add('bar')
         current_data = SettingData('hogehoge@gmail.com', 'hogehoge', Path(), 0, nodes=sets)
         self.assertTrue(current_data.is_current_data())
+        
+    def test_editable_data(self):
+        data = SettingData()
+        for v in data.editable_data.values():
+            self.assertIsInstance(v, dict)

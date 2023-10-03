@@ -13,6 +13,9 @@ from src.data import Node, EmptyRecode
 
 
 class NodeTest(unittest.TestCase):
+    def setUp(self) -> None:
+        self.n_gen = lambda i: Node(f'key_{i}', f'url_{i}', i)
+    
     def tearDown(self) -> None:
         Node.Nodes.clear()
         return super().tearDown()
@@ -59,13 +62,11 @@ class NodeTest(unittest.TestCase):
     def test_destructor(self):
         def node_env_set():
             Node.Nodes.clear()
-            
-            n_gen = lambda i: Node(f'key_{i}', f'url_{i}', i)
-        
-            n_0 = n_gen(0)
-            n_1 = n_gen(1)
-            n_2 = n_gen(2)
-            n_3 = n_gen(3)
+                    
+            n_1 = self.n_gen(1)
+            n_2 = self.n_gen(2)
+            n_3 = self.n_gen(3)
+            n_0 = self.n_gen(0)
 
             n_0.add_edge(n_1)
             n_1.add_edge(n_2)
@@ -91,15 +92,22 @@ class NodeTest(unittest.TestCase):
         self.assertCountEqual(Node.Nodes[2]['value'].edges, [])
     
     def test_search(self):
-        root = Node('key_0', 'url_0', 0)
-        for x in [Node(f'key_{i}', f'url_{i}', i) for i in range(randint(1, 10))]:
-            root.add_edge(x)
+        n_0 = self.n_gen(0)
+        n_0.add_edge(n_1 := self.n_gen(1))
+        n_1.add_edge(n_2 := self.n_gen(2))
+        n_2.add_edge(n_3 := self.n_gen(3))
         
-        call_mock = MagicMock()
-        root.serach()(call_mock)
-        
-        #すべての配列において呼び出しが発生しているかどうか
-        self.assertEqual(call_mock.call_count, len(Node.Nodes))
+        search_depthes = [0, 2, 10] #どこまで探索するか
+        for depth in search_depthes:
+            with self.subTest(depth=depth):
+                call_mock = MagicMock()
+                n_0.serach(search_depth=depth)(call_mock)
+                
+                if len(Node.Nodes) > depth:
+                    self.assertEqual(call_mock.call_count, depth)
+                else:
+                    #search_depthがtreeの長さを超えている場合
+                    self.assertEqual(call_mock.call_count, len(Node.Nodes))
         
     def test_null_controls(self):
         self.assertRaises(TypeError, Node, 'hoge', 0)

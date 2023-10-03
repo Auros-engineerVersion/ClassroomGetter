@@ -37,6 +37,7 @@ USER_PASSWORD_DESC = 'ユーザーのパスワード'
 SAVE_FOLDER_PATH_DESC = '入手したファイルを保存する場所'
 LOADING_WAIT_TIME_DESC = 'ページの読み込みを待つ時間'
 WEB_DRIVER_OPTIONS_DESC = 'Web Driverが起動する際のオプション'
+SEARCH_DEPTH_DESC = '探索を行う際の深度\n例: 1 -> 1階層のみ探索, 2 -> 2階層まで探索'
 
 #json dictionary keys
 VALUE = 'value'
