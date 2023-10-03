@@ -53,7 +53,8 @@ class SettingData(ISettingData):
             self.web_driver_options_data = {VALUE:self.web_driver_options_data, DESCRIPTION: WEB_DRIVER_OPTIONS_DESC}
             
         if len(self.nodes) == 0:
-            self.nodes.add(Node('Classroom', ISettingData.TARGET_URL, 0))
+            self.nodes = Node.Nodes
+            Node('Classroom', ISettingData.TARGET_URL, 0)
     
     @property
     def profile(self):

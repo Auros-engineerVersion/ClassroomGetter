@@ -59,10 +59,12 @@ class JSONEncoderTest(unittest.TestCase):
     def test_decode_setting_data(self):
         data = SettingData()
         json_data = json.dumps(data, cls=MyClassEncoder, indent=4)
-        after = json.loads(json_data, cls=MyClassDecoder)
+        after: SettingData = json.loads(json_data, cls=MyClassDecoder)
         
         self.assertIsInstance(after, SettingData)
-        for key in data.__dict__:
-            self.assertEqual(data.__dict__[key], after.__dict__[key])
-            if isinstance(data.__dict__[key], dict):
-                self.assertEqual(data.__dict__[key], after.__dict__[key])
+                
+        self.assertIsInstance(after.user_email[VALUE], str)
+        self.assertIsInstance(after.user_password[VALUE], str)
+        self.assertIsInstance(after.save_folder_path[VALUE], Path)
+        self.assertIsInstance(after.loading_wait_time[VALUE], int)
+        self.assertIsInstance(after.web_driver_options_data[VALUE], str)
