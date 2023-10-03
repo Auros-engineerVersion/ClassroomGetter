@@ -26,9 +26,10 @@ class DescBox(tk.Frame):
     @property
     def box(self) -> InputBox:
         for w in self.winfo_children():
-            if type(w) is InputBox:
+            if isinstance(w, InputBox):
                 return w
         
+#TODO cfgの変更を反映させる
 class SettingGroup(tk.LabelFrame):
     def __init__(self, master: tk.Misc, key_values: dict, label_title:str=SETTING):
         tk.LabelFrame.__init__(self, master=master, text=label_title)
@@ -40,39 +41,24 @@ class SettingGroup(tk.LabelFrame):
             
     @property
     def boxes(self) -> list[InputBox]:
-        for w in [b for b in self.winfo_children() if type(b) is DescBox]:
+        for w in [b for b in self.winfo_children() if isinstance(b, DescBox)]:
             yield w.box
 
 class SettingFrame(tk.Frame):
-    def __init__(self, master: tk.Misc, data: SettingData):
+    def __init__(self, master: tk.Misc, cfg: ISettingData):
         super().__init__(master=master)
+        self.__cfg = cfg
         
-        self.__boxes = []
-        SettingGroup(self, data.editable_data)\
+        self.groups: SettingGroup = SettingGroup(self, self.__cfg.editable_data)\
             |arrow| (lambda g: g.pack(side=tk.LEFT, anchor=tk.NW, padx=(25, 1), pady=4))\
-            |arrow| (lambda g: self.__boxes.extend(g.boxes))
-        
-        label = tk.Label(self)\
-            |arrow| (lambda l: l.pack(side=tk.BOTTOM, anchor=tk.E, padx=5, pady=5))
             
-        tk.Button(self, text=SETTING)\
+        tk.Button(self, text=SAVE)\
             |arrow| (lambda b: b.pack(side=tk.BOTTOM, anchor=tk.E, padx=5, pady=5))\
-            |arrow| (lambda b: b.bind(BUTTON_PRESS, lambda e: self.__save_and_reset_message_show(data.nodes, self.__boxes, label)))        
-        
-        self.set(self.__boxes, data)
-        
-    def set(self, targets: list, data: SettingData):
-        for data, box in zip(vars(data).values(), targets):
-            if box is None:
-                continue
-            else:
-                box.set(data)
-        
-    def values(self, nodes: list, boxes: list) -> SettingData:
-        args = [*map(lambda box: box.value(), filter(lambda box: box is not None, boxes)), nodes]
-        return SettingData(*args)
-        
-    def __save_and_reset_message_show(self, nodes: list, boxes: list, label: tk.Label):
-        label[TEXT] = SETTING_RESET_MESSAGE
-        file_path = SettingData.SETTINGFOLDER_PATH.joinpath('setting.json')
-        save(file_path, self.values(nodes, boxes))
+            |arrow| (lambda b: b.bind(BUTTON_PRESS, 
+                    self.__save_cfg(cfg.SETTINGFOLDER_PATH.joinpath('setting.json'))))
+            
+    def __save_cfg(self, file_path: Path):
+        def _inner(e):
+            values = [box.get() for box in self.groups.boxes]
+            try_save(file_path, SettingData(values))
+        return _inner
