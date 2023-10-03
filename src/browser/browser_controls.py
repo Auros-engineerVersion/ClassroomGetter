@@ -12,9 +12,27 @@ from selenium.webdriver.support import expected_conditions as EC
 from ..interface import *
 from ..my_util import arrow
 
+COLLEGE_IDENTIFIER = 'shibboleth.nihon-u.ac.jp/idp/profile/SAML2/Redirect'
+COLLEGE_USER_FORM = "//input[@id='j_username']"
+COLLEGE_PASS_FORM = "//input[@id='j_password']"
+COLLEGE_SUBMIT_BUTTON = "//button[@type='submit']"
+
+GOOGLE_EDU = 'workspace-for-education'
+GOOGLE_EDU_URL = 'https://edu.google.com/intl/ALL_jp/workspace-for-education/classroom/'
+
+GOOGLE_IDENTIFIER = 'accounts.google.com'
+GOOGLE_IDENTIFIER_URL = 'https://accounts.google.com/ServiceLogin?continue=https%3A%2F%2Fclassroom.google.com&passive=true'
+GOOGLE_EMAIL_FORM = "//input[@type='email']"
+GOOGLE_SUBMIT_BUTTON = "//div[@id='identifierNext']"
+GOOGLE_ASK_DO_LOGIN_URL = 'https://accounts.google.com/speedbump/samlconfirmaccount'
+GOOGLE_ASK_DO_LOGIN_BUTTON = "//div[@jsname='Njthtb']"
+
 def move(bc: IBrowserControlData, url: str):
     bc.driver.get(url)
     
+def wait(bc: IBrowserControlData, url: str):
+    return bc.wait.until(EC.url_matches(url))
+        
 def search_element(bc: IBrowserControlData, xpath: str) -> WebElement:
     try:
         return bc.wait.until(EC.presence_of_element_located((By.XPATH, xpath)))
@@ -58,42 +76,37 @@ def click_all_sections(bc: IBrowserControlData):
     except TimeoutException:
         return
     
-def login_college_form(bc: IBrowserControlData, email: str, password: str):
-    user_name = email[:email.find('@')]
-    
+def college_login(bc: IBrowserControlData, email: str, password: str):
     #1:emailの@以前をユーザー名に送る
     #2:passwordを送る
     #3:ログインボタンを押す
-    search_element(bc, "//input[@id='j_username']").send_keys(user_name)
-    search_element(bc, "//input[@id='j_password']").send_keys(password)
-    search_element(bc, "//button[@type='submit']").click()
+    try:
+        wait(bc, COLLEGE_IDENTIFIER)
+        search_element(bc, COLLEGE_USER_FORM).send_keys(email[:email.find('@')])
+        search_element(bc, COLLEGE_PASS_FORM).send_keys(password)
+        search_element(bc, COLLEGE_SUBMIT_BUTTON).click()
+    except TimeoutException:
+        return
 
-def login_google(bc: IBrowserControlData, email: str, password: str):
-    if 'accounts.google.com/signin/v2/identifier' in bc.current_url:
-        #1:emailを入力する
-        #2:続行を押す
-        #3:大学のフォームにログイン
-        #4:続行を押す
-        search_element(bc, "//input[@type='email']")        .send_keys(email)
-        search_element(bc, "//div[@id='identifierNext']")   .click()
-        if 'shibboleth.nihon-u.ac.jp/idp/profile/SAML2/Redirect' in bc.current_url:
-            login_college_form(bc, email, password)
-            
-        search_element(bc, "//div[@jsname='Njthtb']")       .click()
+def google_login(bc: IBrowserControlData, email: str, password: str):
+    move(bc, GOOGLE_IDENTIFIER_URL)
+    wait(bc, GOOGLE_IDENTIFIER)
+    search_element(bc, GOOGLE_EMAIL_FORM).send_keys(email) #1:emailを入力する
+    search_element(bc, GOOGLE_SUBMIT_BUTTON).click()#2:続行を押す
+
+    college_login(bc, email, password)
+    search_element(bc, GOOGLE_ASK_DO_LOGIN_BUTTON).click()
+
+def classroom_login(bc: IBrowserControlData, email: str, password: str) -> None:
+    move(bc, ISettingData.TARGET_URL)
+    if ISettingData.TARGET_URL in bc.current_url:
+        return #ログイン済みの場合は何もしない
+    #google educationのワークスペースに飛ばされた場合
+    elif GOOGLE_EDU in bc.current_url:
+        google_login(bc, email, password)
     else:
-        move(bc, 'https://accounts.google.com/signin/v2/identifier')
-        login_google(bc, email, password)
-    
-def login_classroom(bc: IBrowserControlData, email: str, password: str):
-    if bc.current_url != ISettingData.TARGET_URL:
-        move(bc, ISettingData.TARGET_URL)
-    
-    #1:ログイン画面に移動する
-    #2:Googleにログインする
-    #3:プロファイルを設定する
-    move(bc, search_element(bc, "//a[@class='gfe-button gfe-button--medium-emphasis gfe-button--middle-align']").get_attribute('href'))
-    login_google(bc, email, password)
-    bc.wait.until(EC.url_matches(ISettingData.TARGET_URL))
+        raise ConnectionError(
+            'Googleのログイン画面に移動できませんでした\nログインを行う必要がないか、urlが変更された可能性があります')
     
 def donwload(bc: IBrowserControlData, url: str, file_path: Path, timeout: int = 10):
     move(bc, url)
