@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import font
 
-from ...data.setting_data import *
+from ...data import *
 from ...literals import *
 from ...my_util import *
 from ...settings import *
@@ -60,5 +60,5 @@ class SettingFrame(tk.Frame):
     def __save_cfg(self, file_path: Path):
         def _inner(e):
             values = [box.get() for box in self.groups.boxes]
-            try_save(file_path, SettingData(values))
+            try_save(file_path, SettingData(*values, nodes=self.__cfg.nodes))
         return _inner
