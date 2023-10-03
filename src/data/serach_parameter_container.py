@@ -29,18 +29,15 @@ class SearchParameter:
             attribute (callable): WebElementから、aタブやtext等を取得するための関数
         """
         result = []
-        @tail_recursion
         def loop(elems: Iterable[WebElement]):
-            elem = elems.pop(0)
             nonlocal result
-            
-            self.attribute_selector(elem)\
-                |pipe| self.sifter\
-                |pipe| result.append
-
             if len(elems) == 0:
                 return result
             else:
+                elem = elems.pop(0)                
+                self.attribute_selector(elem)\
+                    |pipe| self.sifter\
+                    |pipe| result.append
                 return loop(elems)
                     
         return loop(get(bc, self.xpath))
@@ -50,20 +47,18 @@ class SearchParameterPattern:
     key_param: SearchParameter = field(default=None)
     url_param: SearchParameter = field(default=None)
     elems_get_proc: Callable[[IBCD, str], list[WebElement]] = field(default=search_element_all)
-    pre_proc: Callable[[INode], None] = field(default=identity)
+    pre_proc: Callable[[INode], tuple[str, str]] = field(default=identity)
     
     #func:textとlinkのペアに対して行う関数
     #text_filter, link_filter: それぞれのlistに対して行う関数
-    def key_url_pair(self, ibc: INode, node: INode) -> tuple:
-        """獲得したファイルの名前とurlを返す。返り値をNodeのコンストラクタに渡すことを想定している"""        
-        #if self.key_param is None or self.url_param is None:
-        #    return [*zip([node.key + 'の授業タブ'], [to_all_tab_link(node.url)])]
-        #else:
+    def key_url_pair(self, ibc: INode, node: INode) -> tuple[str, str] | Any:
+        """獲得したファイルの名前とurlを返す。返り値をNodeのコンストラクタに渡すことを想定している"""
         
-        temp = self.pre_proc(node)
         if self.key_param is None or self.url_param is None:
-            return temp
+            #listで包むのは、Nodeのコンストラクタに渡す前にfor ~ inで一度展開され、そののちにunpackされるため
+            return [self.pre_proc(node)]
         else:
+            self.pre_proc(node)
             return [*zip(
                 self.key_param.get_next_values(ibc, self.elems_get_proc),
                 self.url_param.get_next_values(ibc, self.elems_get_proc))]
@@ -72,7 +67,7 @@ class SearchParameterContainer:
     browser_control_data: IBCD = None
 
     @staticmethod
-    def next_key_url(node: INode) -> list[tuple[str, str]]:
+    def next_key_url(node: INode):
         """
             渡されたnodeのtree_heightを確認し、次のnodeのkeyとurlを返す。\n
             この関数ではwebへのアクセスが生じるため注意
@@ -86,9 +81,6 @@ def __move(url: str):
 def __move_and_click(url: str):
     __move(url)
     click_all_sections(SearchParameterContainer.browser_control_data)
-    
-def __url(node: INode):
-    return node.url
 
 def __url_parse(f: Callable[[ParseResult], Any]) -> Callable[[Callable[[str], Any]], Any]:
     def _inner(url: str) -> Any:
@@ -135,14 +127,13 @@ parameters: list[SearchParameterPattern] = [
     #添字とtree_heightを一致させる
     #root -> 授業一覧
     SearchParameterPattern(
-        pre_proc=identity,
-        key_param=SearchParameter.key_parameter("//div[@class='YVvGBb z3vRcc-ZoZQ1']", sifter=text_filter),
+        pre_proc=lambda n: __move(n.url),
+        key_param=SearchParameter.key_parameter("//div[@class='YVvGBb z3vRcc-ZoZQ1']"),
         url_param=SearchParameter.url_parameter("//a[@class='onkcGd ZmqAt Vx8Sxd']")),
     
     #授業一覧 -> 授業タブ
     SearchParameterPattern(
-        #tupleを返す, return [(key, url)]
-        pre_proc=lambda n:(\
+        pre_proc=lambda n:(
             n.key + 'の授業タブ',
             #授業一覧のurlを授業タブのurlに変換
             #'.../u/1/c/...'
@@ -167,9 +158,11 @@ parameters: list[SearchParameterPattern] = [
     
     #urlにアクセスし、ファイルを取得
     SearchParameterPattern(
-        pre_proc=lambda n:__url_to_drive(n.url)
+        pre_proc=lambda n:(
+            'ダウンロード',
+            __url_to_drive(n.url)
             |pipe| (lambda url: donwload(
                 SearchParameterContainer.browser_control_data, 
                 url,
-                n.to_path())))
+                n.to_path()))))
 ]

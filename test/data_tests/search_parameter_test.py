@@ -30,9 +30,9 @@ class SearchParameterContainerTest(unittest.TestCase):
         
         result = self.spc.next_key_url(node)
         
-        self.assertTupleEqual(
+        self.assertListEqual(
             result,
-            ('testの授業タブ', 'https://classroom.google.com/u/1/w/AAAAAAAAAAAAAAAA/t/all'))
+            [('testの授業タブ', 'https://classroom.google.com/u/1/w/AAAAAAAAAAAAAAAA/t/all')])
         
     def test_level_4(self):
         node = MagicMock()
@@ -41,7 +41,7 @@ class SearchParameterContainerTest(unittest.TestCase):
         node.tree_height = 4
         
         result = self.spc.next_key_url(node)
-        self.assertIsNone(result)
+        self.assertListEqual(result, [('ダウンロード', None)])
         
 if __name__ == '__main__':
     unittest.main()
