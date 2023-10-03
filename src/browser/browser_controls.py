@@ -40,7 +40,7 @@ def elems_sifter(target, sifter: Callable, reg: str = ''):
 def click_all_sections(bc: IBrowserControlData):
     def __check_loaded(xpath) -> bool:
         def __predictate(driver):
-            sample_buttons = search_element_all(bc, By.XPATH, "//div[@jsmodel='RH7Ihb']")
+            sample_buttons = search_element_all(bc, "//div[@jsmodel='RH7Ihb']")
             if all([x.get_attribute('data-controller-loaded') == 'true' for x in sample_buttons]):
                 return driver.find_elements(By.XPATH, xpath)
             else:
