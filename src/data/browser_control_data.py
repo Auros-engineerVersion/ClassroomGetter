@@ -8,13 +8,13 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 from ..literals import *
 from ..interface import *
-from ..my_util import is_none
+from ..my_util import is_none, arrow
 
 
 class BrowserControlData(IBrowserControlData):
     def __init__(self, cfg: ISettingData, driver: webdriver = None, wait: WebDriverWait = None) -> None:        
-        self.__driver = is_none(driver, lambda:create_driver(cfg))
-        self.__wait = is_none(wait, lambda:WebDriverWait(self.__driver, cfg.loading_wait_time[VALUE], 1))
+        self.__driver: webdriver = is_none(driver, lambda:create_driver(cfg))
+        self.__wait: WebDriverWait = is_none(wait, lambda:WebDriverWait(self.__driver, cfg.loading_wait_time[VALUE], 1))
     
     def __del__(self):
         del self.__wait
@@ -44,18 +44,22 @@ def create_driver(cfg: ISettingData) -> webdriver.Chrome:
         options.add_argument(option)
     
     options.add_experimental_option('prefs', {
-        "download.default_directory":str(cfg.save_folder_path[VALUE].absolute()),
+        "download.default_directory":str(cfg.save_folder_path[VALUE]),
         "plugins.always_open_pdf_externally": True})
     
     try:
-        driver = webdriver.Chrome(service=Service(), options=options)
-        
-        #ヘッドレスモードでダウンロードするために以下の処理が必要
-        driver.command_executor._commands["send_command"] = ("POST", '/session/$sessionId/chromium/send_command')
-        params = {'cmd': 'Page.setDownloadBehavior', 
-                  'params': {'behavior': 'allow', 
-                             'downloadPath': str(cfg.save_folder_path[VALUE].absolute())}}
-        driver.execute("send_command", params)
+        driver = webdriver.Chrome(service=Service(), options=options)\
+            |arrow| (lambda d: d.command_executor._commands.update({
+                'send_command': ('POST', '/session/$sessionId/chromium/send_command')}))\
+            |arrow| (lambda d: d.execute(
+                #ヘッドレスモードでダウンロードするために以下の処理が必要
+                driver_command='send_command',
+                params={
+                    'cmd': 'Page.setDownloadBehavior',
+                    'params': {
+                        'behavior': 'allow',
+                        'downloadPath': str(cfg.save_folder_path[VALUE])}}))
+
     except InvalidArgumentException:
         raise ValueError(f'Invalid options: {optional_args}')
     return driver
