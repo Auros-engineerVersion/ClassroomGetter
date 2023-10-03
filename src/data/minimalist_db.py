@@ -1,13 +1,23 @@
+from __future__ import annotations
+
+from ..interface import IComparable
+
 class MinimalistID(int):
     def value(self, db):
         return db.get(self)
 
-class MinimalistRecode(dict):
+class MinimalistRecode(dict, IComparable):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
     def __lt__(self, other):
         return self['value'] < other['value']
+    
+    def __eq__(self, __value: MinimalistRecode) -> bool:
+        return self['value'] == __value
+    
+    def __hash__(self) -> int:
+        return hash(self['value'])
     
 class EmptyRecode(MinimalistRecode):
     def __init__(self) -> None:

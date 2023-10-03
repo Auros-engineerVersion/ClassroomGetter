@@ -39,3 +39,6 @@ class MinimalistDBTest(unittest.TestCase):
     def test_remove_target(self):
         self.db.remove_target(self.recode1)
         self.assertIsInstance(self.db.get(self.id1), EmptyRecode)
+        
+    def test_min(self):
+        self.assertEqual(min(self.db), self.recode0)
