@@ -6,16 +6,23 @@ sys.path.append(os.path.abspath('.'))
 import unittest
 from unittest.mock import patch
 
-from src.browser import BrowserControlData
 from src.gui.application_root import ApplicationRoot
-from src.settings.settings import SettingData, Settings
-
+from src.settings import *
 
 class ApplicationRootTest(unittest.TestCase):
-    @patch('src.setting.settings.Settings.load')
-    def test_setup(self, m_load):        
-        m_load.return_value = SettingData()
-        cfg, bc = ApplicationRoot.setup()
+    def setUp(self) -> None:
+        self.__test_folder_path = Path('./for_test')
+    
+    @patch('src.gui.application_root.ProfileForm')
+    def test_running_stop(self, form_mock):
+        #Formを途中で終了した場合
+        form_mock().pop_up.side_effect = [ChildProcessError]
+        self.assertRaises(ChildProcessError, 
+            ApplicationRoot, try_load(self.__test_folder_path), (400, 300))
         
-        #ポップアップを途中で閉じた場合
-        
+    @patch('src.gui.application_root.ProfileForm')
+    def test_run(self, form_mock):
+        #ゲストモードで起動
+        form_mock().pop_up.return_value = ('guest', 'guest')
+        app = ApplicationRoot(try_load(self.__test_folder_path), (400, 300))
+        app.stop()
