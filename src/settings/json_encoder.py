@@ -12,7 +12,15 @@ encode_decode_format = {
         ENCODE: lambda o: dic_gen(o.timestamp(), o.__class__.__name__),
         DECODE: lambda o: datetime.fromtimestamp(o)},
     
+    'Path': {
+        ENCODE: lambda o: dic_gen(str(o), o.__class__.__name__),
+        DECODE: lambda o: Path(o)},
+    
     'WindowsPath': {
+        ENCODE: lambda o: dic_gen(str(o), o.__class__.__name__),
+        DECODE: lambda o: Path(o)},
+    
+    'MacPath': {
         ENCODE: lambda o: dic_gen(str(o), o.__class__.__name__),
         DECODE: lambda o: Path(o)},
     
@@ -69,7 +77,10 @@ class MyClassDecoder(JSONDecoder):
     
     def object_hook(self, o: dict):
         if TYPE not in o:
-            return o
+            if isinstance(o, int):
+                return int(o)
+            else:
+                return o
         else:
             params = encode_decode_format.get(o[TYPE])
             if params is None:

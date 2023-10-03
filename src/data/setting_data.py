@@ -30,7 +30,7 @@ class SettingData(ISettingData):
         DESCRIPTION: LOADING_WAIT_TIME_DESC})
     
     web_driver_options_data: dict = field(default_factory=lambda:{
-        VALUE: '--headless, --disable-gpu, --blink-settings=imagesEnabled=false, --ignore-certificate-error, --ignore-certificate-error',
+        VALUE: '--headless=new, --window-size=1280,720',
         DESCRIPTION: WEB_DRIVER_OPTIONS_DESC})
     
     #----------------保存されたデータ--------------------
@@ -44,10 +44,10 @@ class SettingData(ISettingData):
             self.user_password = {VALUE:self.user_password, DESCRIPTION: USER_PASSWORD_DESC}
             
         if not isinstance(self.save_folder_path, dict):
-            self.save_folder_path = {VALUE:self.save_folder_path, DESCRIPTION: SAVE_FOLDER_PATH_DESC}
+            self.save_folder_path = {VALUE:Path(self.save_folder_path), DESCRIPTION: SAVE_FOLDER_PATH_DESC}
             
         if not isinstance(self.loading_wait_time, dict):
-            self.loading_wait_time = {VALUE:self.loading_wait_time, DESCRIPTION: LOADING_WAIT_TIME_DESC}
+            self.loading_wait_time = {VALUE:int(self.loading_wait_time), DESCRIPTION: LOADING_WAIT_TIME_DESC}
             
         if not isinstance(self.web_driver_options_data, dict):
             self.web_driver_options_data = {VALUE:self.web_driver_options_data, DESCRIPTION: WEB_DRIVER_OPTIONS_DESC}
