@@ -4,7 +4,7 @@ from abc import ABCMeta, abstractmethod, abstractproperty
 from typing import Callable, Coroutine
 
 
-class IComparale(metaclass=ABCMeta):
+class IComparable(metaclass=ABCMeta):
     @abstractmethod
     def __lt__(self, other) -> bool:
         raise NotImplementedError
