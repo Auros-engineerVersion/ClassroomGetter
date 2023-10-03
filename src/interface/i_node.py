@@ -30,7 +30,7 @@ class INode(metaclass=ABCMeta):
         raise NotImplementedError
 
     @abstractmethod
-    def serach(entry: INode) -> Coroutine[Callable[[Callable], None]]:
+    def serach(entry: INode, search_depth: int) -> Coroutine[Callable[[Callable], None]]:
         raise NotImplementedError
     
     @abstractmethod
