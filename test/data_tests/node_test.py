@@ -4,12 +4,11 @@ import sys
 sys.path.append(os.path.abspath('.'))
 
 import unittest
-from random import randint
 from pathlib import Path
 from unittest.mock import MagicMock
 
 from src.my_util import splitparN
-from src.data import Node, EmptyRecode
+from src.data import Node, EmptyRecode, MinimalistID
 
 
 class NodeTest(unittest.TestCase):
@@ -50,6 +49,14 @@ class NodeTest(unittest.TestCase):
         self.assertIn(grandchild, child.edges)
         
         self.assertEqual(len(Node.Nodes), 3)
+        
+    def test_raw_edges(self):
+        n_0 = self.n_gen(0)
+        n_1 = self.n_gen(1)
+        n_1.add_edge(n_0)
+        
+        self.assertIsInstance(n_1.edges[0], MinimalistID)
+        self.assertIsInstance(n_1.raw_edges[0], Node)
         
     def test_parent(self):
         parent = Node('parent', 'parent', 0)
