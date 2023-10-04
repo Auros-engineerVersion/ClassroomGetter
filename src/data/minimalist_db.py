@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-from ..interface import IComparable
+from ..interface import *
 
-class MinimalistID(int):
+class MinimalistID(int, IMinimalistID):
     def value(self, db):
         return db.get(self)
 
-class MinimalistRecode(dict, IComparable):
+class MinimalistRecode(dict, IComparable, IMinimalistRecode):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
@@ -26,7 +26,7 @@ class EmptyRecode(MinimalistRecode):
     def __lt__(self, other):
         return False
 
-class MinimalistDB(list[MinimalistRecode]):
+class MinimalistDB(list[MinimalistRecode], IMinimalistDB):
     def __init__(self, initial_line = 0) -> None:
         super().__init__()
         
