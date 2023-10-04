@@ -3,6 +3,8 @@ from __future__ import annotations
 from abc import ABCMeta, abstractmethod, abstractproperty
 from typing import Callable, Coroutine
 
+from ..interface import IMinimalistID, IRoutineData
+
 
 class INode(metaclass=ABCMeta):
     @abstractproperty
@@ -18,11 +20,15 @@ class INode(metaclass=ABCMeta):
         raise NotImplementedError
     
     @abstractproperty
-    def next_init_time(self):
+    def next_init_time(self) -> IRoutineData:
         raise NotImplementedError
     
     @abstractproperty
-    def edges(self) -> list[INode]:
+    def edges(self) -> list[IMinimalistID]:
+        raise NotImplementedError
+    
+    @abstractproperty
+    def raw_edges(self) -> list[INode]:
         raise NotImplementedError
     
     @abstractmethod

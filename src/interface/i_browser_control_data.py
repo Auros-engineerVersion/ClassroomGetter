@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from abc import ABCMeta, abstractmethod, abstractproperty
+from selenium.webdriver.remote.webdriver import WebDriver
+from selenium.webdriver.support.ui import WebDriverWait
 
 
 class IBrowserControlData(metaclass=ABCMeta):
@@ -9,9 +11,9 @@ class IBrowserControlData(metaclass=ABCMeta):
         pass
         
     @abstractproperty
-    def driver(self):
+    def driver(self) -> WebDriver:
         raise NotImplementedError
     
     @abstractproperty
-    def wait(self):
+    def wait(self) -> WebDriverWait:
         raise NotImplementedError
