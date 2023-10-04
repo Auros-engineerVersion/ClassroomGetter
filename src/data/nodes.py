@@ -46,8 +46,11 @@ class Node(INode, IComparable):
         self.__id = other
         
     @property
-    def edges(self):
-        return self.__edges
+    def edges(self, raw=True) -> list:
+        if raw:
+            return self.__edges
+        else:
+            return [Node.Nodes.get(id)['values'] for id in self.__edges]
     
     @edges.setter
     def edges(self, other):
@@ -141,7 +144,7 @@ class Node(INode, IComparable):
             
         return loop(self.id)
     
-    def serach(self, bfs = True, search_depth: int = 0) -> Coroutine[Callable[[Callable], None]]:
+    def serach(self, search_depth, bfs = True) -> Coroutine[Callable[[Callable], None]]:
         """
         Args:
             bfs (bool, optional): Trueなら幅優先探索、Falseなら深さ優先探索を行う
@@ -149,8 +152,7 @@ class Node(INode, IComparable):
         zero_to_neg = lambda x: -1 if x == False else 0
         popping = lambda list, bfs: Node.Nodes.get(list.pop(bfs))['value']
         
-        def __do_serch(func):
-            nonlocal search_depth
+        def __do_serch(func, search_depth=search_depth):
             list: list[INode] = [self.id]
             
             while(len(list) > 0):
@@ -171,5 +173,5 @@ class Node(INode, IComparable):
         def __next(node: INode):
             for key, url in SearchParameterContainer.next_key_url(node):
                 node.add_edge(Node(key, url, node.tree_height + 1))
-            
+        
         self.serach(search_depth=Node.SearchDepth)(__next)
