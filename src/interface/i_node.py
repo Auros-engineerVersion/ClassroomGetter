@@ -7,7 +7,34 @@ from .i_routine_data import IRoutineData
 from .i_minimalist_db import IMinimalistID
 
 
-class INode(metaclass=ABCMeta):
+class ISearchable(metaclass=ABCMeta):
+    @abstractmethod
+    def search(self, search_depth: int) -> Coroutine[Callable[[Callable], None]]:
+        raise NotImplementedError
+    
+class IDisposable(metaclass=ABCMeta):
+    @abstractmethod
+    def dispose(self) -> None:
+        raise NotImplementedError
+    
+class IHasEdges(metaclass=ABCMeta):
+    @abstractproperty
+    def parent(self) -> IMinimalistID:
+        raise NotImplementedError
+    
+    @abstractproperty
+    def edges(self) -> list[IMinimalistID]:
+        raise NotImplementedError
+    
+    @abstractproperty
+    def raw_edges(self) -> list[IHasEdges]:
+        raise NotImplementedError
+
+class INodeProperty(metaclass=ABCMeta):
+    @abstractproperty
+    def id(self):
+        raise NotImplementedError
+    
     @abstractproperty
     def key(self):
         raise NotImplementedError
@@ -22,28 +49,4 @@ class INode(metaclass=ABCMeta):
     
     @abstractproperty
     def next_init_time(self) -> IRoutineData:
-        raise NotImplementedError
-    
-    @abstractproperty
-    def edges(self) -> list[IMinimalistID]:
-        raise NotImplementedError
-    
-    @abstractproperty
-    def raw_edges(self) -> list[INode]:
-        raise NotImplementedError
-    
-    @abstractmethod
-    def __str__(self) -> str:
-        raise NotImplementedError
-
-    @abstractmethod
-    def serach(entry: INode, search_depth: int) -> Coroutine[Callable[[Callable], None]]:
-        raise NotImplementedError
-    
-    @abstractmethod
-    def initialize_tree(entry: INode) -> None:
-        raise NotImplementedError
-    
-    @abstractmethod
-    def dispose(self) -> None:
         raise NotImplementedError

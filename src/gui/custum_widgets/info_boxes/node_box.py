@@ -4,14 +4,14 @@ import gc
 import tkinter as tk
 
 from ....literals import *
-from ....interface import INode
+from ....interface import INodeProperty, IHasEdges
 from ....my_util import arrow
 from ..base.switch import Switch
 
 class NodeBox(tk.Frame):
     node_info_frame = None
     
-    def __init__(self, master: tk.Misc, node: INode, parent: NodeBox = None):
+    def __init__(self, master: tk.Misc, node: lambda: type('INode', (INodeProperty, IHasEdges)), parent: NodeBox = None):
         tk.Frame.__init__(self, master)
         self.__master = master
         self.__parent_box = parent
@@ -73,7 +73,7 @@ class NodeBox(tk.Frame):
                     
     def expand(self):
         self.pack(anchor=tk.W)
-        for node in self.__node.edges:
+        for node in self.__node.raw_edges:
             new_box = NodeBox(self.__master, node, self)
             self.__nextboxes.append(new_box)
                 

@@ -1,12 +1,12 @@
 import tkinter as tk
 
-from ...interface import INode
+from ...interface import INodeProperty
 from ...my_util import arrow
 from .base import *
 
 
 class FrontFrame(tk.Frame):
-    def __init__(self, master: tk.Misc, root: INode = None):
+    def __init__(self, master: tk.Misc, root: INodeProperty = None):
         super().__init__(master=master)
         
         #Node描写用のFrame

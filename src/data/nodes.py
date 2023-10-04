@@ -4,28 +4,18 @@ from pathlib import Path
 from typing import Callable, Coroutine
 
 from ..interface import *
+from ..my_util import is_none
 from .routine_data import RoutineData
 from .serach_parameter_container import SearchParameterContainer
 from .minimalist_db import *
 
 
-class Node(INode, IComparable):
+class Node(INodeProperty, IHasEdges, IDisposable):
     Nodes: MinimalistDB = MinimalistDB()
     SearchDepth: int = 0
-
-    def __init__(self, key: str, url: str, tree_height: int, next_init_time: RoutineData = None) -> None:        
-        self.__id: MinimalistID = self.Nodes.add(self)
-        
-        self.__key = key
-        self.__url = url
-        
-        self.__tree_height = abs(int(tree_height)) #負の値が入れられないように
-        self.__next_init_time = next_init_time if next_init_time != None else RoutineData()
-        
-        self.__parent: MinimalistID = None
-        self.__edges: list[INode] = []
-
+    
     #これらの引数の並びは、__init__で定義されている変数群の並びと同じである必要がある
+    #これはjsonから読み込んだデータを元にノードを作成する際に同じでないとうまくインスタンスの生成ができないため
     @classmethod
     def factory(cls, id, key, url, tree_height, next_init_time, parent, edges):
         """Jsonから読み込んだデータを元にノードを作成するためのfactory"""
@@ -36,7 +26,35 @@ class Node(INode, IComparable):
         
         return node
 
-#region property
+    def __init__(self, key: str, url: str, tree_height: int, next_init_time: RoutineData = None) -> None:
+        self.__id: MinimalistID = self.Nodes.add(self)
+        
+        self.__key: str = key
+        self.__url: str = url
+        self.__tree_height: int = abs(int(tree_height))
+        self.__next_init_time: RoutineData = is_none(next_init_time, RoutineData)
+        
+        self.__parent: MinimalistID = None
+        self.__edges: list[IHasEdges] = []
+
+    def __str__(self) -> str:
+        return str.format(self.__dict__)
+    
+    def __lt__(self, other) -> bool:
+        return self.__tree_height < other.tree_height
+    
+    def __eq__(self, other: object) -> bool:
+        if (other == None):
+            return False
+        else:
+            return all([x[0] == x[1] for x in zip(vars(self).values(), vars(other).values())])
+
+    def __hash__(self) -> int:
+        return hash(vars(self).values())
+    
+    def __del__(self) -> None:
+        self.dispose()
+
     @property
     def id(self):
         return self.__id
@@ -45,72 +63,45 @@ class Node(INode, IComparable):
     def id(self, other):
         self.__id = other
         
+#region INodeProperty
     @property
-    def edges(self, raw=True) -> list:
-        if raw:
-            return self.__edges
-        else:
-            return [Node.Nodes.get(id)['values'] for id in self.__edges]
-    
-    @edges.setter
-    def edges(self, other):
-        self.__edges = other
-        
-    @property
-    def key(self):
+    def key(self) -> str:
         return self.__key
     
     @property
-    def url(self):
+    def url(self) -> str:
         return self.__url
-        
+    
     @property
-    def tree_height(self):
+    def tree_height(self) -> int:
         return self.__tree_height
     
     @property
-    def next_init_time(self):
+    def next_init_time(self) -> RoutineData:
         return self.__next_init_time
+#endregion
     
+#region IHasEdges
     @property
-    def parent(self):
+    def parent(self) -> MinimalistID:
         return self.__parent
     
     @parent.setter
     def parent(self, id: MinimalistID):
         self.__parent = id
+    
+    @property
+    def edges(self) -> list[IMinimalistID]:
+        return self.__edges
+    
+    @edges.setter
+    def edges(self, other):
+        self.__edges = other
+    
+    @property
+    def raw_edges(self) -> list[IHasEdges]:
+        return [self.Nodes.get(id)['value'] for id in self.__edges]
 #endregion
-    
-    def __str__(self) -> str:
-        return str.format('{0}:{1}', self.__tree_height, self.__key)
-    
-    def __lt__(self, other) -> bool:
-        return self.__tree_height < other.tree_height
-    
-    def __eq__(self, other) -> bool:
-        if (other == None):
-            return False
-        else:
-            return all([x[0] == x[1] for x in zip(vars(self).values(), vars(other).values())])
-
-    def __hash__(self) -> int:
-        return hash((self.__key, self.__url, self.__tree_height, self.__next_init_time))
-    
-    def __del__(self) -> None:
-        self.dispose()
-    
-    def add_edge(self, id: MinimalistID | INode) -> list[INode]:
-        #idにINodeを入れてしまった場合
-        if isinstance(id, INode):
-            return self.add_edge(id.id)
-        
-        if self.Nodes.get(id) is EmptyRecode:
-            raise ValueError('ノードが存在しません')
-        else:
-            self.__edges.append(id)
-            self.Nodes.get(id)['value'].__parent = self.id
-            
-            return self.__edges
     
     def dispose(self) -> None:
         self.Nodes.remove(self.id)
@@ -120,7 +111,7 @@ class Node(INode, IComparable):
             if isinstance(recodes, EmptyRecode):
                 continue
             else:
-                node: INode = recodes['value']
+                node: IHasEdges = recodes['value']
                 if self is node:
                     continue
 
@@ -130,19 +121,18 @@ class Node(INode, IComparable):
                 if self.id in node.edges:
                     node.edges.remove(self.id)
                     
-    def to_path(self) -> Path:
-        if len(Node.Nodes) == 0:
+    def add_edge(self, other: IHasEdges | IMinimalistID) -> list[IMinimalistID]:
+        #idにINodeを入れてしまった場合
+        if isinstance(other, IHasEdges):
+            return self.add_edge(other.id)
+        
+        if self.__class__.Nodes.get(other) is EmptyRecode:
             raise ValueError('ノードが存在しません')
-        
-        getting: INode = lambda id: Node.Nodes.get(id)['value']
-        
-        def loop(id: MinimalistID):
-            if id is None:
-                return Path()
-            else:
-                return loop(getting(id).parent).joinpath(getting(id).key)
+        else:
+            self.edges.append(other)
+            Node.Nodes.get(other)['value'].parent = self.id
             
-        return loop(self.id)
+            return self.edges
     
     def serach(self, search_depth, bfs = True) -> Coroutine[Callable[[Callable], None]]:
         """
@@ -153,7 +143,7 @@ class Node(INode, IComparable):
         popping = lambda list, bfs: Node.Nodes.get(list.pop(bfs))['value']
         
         def __do_serch(func, search_depth=search_depth):
-            list: list[INode] = [self.id]
+            list: list[MinimalistID] = [self.id]
             
             while(len(list) > 0):
                 #出す場所が0なら深さ優先探索, queueの振る舞いをする
@@ -170,8 +160,22 @@ class Node(INode, IComparable):
                 
     #幅優先探索
     def initialize_tree(self) -> None:
-        def __next(node: INode):
+        def __next(node: IHasEdges):
             for key, url in SearchParameterContainer.next_key_url(node):
                 node.add_edge(Node(key, url, node.tree_height + 1))
         
         self.serach(search_depth=Node.SearchDepth)(__next)
+        
+    def to_path(self) -> Path:
+        if len(Node.Nodes) == 0:
+            raise ValueError('ノードが存在しません')
+        
+        getting: IHasEdges = lambda id: Node.Nodes.get(id)['value']
+        
+        def loop(id: MinimalistID):
+            if id is None:
+                return Path()
+            else:
+                return loop(getting(id).parent).joinpath(getting(id).key)
+            
+        return loop(self.id)

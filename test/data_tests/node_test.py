@@ -21,6 +21,7 @@ class NodeTest(unittest.TestCase):
     
     def test_constructor(self):
         id_1 = Node('key', 'url', 0)
+        self.assertIsNotNone(id_1)
         self.assertEqual(id_1.id, 0)
         
         id_2 = Node('key', 'url', 0)
