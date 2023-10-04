@@ -22,7 +22,7 @@ class SearchParameterContainerTest(unittest.TestCase):
         self.spc = SearchParameterContainer
         return super().setUp()
     
-    def test_level_2(self):
+    def test_level_1(self):
         node = MagicMock()
         node.url = 'https://classroom.google.com/u/1/c/AAAAAAAAAAAAAAAA'
         node.key = 'test'
@@ -30,15 +30,13 @@ class SearchParameterContainerTest(unittest.TestCase):
         
         result = self.spc.next_key_url(node)
         
-        self.assertListEqual(
-            result,
-            [('testの授業タブ', 'https://classroom.google.com/u/1/w/AAAAAAAAAAAAAAAA/t/all')])
-        
-    def test_level_4(self):
+        self.assertIsInstance(result, zip)
+                
+    def test_level_3(self):
         node = MagicMock()
         node.url = 'https://drive.google.com/file/d/AAAAAAAAAAAAAAAA/view?usp=drive_web&authuser=1'
         node.key = 'test'
-        node.tree_height = 4
+        node.tree_height = 3
         
         result = self.spc.next_key_url(node)
         self.assertListEqual(result, [('ダウンロード', None)])

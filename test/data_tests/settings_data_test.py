@@ -19,6 +19,7 @@ class SettingDataTest(unittest.TestCase):
         data1 = SettingData()
         self.assertIsInstance(data1.nodes, list)
         self.assertIsInstance(*data1.nodes.pop().values(), INode)
+        self.assertEqual(data1.search_depth['value'], Node.SearchDepth)
         
         data2 = SettingData('test', 'test')
         self.assertIsInstance(data2.user_email, dict)
