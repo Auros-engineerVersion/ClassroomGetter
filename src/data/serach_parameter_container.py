@@ -141,7 +141,7 @@ parameters: list[SearchParameterPattern] = [
                         |pipe| __url_parse(identity) #次の関数への繋ぎ
                         |pipe| __url_replace(lambda x: x.path, old='/c/', new='/w/'))(n.url)),
         key_param=SearchParameter.key_parameter("//span[@class='YVvGBb UzbjTd']"),
-        url_param=SearchParameter.url_parameter("//a[contains(@aria-label, '表示')]")),
+        url_param=SearchParameter.url_parameter("//a[contains(@aria-label, '表示') and not(contains(@aria-label, '課題'))]")),
     
     #ファイルを取得
     SearchParameterPattern(
