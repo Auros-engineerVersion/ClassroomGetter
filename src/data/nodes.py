@@ -17,21 +17,22 @@ class Node(INodeProperty, IHasEdges, IDisposable):
     #これらの引数の並びは、__init__で定義されている変数群の並びと同じである必要がある
     #これはjsonから読み込んだデータを元にノードを作成する際に同じでないとうまくインスタンスの生成ができないため
     @classmethod
-    def factory(cls, id, key, url, tree_height, next_init_time, parent, edges):
+    def factory(cls, id, key, url, tree_height, include_this_to_path, next_init_time, parent, edges):
         """Jsonから読み込んだデータを元にノードを作成するためのfactory"""
-        node = cls(key, url, tree_height, next_init_time)
+        node = cls(key, url, tree_height, include_this_to_path, next_init_time)
         node.id = id
         node.parent = parent
         node.edges = edges
         
         return node
 
-    def __init__(self, key: str, url: str, tree_height: int, next_init_time: RoutineData = None) -> None:
+    def __init__(self, key: str, url: str, tree_height: int, include_this_to_path: bool = True, next_init_time: RoutineData = None) -> None:
         self.__id: MinimalistID = self.Nodes.add(self)
         
         self.__key: str = key
         self.__url: str = url
         self.__tree_height: int = abs(int(tree_height))
+        self.__include_this_to_path: bool = include_this_to_path
         self.__next_init_time: RoutineData = is_none(next_init_time, RoutineData)
         
         self.__parent: MinimalistID = None
@@ -79,6 +80,15 @@ class Node(INodeProperty, IHasEdges, IDisposable):
     @property
     def next_init_time(self) -> RoutineData:
         return self.__next_init_time
+    
+    @property
+    def include_this_to_path(self) -> bool:
+        return self.__include_this_to_path
+    
+    @include_this_to_path.setter
+    def include_this_to_path(self, other: bool):
+        self.__include_this_to_path = bool(other)
+
 #endregion
     
 #region IHasEdges
@@ -162,7 +172,10 @@ class Node(INodeProperty, IHasEdges, IDisposable):
     def initialize_tree(self) -> None:
         def __next(node: IHasEdges):
             for key, url in SearchParameterContainer.next_key_url(node):
-                node.add_edge(Node(key, url, node.tree_height + 1))
+                if key is None or url is None:
+                    continue
+                else:
+                    node.add_edge(Node(key, url, node.tree_height + 1))
         
         self.serach(search_depth=Node.SearchDepth)(__next)
         
@@ -172,10 +185,12 @@ class Node(INodeProperty, IHasEdges, IDisposable):
         
         getting: IHasEdges = lambda id: Node.Nodes.get(id)['value']
         
-        def loop(id: MinimalistID):
+        def loop(id: MinimalistID) -> Path:
             if id is None:
                 return Path()
             else:
-                return loop(getting(id).parent).joinpath(getting(id).key)
+                node = getting(id)
+                return loop(node.parent).joinpath(
+                    node.key if node.include_this_to_path else '') #自身を飛ばすかどうか
             
         return loop(self.id)

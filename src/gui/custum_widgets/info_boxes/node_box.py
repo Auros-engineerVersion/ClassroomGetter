@@ -35,10 +35,6 @@ class NodeBox(tk.Frame):
             |arrow| (lambda l: l.pack(side=tk.LEFT))
         
         self.pack(anchor=tk.W, padx=(node.tree_height*20, 1), after=self.__parent_box)
-        
-    @property
-    def time(self):
-        return self.__node.next_init_time
     
     @property
     def text(self):
@@ -47,6 +43,18 @@ class NodeBox(tk.Frame):
     @property
     def url(self):
         return self.__node.url
+    
+    @property
+    def include_this_to_path(self):
+        return self.__node.include_this_to_path
+    
+    @include_this_to_path.setter
+    def include_this_to_path(self, other: bool):
+        self.__node.include_this_to_path = bool(other)
+    
+    @property
+    def time(self):
+        return self.__node.next_init_time
     
     def set_time(self, data):
         self.__node.next_init_time = data

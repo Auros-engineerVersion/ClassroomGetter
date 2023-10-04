@@ -32,6 +32,9 @@ STOP_OR_CONTINUE = '入力の途中で閉じようとしています。'
 SETTING_RESET_MESSAGE = '設定を適用するには再起動が必要です。'
 PROFILE_WARNING = '入力した値が正しくありません。再入力してください。'
 WEB_DRIVER_QUIT = 'Web Driverを終了しています。'
+
+INCLUDE_THIS_IN_PATH = '保存の際、自身をパスに含める'
+
 USER_EMAIL_DESC = 'ユーザーのメールアドレス'
 USER_PASSWORD_DESC = 'ユーザーのパスワード'
 SAVE_FOLDER_PATH_DESC = '入手したファイルを保存する場所'

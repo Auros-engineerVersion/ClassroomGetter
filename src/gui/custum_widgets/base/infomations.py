@@ -23,8 +23,17 @@ class NodeInfoFrame(tk.Frame):
         #ボタンが押されたら、監視中のNodeBoxからinitialize_treeを実行する
         self.__init_button = tk.Button(self, text=RUN)\
             |arrow| (lambda b: b.pack(side=tk.BOTTOM, fill=tk.X))\
-            |arrow| (lambda b: b.bind(BUTTON_PRESS, lambda _: self.__watching_box.initialize()))
-        
+            |arrow| (lambda b: b.bind(BUTTON_PRESS, lambda _: 
+                self.__watching_box.initialize()))
+            
+        #保存の際、そのNodeをパスに含めるかどうかを設定する
+        self.__check_var = tk.BooleanVar(value=watching_box.include_this_to_path)
+        tk.Checkbutton(self,
+            text=INCLUDE_THIS_IN_PATH,
+            variable=self.__check_var,
+            command=lambda: self.on_change_check_value(self.__check_var))\
+            |arrow| (lambda c: c.pack(side=tk.BOTTOM, fill=tk.X))
+                        
         #次回の更新までの時間を表示する
         self.__time_box: Timer = Timer(self, watching_box=self.__watching_box)\
             |arrow| (lambda t: t.pack(side=tk.TOP))
@@ -32,8 +41,12 @@ class NodeInfoFrame(tk.Frame):
     def set_box(self, box: NodeBox):
         self.__key_label[TEXT] = box.text
         self.__url_label[TEXT] = box.url
+        self.__check_var.set(box.include_this_to_path)
         self.__watching_box = box
         self.__time_box.watching_box = box
+        
+    def on_change_check_value(self, boolean_var: tk.BooleanVar):
+        self.__watching_box.include_this_to_path = boolean_var.get()
         
     def change_state(self, state: str, text: str):
         self.__init_button[STATE] = state

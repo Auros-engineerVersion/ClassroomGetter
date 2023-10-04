@@ -50,3 +50,7 @@ class INodeProperty(metaclass=ABCMeta):
     @abstractproperty
     def next_init_time(self) -> IRoutineData:
         raise NotImplementedError
+
+    @abstractproperty
+    def include_this_to_path(self) -> bool:
+        raise NotImplementedError

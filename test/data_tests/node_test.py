@@ -70,15 +70,10 @@ class NodeTest(unittest.TestCase):
     def test_destructor(self):
         def node_env_set():
             Node.Nodes.clear()
-                    
-            n_1 = self.n_gen(1)
-            n_2 = self.n_gen(2)
-            n_3 = self.n_gen(3)
-            n_0 = self.n_gen(0)
-
-            n_0.add_edge(n_1)
-            n_1.add_edge(n_2)
-            n_2.add_edge(n_3)
+            n_1 = self.n_gen(0)
+            n_1.add_edge(n_2 := self.n_gen(1))
+            n_2.add_edge(n_3 := self.n_gen(2))
+            n_3.add_edge(n_4 := self.n_gen(3))
         
         #n_0を削除
         node_env_set()
@@ -120,10 +115,10 @@ class NodeTest(unittest.TestCase):
     def test_null_controls(self):
         self.assertRaises(TypeError, Node, 'hoge', 0)
             
-    def test_to_path(self):        
-        root = Node('root', 'root', 0)
-        stem = Node('stem', 'stem', 1)
-        reaf = Node('reaf', 'reaf', 2)
+    def test_to_path_when_include_true(self):
+        root = Node('root', 'root', 0, include_this_to_path=True)
+        stem = Node('stem', 'stem', 1, include_this_to_path=True)
+        reaf = Node('reaf', 'reaf', 2, include_this_to_path=True)
         
         root.add_edge(stem)
         stem.add_edge(reaf)
@@ -139,6 +134,18 @@ class NodeTest(unittest.TestCase):
         branch.add_edge(fruit)
         
         self.assertEqual(fruit.to_path(), Path('stem/branch/fruit'))
+        
+    def test_to_path_when_include_false(self):
+        n_0 = self.n_gen(0)
+        n_0.add_edge(n_1 := self.n_gen(1))
+        n_1.add_edge(n_2 := self.n_gen(2))
+        n_2.add_edge(n_3 := self.n_gen(3))
+        
+        n_1.include_this_to_path = False
+        self.assertEqual(n_3.to_path(), Path('key_0/key_2/key_3'))
+        
+        n_0.include_this_to_path = False
+        self.assertEqual(n_3.to_path(), Path('key_2/key_3'))
         
 if __name__ == '__main__':
     unittest.main()
