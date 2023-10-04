@@ -107,7 +107,8 @@ def classroom_login(bc: IBrowserControlData, email: str, password: str) -> None:
     else:
         raise ConnectionError(
             'Googleのログイン画面に移動できませんでした\nログインを行う必要がないか、urlが変更された可能性があります')
-    
+
+#seleniumでurlに移動しないとダウンロードが開始されないものに対して
 def donwload(bc: IBrowserControlData, url: str, file_path: Path, timeout: int = 10):
     move(bc, url)
     

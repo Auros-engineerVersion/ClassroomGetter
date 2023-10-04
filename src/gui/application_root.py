@@ -16,13 +16,19 @@ def setup_profile(cfg: ISettingData, warning = identity):
         cfg.profile = ProfileForm().pop_up()
         return setup_profile(cfg, lambda: messagebox.showwarning(title=WARNING, message=PROFILE_WARNING))
 
-def set_spc(cfg: ISettingData):
-    spc.browser_control_data = bc_data(cfg)
+def set_env(cfg: ISettingData):
+    spc.browser_control_data = (bc := bc_data(cfg))
+    spc.save_dir = cfg.save_folder_path[VALUE]
+    
+    if not cfg.is_guest():
+        classroom_login(bc, *cfg.profile)
+        
     return cfg
 
 class ApplicationRoot(tk.Tk):
     def __init__(self, cfg: ISettingData, size: tuple) -> None:
-        cfg = set_spc(setup_profile(cfg))
+        cfg = set_env(setup_profile(cfg))
+        
         tk.Tk.__init__(self)
         self\
             |arrow| (lambda w: w.title(ROOT_TITLE))\

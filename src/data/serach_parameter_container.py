@@ -65,6 +65,7 @@ class SearchParameterPattern:
         
 class SearchParameterContainer:
     browser_control_data: IBCD = None
+    save_dir: Path = Path('./Save')
 
     @staticmethod
     def next_key_url(node: INodeProperty):
@@ -151,11 +152,14 @@ parameters: list[SearchParameterPattern] = [
     
     #urlにアクセスし、ファイルを取得
     SearchParameterPattern(
-        pre_proc=lambda n:(
-            'ダウンロード',
+        pre_proc=lambda n:(None,
             __url_to_drive(n.url)
-            |pipe| (lambda url: donwload(
-                SearchParameterContainer.browser_control_data, 
-                url,
-                n.to_path()))))
+                |pipe| (lambda url: donwload(
+                    bc=SearchParameterContainer.browser_control_data, 
+                    url=url,
+                    file_path=n.to_path()
+                        |pipe| (lambda p: SearchParameterContainer.save_dir.joinpath(p))
+                        |pipe| (lambda p: SearchParameterContainer.browser_control_data.download_path_change(p))
+                        |pipe| (lambda p: None if p.exists() else p\
+                            |arrow| (lambda p: p.parent.mkdir(parents=True, exist_ok=True))))))) #ダウンロード先のフォルダが存在しない場合は作成する
 ]

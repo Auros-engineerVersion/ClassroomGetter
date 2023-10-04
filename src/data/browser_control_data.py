@@ -16,6 +16,8 @@ class BrowserControlData(IBrowserControlData):
         self.__driver: webdriver = is_none(driver, lambda:create_driver(cfg))
         self.__wait: WebDriverWait = is_none(wait, lambda:WebDriverWait(self.__driver, cfg.loading_wait_time[VALUE], 1))
     
+        self.download_path_change(cfg.save_folder_path[VALUE], self.__driver)
+    
     def __del__(self):
         del self.__wait
         self.__driver.quit()
@@ -32,6 +34,20 @@ class BrowserControlData(IBrowserControlData):
     @property
     def current_url(self) -> str:
         return self.__driver.current_url
+    
+    def download_path_change(self, path: Path, driver: webdriver=None) -> Path:
+        if driver is None:
+            driver = self.__driver
+            
+        driver.execute(
+            driver_command='send_command',
+            params={
+                'cmd': 'Page.setDownloadBehavior',
+                'params': {
+                    'behavior': 'allow',
+                    'downloadPath': str(path)}})
+        
+        return path
         
 def create_driver(cfg: ISettingData) -> webdriver.Chrome:
     options = webdriver.ChromeOptions()
@@ -49,16 +65,8 @@ def create_driver(cfg: ISettingData) -> webdriver.Chrome:
     
     try:
         driver = webdriver.Chrome(service=Service(), options=options)\
-            |arrow| (lambda d: d.command_executor._commands.update({
+            |arrow| (lambda d: d.command_executor._commands.update({ #ヘッドレスモードでダウンロードするために以下の処理が必要
                 'send_command': ('POST', '/session/$sessionId/chromium/send_command')}))\
-            |arrow| (lambda d: d.execute(
-                #ヘッドレスモードでダウンロードするために以下の処理が必要
-                driver_command='send_command',
-                params={
-                    'cmd': 'Page.setDownloadBehavior',
-                    'params': {
-                        'behavior': 'allow',
-                        'downloadPath': str(cfg.save_folder_path[VALUE])}}))
 
     except InvalidArgumentException:
         raise ValueError(f'Invalid options: {optional_args}')
