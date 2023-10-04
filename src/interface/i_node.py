@@ -3,7 +3,8 @@ from __future__ import annotations
 from abc import ABCMeta, abstractmethod, abstractproperty
 from typing import Callable, Coroutine
 
-from ..interface import IMinimalistID, IRoutineData
+from .i_routine_data import IRoutineData
+from .i_minimalist_db import IMinimalistID
 
 
 class INode(metaclass=ABCMeta):
