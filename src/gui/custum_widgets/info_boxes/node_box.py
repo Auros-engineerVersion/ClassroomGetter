@@ -14,8 +14,8 @@ class NodeBox(tk.Frame):
     def __init__(self, master: tk.Misc, node: lambda: type('INode', (INodeProperty, IHasEdges)), parent: NodeBox = None):
         tk.Frame.__init__(self, master)
         self.__master = master
-        self.__parent_box = parent
-        self.__node = node
+        self.__parent_box: NodeBox = parent
+        self.__node: INodeProperty = node
         self.__nextboxes: list[NodeBox] = []
         
         #dropdown
@@ -70,6 +70,7 @@ class NodeBox(tk.Frame):
     def initialize(self):
         self.__node.edges.clear() #子を初期化する
         self.__node.initialize_tree()
+        self.close()
                     
     def expand(self):
         self.pack(anchor=tk.W)
