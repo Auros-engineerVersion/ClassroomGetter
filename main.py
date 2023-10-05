@@ -10,12 +10,12 @@ from src.my_io import *
 def main():
     #最初の認証
     #gauth = GoogleAuth()
-    #gauth.LocalWebserverAuth()h
+    #gauth.LocalWebserverAuth()
     
     try:
         path = SettingData.SETTINGFOLDER_PATH.joinpath('setting.json').absolute()
         ApplicationRoot(try_load(path), (400, 300)).mainloop()
-    except NoSuchWindowException or ChildProcessError as e:
+    except ChildProcessError or NoSuchWindowException as e:
             print('\nProcess has finished by Hand')
 
 try:

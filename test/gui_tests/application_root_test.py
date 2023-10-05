@@ -7,7 +7,7 @@ import unittest
 from unittest.mock import patch
 
 from src.gui.application_root import ApplicationRoot
-from src.io import *
+from src.my_io import *
 
 class ApplicationRootTest(unittest.TestCase):
     def setUp(self) -> None:
