@@ -37,7 +37,7 @@ class ApplicationRoot(tk.Tk):
         
         ttk.Notebook(self, width=size[0], height=size[1])\
             |arrow| (lambda n: n.pack(fill=tk.BOTH, expand=True))\
-            |arrow| (lambda n: n.add(text=MAIN,    child=FrontFrame(n, cfg.nodes[0][VALUE])))\
+            |arrow| (lambda n: n.add(text=MAIN,    child=FrontFrame(n, Node.root())))\
             |arrow| (lambda n: n.add(text=SETTING, child=SettingFrame(n, cfg)))
                     
     def stop(self):

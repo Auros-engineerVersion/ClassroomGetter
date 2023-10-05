@@ -25,8 +25,10 @@ class Node(INodeProperty, IHasEdges, IDisposable):
         node.edges = edges
         
         return node
+    @classmethod
+    def root(cls) -> Node:
+        return min(Node.Nodes, key=lambda x: x['value'].tree_height)
 
-    def __init__(self, key: str, url: str, tree_height: int, include_this_to_path: bool = True, next_init_time: RoutineData = None) -> None:
         self.__id: MinimalistID = self.Nodes.add(self)
         
         self.__key: str = key
