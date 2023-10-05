@@ -4,7 +4,7 @@ from pydrive2.auth import GoogleAuth
 from selenium.common.exceptions import NoSuchWindowException
 
 from src.gui.application_root import ApplicationRoot
-from src.settings import *
+from src.my_io import *
 
 
 def main():

@@ -10,7 +10,7 @@ from unittest.mock import MagicMock, patch
 
 from src.data import *
 from src.my_util import arrow
-from src.settings import *
+from src.io import *
 
 
 class SettingTest(unittest.TestCase):

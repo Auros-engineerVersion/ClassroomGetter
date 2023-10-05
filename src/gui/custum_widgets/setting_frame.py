@@ -4,7 +4,7 @@ from tkinter import font
 from ...data import *
 from ...literals import *
 from ...my_util import *
-from ...settings import *
+from ...my_io import *
 from .info_boxes.input_boxes import *
 from .base import *
 

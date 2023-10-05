@@ -6,7 +6,7 @@ sys.path.append(os.path.abspath('.'))
 import unittest
 import json
 
-from src.settings import *
+from src.io import *
 from src.data import *
 
 
@@ -22,6 +22,11 @@ def try_cast(x) -> int | str | list | Any:
 class JSONEncoderTest(unittest.TestCase):    
     def setUp(self) -> None:
         self.maxDiff = None
+        return super().setUp()
+        
+    def tearDown(self) -> None:
+        Node.Nodes.clear()
+        return super().tearDown()
     
     def test_encode_node(self):
         key, url, tree_height, date = 'key', 'url', 0, RoutineData()
@@ -38,13 +43,13 @@ class JSONEncoderTest(unittest.TestCase):
                 self.assertIn(v, json_data)
             
     def test_decode_node(self):
-        node = Node('root_key', 'root_url', 0, RoutineData())
-        node.add_edge(Node('child_key', 'child_url', 1))
-        json_data = json.dumps(node, cls=MyClassEncoder, indent=4)
+        n_0 = Node('n_0_key', 'n_0_url', 0, True, RoutineData())
+        
+        json_data = json.dumps(n_0, cls=MyClassEncoder, indent=4)
         after = json.loads(json_data, cls=MyClassDecoder)
         
-        self.assertEqual(node, after)
-        self.assertIn(node, after.Nodes)
+        self.assertEqual(n_0, after)
+        self.assertIn(n_0, after.Nodes)
         
     def test_encode_setting_data(self):
         data = SettingData()
