@@ -38,6 +38,13 @@ class NodeInfoFrame(tk.Frame):
         self.__time_box: Timer = Timer(self, watching_box=self.__watching_box)\
             |arrow| (lambda t: t.pack(side=tk.TOP))
         
+        #全てのNodeに対して、時計を動かす
+        #dead_lineが既定の時間の場合、この関数は何もしない
+        Node.root().serach()(
+            func=lambda n: self.__timer.clock_event_publish(
+                dead_line=n.next_init_time,
+                when_reach=identity,
+                interval_ms=10))
     def set_box(self, box: NodeBox):
         self.__key_label[TEXT] = box.text
         self.__url_label[TEXT] = box.url
@@ -100,26 +107,37 @@ class Timer(tk.Frame):
         self.__watching_box = box
         self.__time_setters.set(box.time)
         
-    #
-    #interval: 
-    async def update_clock(self, dead_line: IRoutineData, complete_func, interval: int):
-        """boxの時間を監視し、時間が来たらboxのinitialize_treeを実行する
-
+    def __cancel_all(self):
+        #保持されたイベントを全てキャンセルする
+        for id in self.__events:
+            self.after_cancel(id)
+        self.__events.clear()
+                
+    def clock_event_publish(self, dead_line: IRoutineData, when_reach: Callable, interval_ms: int = 500):
+        """boxの時間を監視し、時間が来たらwhen_reachを実行する。\nもしdead_lineのis_current
         Args:
             dead_line (IRoutineData): 残り時間
-            complete_func (Callable): 時間が来た時に実行する関数
+            when_reach (Callable): 時間が来た時に実行する関数
             interval (int): 監視する間隔
         """
-        try:
-            while not dead_line.should_init():
-                self.clock_label[TEXT] = dead_line.remaine()
-                await asyncio.sleep(interval)
-                
-            else:
-                complete_func()
-        except asyncio.CancelledError:
+        #値が初期値でないかチェック
+        if not dead_line.is_current():
             return
+        
+        if (remaine_time := dead_line.remaine()) == timedelta():
+            self.clock_label[TEXT] = NO_DATA
+            when_reach()
+        else:
+            self.clock_label[TEXT] = remaine_time
+        
+        #発行されたイベントのidを保存する
+        self.__events.append(
+            self.after(interval_ms, self.clock_event_publish, dead_line, when_reach, interval_ms))
 
+    def clock_reset(self):
+        self.__node_box.time_reset()
+        self.__cancel_all()
+        self.clock_label[TEXT] = NO_DATA
 class TimeSetters(tk.Frame):
     def __init__(self, master: tk.Misc):
         tk.Frame.__init__(self, master)
