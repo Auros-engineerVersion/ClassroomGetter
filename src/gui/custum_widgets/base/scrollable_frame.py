@@ -26,18 +26,3 @@ class ScrollableFrame(tk.Frame):
             self.canvas.configure(xscrollcommand=self.scrollbar_x.set)
             
         self.canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-                
-    #更新するかを検証する
-    def validate_init(self, interval: int) -> bool:
-        """
-        Args:
-        Returns:
-            bool:初期化したならTrue、そうでないならFalse
-        """
-        self.__node.next_init_time = self.time
-        
-        if self.time.is_current() and self.time.should_init():
-            self.__cancel_all()
-            self.initialize_node()
-        
-        self.__events.append(self.after(interval, self.validate_init, interval)) #再び繰り返す

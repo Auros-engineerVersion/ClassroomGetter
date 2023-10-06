@@ -44,28 +44,9 @@ class Controller:
                 when_reach=node_info_frame.__node_box.initialize,
                 interval_ms=10))
         
-        node_box.on_click_this(lambda:
-            node_info_frame.set_box(node_box))
-        
+        timer.on_time_reset_btn_press(f=timer.clock_reset)
         
 #endregion
-            
-    def binding(self, widget: tk.Misc):
-        match widget:
-            #設定管理系
-            case SettingFrame():
-                def save_cfg(ins, file_path: Path):
-                    values = [box.get() for box in ins.groups.boxes]
-                    try_save(file_path, SettingData(*values, nodes=Node.Nodes))
-                    
-                widget.on_save(save_cfg, ins=widget, file_path=ISettingData.SETTINGFOLDER_PATH.joinpath('setting.json'))
-                
-            #Node管理系
-            case NodeInfoFrame():
-                widget.on_node_init_btn_press(widget.__node_box.initialize)
-                
-            case NodeBox():
-                widget.on_click_this(widget.__node_info.set_box)
-                
+        
     def run_applicaiton(self):
         self.root.mainloop()

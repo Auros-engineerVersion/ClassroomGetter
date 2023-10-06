@@ -17,6 +17,3 @@ class FrontFrame(tk.Frame):
             |arrow| (lambda x: x.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True))
             
         NodeBox.node_info_frame = self.__node_info
-        
-    async def run_clock(self):
-        self.__node_info.run_clock_async()
