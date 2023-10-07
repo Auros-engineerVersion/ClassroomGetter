@@ -128,9 +128,9 @@ class NodeTest(unittest.TestCase):
         root.dispose()
         self.assertEqual(reaf.to_path(), Path('stem/reaf'))
         
-        branch = Node('branch', 'branch', 2)
+        branch = Node('branch', 'branch', 2, True)
         stem.add_edge(branch)
-        fruit = Node('fruit', 'fruit', 3)
+        fruit = Node('fruit', 'fruit', 3, True)
         branch.add_edge(fruit)
         
         self.assertEqual(fruit.to_path(), Path('stem/branch/fruit'))
@@ -141,7 +141,14 @@ class NodeTest(unittest.TestCase):
         n_1.add_edge(n_2 := self.n_gen(2))
         n_2.add_edge(n_3 := self.n_gen(3))
         
+        #全てがFalseの場合
+        self.assertEqual(n_3.to_path(), Path('.'))
+        
+        n_0.include_this_to_path = True
         n_1.include_this_to_path = False
+        n_2.include_this_to_path = True
+        n_3.include_this_to_path = True
+        
         self.assertEqual(n_3.to_path(), Path('key_0/key_2/key_3'))
         
         n_0.include_this_to_path = False
