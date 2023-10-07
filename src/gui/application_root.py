@@ -1,8 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox, ttk
 
-from ..data import BrowserControlData as bc_data
-from ..data import SearchParameterContainer as spc
+from ..data import BrowserControlData as bc_data, DriverSession
 from ..interface import ISettingData
 from ..literals import *
 from ..my_util import *
@@ -14,22 +13,26 @@ def setup_profile(cfg: ISettingData, warning = identity):
     else:
         warning()
         cfg.profile = ProfileForm().pop_up()
-        return setup_profile(cfg, lambda: messagebox.showwarning(title=WARNING, message=PROFILE_WARNING))
+        return setup_profile(
+            cfg, 
+            lambda: messagebox.showwarning(title=WARNING, message=PROFILE_WARNING))
 
-def set_env(cfg: ISettingData):
-    spc.browser_control_data = (bc := bc_data(cfg))
-    spc.save_dir = cfg.save_folder_path[VALUE]
+def set_env(cfg: ISettingData) -> tuple[ISettingData, DriverSession]:
+    session = DriverSession(
+        bc=(bc := bc_data(cfg)),
+        save_dir=cfg.save_folder_path[VALUE],
+    )
     
     if not cfg.is_guest():
         classroom_login(bc, *cfg.profile)
         
-    return cfg
+    return cfg, session
 
 class ApplicationRoot(tk.Tk):
     def __init__(self, cfg: ISettingData, size: tuple) -> None:
         cfg = set_env(setup_profile(cfg))
+        super().__init__()
         
-        tk.Tk.__init__(self)
         self\
             |arrow| (lambda w: w.title(ROOT_TITLE))\
             |arrow| (lambda w: w.geometry(size_to_geometory(*size)))\
@@ -39,7 +42,9 @@ class ApplicationRoot(tk.Tk):
             |arrow| (lambda n: n.pack(fill=tk.BOTH, expand=True))\
             |arrow| (lambda n: n.add(text=MAIN,    child=FrontFrame(n, Node.root())))\
             |arrow| (lambda n: n.add(text=SETTING, child=SettingFrame(n, cfg)))
+            
+    def __del__(self):
+        self.stop()
                     
     def stop(self):
-        del spc.browser_control_data
         self.destroy()

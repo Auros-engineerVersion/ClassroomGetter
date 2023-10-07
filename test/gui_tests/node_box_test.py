@@ -13,7 +13,7 @@ from src.data import *
 
 class NodeBoxTest(unittest.TestCase):
     def setUp(self) -> None:
-        SearchParameterContainer.browser_control_data = MagicMock()
+        DriverSession.bc = MagicMock()
     
     def test_initialize(self):
         node = Node('key', 'url', 0)

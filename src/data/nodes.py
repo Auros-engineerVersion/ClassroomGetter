@@ -6,7 +6,6 @@ from typing import Callable, Coroutine
 from ..interface import *
 from ..my_util import is_none
 from .routine_data import RoutineData
-from .serach_parameter_container import SearchParameterContainer
 from .minimalist_db import *
 
 
@@ -177,9 +176,9 @@ class Node(INodeProperty, IHasEdges, IDisposable):
         return __do_serch
                 
     #幅優先探索
-    def initialize_tree(self) -> None:
+    def initialize_tree(self, acquire: Callable[[INodeProperty], tuple[str, str]]) -> None:
         def __next(node: IHasEdges):
-            for key, url in SearchParameterContainer.next_key_url(node):
+            for key, url in acquire(node):
                 if key is None or url is None:
                     continue
                 else:

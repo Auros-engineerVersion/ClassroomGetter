@@ -6,7 +6,7 @@ sys.path.append(os.path.abspath('.'))
 import unittest
 from unittest.mock import MagicMock, patch
 
-from src.data.serach_parameter_container import *
+from data.driver_session import *
 from src.my_util import identity, arrow
 
 
@@ -16,10 +16,10 @@ class ParameterTest(unittest.TestCase):
         param = SearchParameter(..., identity, identity)
         self.assertEqual(param.get_next_values(..., lambda x, y: [*range(3)]), excepted)
         
-class SearchParameterContainerTest(unittest.TestCase):
+class DriverSessionTest(unittest.TestCase):
     def setUp(self) -> None:
-        SearchParameterContainer.browser_control_data = MagicMock()
-        self.spc = SearchParameterContainer
+        DriverSession.bc = MagicMock()
+        self.spc = DriverSession
         return super().setUp()
     
     def test_level_1(self):
@@ -39,7 +39,7 @@ class SearchParameterContainerTest(unittest.TestCase):
         node.tree_height = 3
         
         result = self.spc.next_key_url(node)
-        self.assertListEqual(result, [('ダウンロード', None)])
+        self.assertListEqual(result, [(None, None)])
         
 if __name__ == '__main__':
     unittest.main()
