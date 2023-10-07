@@ -102,7 +102,7 @@ def classroom_login(bc: IBrowserControlData, email: str, password: str) -> None:
     if ISettingData.TARGET_URL in bc.current_url:
         return #ログイン済みの場合は何もしない
     #google educationのワークスペースに飛ばされた場合
-    elif GOOGLE_EDU in bc.current_url:
+    elif GOOGLE_EDU in bc.current_url or GOOGLE_IDENTIFIER in bc.current_url:
         google_login(bc, email, password)
     else:
         raise ConnectionError(

@@ -29,7 +29,7 @@ class BrowserControlsTest(unittest.TestCase):
         current_xpath = '//div[@id="hoge"]'
         self.assertEqual(elem_get(current_xpath), 'hoge')
         
-        invailed_xpath = randstr(10)
+        invailed_xpath = 'hogehoge'
         self.assertRaises(ValueError, elem_get, invailed_xpath)
         
         timeout_xpath = '//div[@id="fuga"]'
