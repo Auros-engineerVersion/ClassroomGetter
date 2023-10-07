@@ -34,7 +34,8 @@ class Controller:
         setting_frame:      SettingFrame =  name_of(SettingFrame, ins_type)
         node_info_frame:    NodeInfoFrame = name_of(NodeInfoFrame, ins_type)
         timer:              Timer =         name_of(Timer, ins_type)
-        node_box:         NodeBox =         name_of(NodeBox, ins_type)
+        time_setters:       TimeSetters =   name_of(TimeSetters, ins_type)
+        node_box:           NodeBox =       name_of(NodeBox, ins_type)
 
 #region 設定管理系
         setting_frame.on_save(lambda: 
@@ -48,8 +49,8 @@ class Controller:
         #監視しているNodeBoxを更新する
         timer.on_time_set_btn_press(lambda:
             timer.clock_event_publish(
-                dead_line=timer.__time_setters.value(),
-                when_reach=node_info_frame.__node_box.initialize,
+                dead_line=time_setters.value(),
+                when_reach=node_info_frame.node_box.initialize,
                 interval_ms=10))
         
         timer.on_time_reset_btn_press(f=timer.clock_reset)
