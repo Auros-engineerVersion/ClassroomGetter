@@ -6,7 +6,7 @@ sys.path.append(os.path.abspath('.'))
 import unittest
 from unittest.mock import MagicMock, patch
 
-from data.driver_session import *
+from handler.driver_session import *
 from src.my_util import identity, arrow
 
 
