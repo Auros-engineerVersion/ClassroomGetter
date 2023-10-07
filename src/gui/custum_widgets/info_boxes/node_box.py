@@ -5,7 +5,7 @@ import tkinter as tk
 
 from ....literals import *
 from ....interface import INodeProperty, IHasEdges
-from ....my_util import arrow
+from ....my_util import arrow, containe, identity
 from ..base.switch import Switch
 
 class NodeBox(tk.Frame):
@@ -18,20 +18,21 @@ class NodeBox(tk.Frame):
         self.__node: INodeProperty = node
         self.__nextboxes: list[NodeBox] = []
         
+        self.__on_expand = identity
+        self.__on_close = identity
+        
         #dropdown
         Switch(master=self, default_state=False, width=self.winfo_height())\
+            |arrow| (lambda s: s.pack(side=tk.LEFT))\
             |arrow| (lambda s: s.on_active(self.expand))\
-            |arrow| (lambda s: s.on_not_active(self.close))\
-            |arrow| (lambda s: s.pack(side=tk.LEFT))
+            |arrow| (lambda s: s.on_not_active(self.close))
 
         #tree_height
         tk.Label(self, text=str(node.tree_height) + ':')\
-            |arrow| (lambda b: b.bind(BUTTON_PRESS, self.on_frame_click))\
             |arrow| (lambda b: b.pack(side=tk.LEFT))
         
         #node_key
         tk.Label(self, text=str(node.key))\
-            |arrow| (lambda l: l.bind(BUTTON_PRESS, self.on_frame_click))\
             |arrow| (lambda l: l.pack(side=tk.LEFT))
         
         self.pack(anchor=tk.W, padx=(node.tree_height*20, 1), after=self.__parent_box)
@@ -59,11 +60,8 @@ class NodeBox(tk.Frame):
     def set_time(self, data):
         self.__node.next_init_time = data
             
-    def time_reset(self, event):
+    def time_reset(self):
         self.__node.next_init_time.reset()
-    
-    def on_frame_click(self, event):
-        NodeBox.node_info_frame.set_box(self)
         
     def dispose(self):
         stack: list[NodeBox] = [self]
@@ -84,11 +82,25 @@ class NodeBox(tk.Frame):
         self.pack(anchor=tk.W)
         for node in self.__node.raw_edges:
             new_box = NodeBox(self.__master, node, self)
+            self.__on_expand(new_box)
             self.__nextboxes.append(new_box)
                 
     def close(self):
         #子を初期化する
         for next in self.__nextboxes:
+            self.__on_close(next)
             next.dispose()
         self.__nextboxes.clear()
         gc.collect()
+        
+    def on_click_this(self, f, **kwargs):
+        for label in containe(self, tk.Label):
+            label.bind(BUTTON_PRESS, lambda _: f(**kwargs))
+            
+    def on_expand(self, f, **kwargs):
+        """渡される関数は新しく生成されたNodeBoxを引数として受け取る"""
+        self.__on_expand = lambda n: f(n, **kwargs)
+        
+    def on_close(self, f, **kwargs):
+        """渡される関数は新しく生成されたNodeBoxを引数として受け取る"""
+        self.__on_close = lambda: f(**kwargs)

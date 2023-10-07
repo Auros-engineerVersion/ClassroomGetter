@@ -16,19 +16,15 @@ class TimeSettersTest(unittest.TestCase):
         setters = TimeSetters(tk.Tk())
         routine = RoutineData(1,1,1,1)
         setters.set(routine)
-        self.assertEqual(setters.values(), routine)
+        self.assertEqual(setters.value(), routine)
         
-class TimerTest(unittest.IsolatedAsyncioTestCase):    
+class TimerTest(unittest.TestCase):    
     #@patch('src.gui.custum_widgets.info_boxes.node_box.NodeBox', spec=NodeBox)
-    async def test_update_clock(self):
+    def test_update_clock(self):
         timer = Timer(tk.Tk(), MagicMock(spec=NodeBox))
         
-        #時間が間に合う場合
         call_mock = MagicMock()
-        await timer.update_clock(RoutineData(minute=1/60), call_mock, 0.1)
-        self.assertEqual(call_mock.call_count, 1)
         
-        #間に合わない場合
-        call_mock = MagicMock()
-        await asyncio.wait_for(timer.update_clock(RoutineData(week=1), call_mock, 0.1), 0.2)
-        self.assertLess(call_mock.call_count, 1)
+        timer.clock_event_publish(
+            dead_line=RoutineData(minute=0.1/60), when_reach=call_mock, interval_ms=10)
+        self.assertEqual(call_mock.call_count, 0)
