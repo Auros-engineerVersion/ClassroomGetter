@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Callable, Coroutine
+from typing import Callable
 
 from ..interface import *
 from ..my_util import is_none

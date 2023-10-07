@@ -26,5 +26,5 @@ class TimerTest(unittest.TestCase):
         call_mock = MagicMock()
         
         timer.clock_event_publish(
-            dead_line=RoutineData(minute=0.1/60), when_reach=call_mock, interval_ms=10)
+            dead_line=RoutineData(minute=0.1/60), interval_ms=10)
         self.assertEqual(call_mock.call_count, 0)

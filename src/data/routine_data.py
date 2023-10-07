@@ -71,6 +71,9 @@ class RoutineData(IRoutineData):
             return timedelta()
     
     def is_current(self) -> bool:
+        """
+        すべての値が初期値でなければTrueを返す
+        """
         #すべての値が初期値でなければ
         x = public_vars(self).values()
         return sum(x) > 0

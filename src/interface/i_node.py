@@ -13,7 +13,7 @@ class ISearchable(metaclass=ABCMeta):
         raise NotImplementedError
     
     @abstractmethod
-    def initialize_tree(self) -> None:
+    def initialize_tree(self, acquire: Callable[[INodeProperty], tuple[str, str]]) -> None:
         raise NotImplementedError
     
 class IDisposable(metaclass=ABCMeta):

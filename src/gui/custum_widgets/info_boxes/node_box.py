@@ -5,7 +5,7 @@ import tkinter as tk
 
 from ....literals import *
 from ....interface import INodeProperty, IHasEdges
-from ....my_util import arrow, containe, identity
+from ....my_util import arrow, identity
 from ..base.switch import Switch
 
 class NodeBox(tk.Frame):
@@ -94,7 +94,7 @@ class NodeBox(tk.Frame):
         gc.collect()
         
     def on_click_this(self, f, **kwargs):
-        for label in containe(self, tk.Label):
+        for label in [w for w in self.winfo_children() if isinstance(w, tk.Label)]:
             label.bind(BUTTON_PRESS, lambda _: f(**kwargs))
             
     def on_expand(self, f, **kwargs):
