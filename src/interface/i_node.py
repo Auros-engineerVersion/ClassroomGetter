@@ -9,7 +9,11 @@ from .i_minimalist_db import IMinimalistID
 
 class ISearchable(metaclass=ABCMeta):
     @abstractmethod
-    def search(self, search_depth: int) -> Coroutine[Callable[[Callable], None]]:
+    def search(self, search_depth: int) -> Callable[[Callable[[ISearchable, int], None]], None]:
+        raise NotImplementedError
+    
+    @abstractmethod
+    def initialize_tree(self) -> None:
         raise NotImplementedError
     
 class IDisposable(metaclass=ABCMeta):

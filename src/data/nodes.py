@@ -146,7 +146,7 @@ class Node(INodeProperty, IHasEdges, IDisposable):
             
             return self.edges
     
-    def serach(self, search_depth, bfs = True) -> Coroutine[Callable[[Callable], None]]:
+    def serach(self, search_depth = 100, bfs = True) -> Callable[[Callable], None]:
         """
         Args:
             bfs (bool, optional): Trueなら幅優先探索、Falseなら深さ優先探索を行う
