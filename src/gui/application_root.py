@@ -36,7 +36,9 @@ class ApplicationRoot(tk.Tk):
         self.destroy()
         
     def on_loop_start(self, f, **kwargs):
+        """ApplicationRootの一ループの始まりに実行される"""
         self.__on_loop_start = lambda: f(**kwargs)
         
     def on_loop_end(self, f, **kwargs):
+        """ApplicationRootの一ループの終わりに実行される"""
         self.__on_loop_end = lambda: f(**kwargs)
