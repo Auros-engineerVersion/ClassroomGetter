@@ -1,36 +1,13 @@
 import tkinter as tk
-from tkinter import messagebox, ttk
+from tkinter import ttk
 
-from ..data import BrowserControlData as bc_data, DriverSession
 from ..interface import ISettingData
 from ..literals import *
 from ..my_util import *
 from .custum_widgets import *
 
-def setup_profile(cfg: ISettingData, warning = identity):
-    if cfg.is_current_user() or cfg.is_guest():
-        return cfg
-    else:
-        warning()
-        cfg.profile = ProfileForm().pop_up()
-        return setup_profile(
-            cfg, 
-            lambda: messagebox.showwarning(title=WARNING, message=PROFILE_WARNING))
-
-def set_env(cfg: ISettingData) -> tuple[ISettingData, DriverSession]:
-    session = DriverSession(
-        bc=(bc := bc_data(cfg)),
-        save_dir=cfg.save_folder_path[VALUE],
-    )
-    
-    if not cfg.is_guest():
-        classroom_login(bc, *cfg.profile)
-        
-    return cfg, session
-
 class ApplicationRoot(tk.Tk):
     def __init__(self, cfg: ISettingData, size: tuple) -> None:
-        cfg = set_env(setup_profile(cfg))
         super().__init__()
         self.__on_loop_start = identity
         self.__on_loop_end = identity
