@@ -32,6 +32,8 @@ class ApplicationRoot(tk.Tk):
     def __init__(self, cfg: ISettingData, size: tuple) -> None:
         cfg = set_env(setup_profile(cfg))
         super().__init__()
+        self.__on_loop_start = identity
+        self.__on_loop_end = identity
         
         self\
             |arrow| (lambda w: w.title(ROOT_TITLE))\
@@ -46,5 +48,18 @@ class ApplicationRoot(tk.Tk):
     def __del__(self):
         self.stop()
                     
+    def run(self):
+        while True:
+            self.__on_loop_start()
+            self.update()
+            self.update_idletasks()
+            self.__on_loop_end()
+                    
     def stop(self):
         self.destroy()
+        
+    def on_loop_start(self, f, **kwargs):
+        self.__on_loop_start = lambda: f(**kwargs)
+        
+    def on_loop_end(self, f, **kwargs):
+        self.__on_loop_end = lambda: f(**kwargs)
