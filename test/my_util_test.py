@@ -4,11 +4,20 @@ sys.path.append(os.path.abspath('.'))
 
 import unittest
 from unittest.mock import Mock
+from typing import Callable
 
 from src.my_util import *
 
 
 class MyUtilTest(unittest.TestCase):
+    def test_higher_order(self):
+        @higher_order
+        def f(x):
+            return x + 1
+        
+        self.assertIsInstance(f(1), Callable)
+        self.assertEqual(f(1)(), 2)
+    
     def test_left(self):
         x = 0
         y = left(x)(identity)
@@ -54,6 +63,10 @@ class MyUtilTest(unittest.TestCase):
         mock = Mock()
         x = 2 |pipe| mock |pipe| mock
         self.assertEqual(mock.call_count, 2)
+        
+        #return None Function
+        x = 'hoge' |pipe| print |pipe| (lambda: print('hoge'))
+        self.assertEqual(x, None)
         
         #arrow
         x = [] |arrow| (lambda x: x.append(1)) |arrow| (lambda x: x.append(2))

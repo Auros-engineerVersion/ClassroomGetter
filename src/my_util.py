@@ -7,32 +7,13 @@ from typing import Any, Callable, Iterable, SupportsInt
 from itertools import groupby
 
 
-#末尾再帰の最適化
-def tail_recursion(func):
-    firstcall = True
-    params = ((), {})
-    result = func
-    
+def higher_order(func):
     @wraps(func)
-    def wrapper(*args, **kwd):
-        nonlocal firstcall, params, result
-        params = args, kwd
-        if firstcall:
-            firstcall = False
-            try:
-                while result is func:
-                    result = func(*args, **kwd) # call wrapper
-                    args, kwd = params
-            finally:
-                firstcall = True
-                return result
-        else:
-          return func
-    
-    return wrapper
+    def _inner(*args, **kwargs):
+        return lambda: func(*args, **kwargs)
+    return _inner
     
 def text_filter(value: str) -> str:
-    @tail_recursion
     def __remove(value: str, patterns: list[str], pattern_count: int = 0) -> str:
         if pattern_count == len(patterns):
             return value
@@ -105,5 +86,5 @@ class Infix:
     def __call__(self, value1, value2):
         return self.function(value1, value2)
             
-pipe = Infix(lambda x, func: func(x)) #関数の返値を次の関数の引数にするもの
+pipe = Infix(lambda x, func: func(x) if x is not None else func()) #関数の返値を次の関数の引数にするもの
 arrow = Infix(lambda x, func: left(x)(func)) #最初に指定された対象を常にいじるもの
