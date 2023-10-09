@@ -51,14 +51,15 @@ class SettingFrame(tk.Frame):
         
         self.groups: SettingGroup = SettingGroup(self, self.__cfg.editable_data)\
             |arrow| (lambda g: g.pack(side=tk.LEFT, anchor=tk.NW, padx=(25, 1), pady=4))\
-            
-        tk.Button(self, text=SAVE)\
-            |arrow| (lambda b: b.pack(side=tk.BOTTOM, anchor=tk.E, padx=5, pady=5))\
-            |arrow| (lambda b: b.bind(BUTTON_PRESS, 
-                    self.__save_cfg(cfg.SETTINGFOLDER_PATH.joinpath('setting.json'))))
-            
-    def __save_cfg(self, file_path: Path):
-        def _inner(e):
-            values = [box.get() for box in self.groups.boxes]
-            try_save(file_path, SettingData(*values, nodes=self.__cfg.nodes))
-        return _inner
+        
+        #セーブボタン
+        self.__save_btn = tk.Button(self, text=SAVE)\
+            |arrow| (lambda b: b.pack(side=tk.BOTTOM, anchor=tk.E, padx=5, pady=5))
+                    #self.__save_cfg(cfg.SETTINGFOLDER_PATH.joinpath('setting.json'))))
+    
+    def save_cfg(self, file_path: Path):
+        values = [box.get() for box in self.groups.boxes]
+        try_save(file_path, SettingData(*values, nodes=Node.Nodes))
+    
+    def on_save(self, f, **kwargs):
+        self.__save_btn.bind(BUTTON_PRESS, lambda _: f(**kwargs))

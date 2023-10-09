@@ -1,3 +1,4 @@
+import threading
 from tkinter import Widget
 
 from ..gui import *
@@ -5,11 +6,12 @@ from ..my_util import *
 from ..data import *
 from ..interface import *
 
+from .driver_session import *
 from .event_runner import *
 
 
 def children(widget) -> dict[Widget, type]:
-    result = {}
+    result = {widget: widget.__class__}
     def _loop(widget):
         for child in widget.winfo_children():
             #インスタンスをkeyにしているので、同一クラスのインスタンスを取得できる
@@ -59,7 +61,6 @@ class Controller:
         timer.on_time_set_btn_press(lambda:
             timer.clock_event_publish(
                 dead_line=time_setters.value(),
-                when_reach=node_info_frame.node_box.initialize,
                 interval_ms=10))
         
         timer.on_time_reset_btn_press(f=timer.clock_reset)
@@ -74,8 +75,21 @@ class Controller:
         node_box.on_click_this(lambda:__set_box_to_info_frame(node_box))
         node_box.on_expand(
             lambda n: n.on_click_this(lambda: __set_box_to_info_frame(n)))
-        
 #endregion
 
+
+        def __root_stop(root, session):
+            close_thread = threading.Thread(target=session.close)\
+                |pipe| (lambda t: t.start())
+            
+            for thread in [t for t in threading.enumerate() if t != threading.main_thread()]:
+                thread.join()
+                
+            root.destroy()
+            close_thread.join()
+            
+        app_root.on_loop_end(self.event_runner.run_all)
+        app_root.on_stop(__root_stop, root=app_root, session=session)
+
     def run_applicaiton(self):
-        self.root.mainloop()
+        self.root.run()
