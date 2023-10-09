@@ -5,6 +5,8 @@ from ..my_util import *
 from ..data import *
 from ..interface import *
 
+from .event_runner import *
+
 
 def children(widget) -> dict[Widget, type]:
     result = {}
