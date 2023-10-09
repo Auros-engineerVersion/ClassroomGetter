@@ -50,7 +50,10 @@ class Controller:
 #endregion
         
 #region Node管理系
-        node_info_frame.on_node_init_btn_press(node_info_frame.node_box.initialize)
+        node_info_frame.on_node_init_btn_press(lambda:
+            self.event_runner.add(
+                threading.Thread(target=lambda:
+                    node_info_frame.node_box.initialize(aqcuire=session.next_key_url)).start))
         
         #監視しているNodeBoxを更新する
         timer.on_time_set_btn_press(lambda:
