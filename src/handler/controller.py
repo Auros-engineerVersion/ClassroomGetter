@@ -6,6 +6,7 @@ from ..my_util import *
 from ..data import *
 from ..interface import *
 
+from . import logics as lg
 from .driver_session import *
 from .event_runner import *
 
@@ -53,9 +54,11 @@ class Controller:
         
 #region Node管理系
         node_info_frame.on_node_init_btn_press(lambda:
-            self.event_runner.add(
-                threading.Thread(target=lambda:
-                    node_info_frame.node_box.initialize(aqcuire=session.next_key_url)).start))
+            lg.e_runner_add_with_thread(
+                event_runner=self.event_runner,
+                func=lambda:
+                    node_info_frame.node_box.initialize(
+                        aqcuire=session.next_key_url)))
         
         #監視しているNodeBoxを更新する
         timer.on_time_set_btn_press(lambda:
@@ -76,21 +79,9 @@ class Controller:
         node_box.on_expand(
             lambda n: n.on_click_this(lambda: __set_box_to_info_frame(n)))
 #endregion
-
-
-        def __root_stop(root, session):
-            close_thread = threading.Thread(target=session.close)
-            close_thread.start()
-            
-            for thread in [t for t in threading.enumerate()
-                           if t not in (threading.main_thread(), close_thread)]:
-                thread.join()
-                
-            root.destroy()
-            close_thread.join()
             
         app_root.on_loop_end(self.event_runner.run_all)
-        app_root.on_stop(__root_stop, root=app_root, session=session)
+        app_root.on_stop(lg.root_stop, root=app_root, session=session)
 
     def run_applicaiton(self):
         self.root.run()
