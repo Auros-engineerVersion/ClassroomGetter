@@ -35,13 +35,14 @@ class Controller:
         
         self.binding(children(root), session)
             
-    def binding(self, ins_type: dict[Widget, type]):
-        setting_frame:      SettingFrame =  name_of(SettingFrame, ins_type)
-        node_info_frame:    NodeInfoFrame = name_of(NodeInfoFrame, ins_type)
-        timer:              Timer =         name_of(Timer, ins_type)
-        time_setters:       TimeSetters =   name_of(TimeSetters, ins_type)
-        node_box:           NodeBox =       name_of(NodeBox, ins_type)
-
+    def binding(self, ins_type: dict[Widget, type], session: DriverSession):
+        app_root:           ApplicationRoot = name_of(ApplicationRoot, ins_type)
+        setting_frame:      SettingFrame =    name_of(SettingFrame, ins_type)
+        node_info_frame:    NodeInfoFrame =   name_of(NodeInfoFrame, ins_type)
+        timer:              Timer =           name_of(Timer, ins_type)
+        time_setters:       TimeSetters =     name_of(TimeSetters, ins_type)
+        node_box:           NodeBox =         name_of(NodeBox, ins_type)
+        
 #region 設定管理系
         setting_frame.on_save(lambda: 
             setting_frame.save_cfg(
