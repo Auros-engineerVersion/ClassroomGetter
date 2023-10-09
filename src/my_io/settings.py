@@ -17,13 +17,13 @@ def save(path: Path, data):
     else:
         raise FileNotFoundError('指定したパスはファイルではありません')
     
-def try_save(path: Path, data):
+def try_save(file_path: Path, data):
     try:
-        save(path, data)
+        save(file_path, data)
     except FileNotFoundError:
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.touch()
-        save(path, data)
+        file_path.parent.mkdir(parents=True, exist_ok=True)
+        file_path.touch()
+        save(file_path, data)
                 
 def load(path: Path) -> ISettingData:
     if not path.is_file():
