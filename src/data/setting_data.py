@@ -47,13 +47,15 @@ class SettingData(ISettingData):
         if not isinstance(self.search_depth, dict):
             self.search_depth = {VALUE:int(self.search_depth), DESCRIPTION: SEARCH_DEPTH_DESC}
             
+        #深度を設定する
+        Node.SearchDepth = self.search_depth[VALUE]
+            
         if len(self.nodes) == 0:
             self.nodes = Node.Nodes
-            Node.SearchDepth = self.search_depth[VALUE]
             
-            #ノードが一つもない場合は、デフォルトのノードを作成する
-            if len(self.nodes) == 0:
-                Node('Classroom', ISettingData.TARGET_URL, 0)
+        #ノードが存在しない場合は、デフォルトのノードを作成する
+        if len(Node.Nodes) == 0:
+            Node('Classroom', ISettingData.TARGET_URL, 0)
     
     @property
     def profile(self):
