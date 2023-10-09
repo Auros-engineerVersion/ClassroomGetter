@@ -46,10 +46,8 @@ class Controller:
         time_setters:       TimeSetters =     name_of(TimeSetters, ins_type)
         node_box:           NodeBox =         name_of(NodeBox, ins_type)
         
-#region 設定管理系
-        setting_frame.on_save(lambda: 
-            setting_frame.save_cfg(
-                file_path=ISettingData.SETTINGFOLDER_PATH.joinpath('setting.json')))
+#region IO
+        setting_frame.on_save(lambda: lg.saving(setting_frame.current_cfg()))
 #endregion
         
 #region Node管理系
@@ -81,7 +79,9 @@ class Controller:
 #endregion
             
         app_root.on_loop_end(self.event_runner.run_all)
-        app_root.on_stop(lg.root_stop, root=app_root, session=session)
-
+        app_root.on_stop(lambda:
+            lg.root_stop(app_root, session)\
+                |pipe| (lambda _: lg.saving(setting_frame.current_cfg())))
+        
     def run_applicaiton(self):
         self.root.run()
