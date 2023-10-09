@@ -79,10 +79,11 @@ class Controller:
 
 
         def __root_stop(root, session):
-            close_thread = threading.Thread(target=session.close)\
-                |pipe| (lambda t: t.start())
+            close_thread = threading.Thread(target=session.close)
+            close_thread.start()
             
-            for thread in [t for t in threading.enumerate() if t != threading.main_thread()]:
+            for thread in [t for t in threading.enumerate()
+                           if t not in (threading.main_thread(), close_thread)]:
                 thread.join()
                 
             root.destroy()

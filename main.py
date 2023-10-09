@@ -45,7 +45,6 @@ def main():
             print('\nProcess has finished by Hand')
             
     finally:
-        root.stop()
         print('Process has finished')
 
 try:
