@@ -75,6 +75,9 @@ class DriverSession:
         #負の値が入らないように
         return parameters[max(0, node.tree_height)].key_url_pair(self.bc, node)
 
+    def close(self):
+        del self.bc
+
 def __move_and_click(bc: IBCD, url: str):
     move(bc, url)
     click_all_sections(bc)
