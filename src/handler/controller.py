@@ -28,9 +28,12 @@ def name_of(cls, dic) -> str:
         return from_value
 
 class Controller:
-    def __init__(self, root: ApplicationRoot) -> None:
+    def __init__(self, root: ApplicationRoot, session: DriverSession) -> None:
         self.root = root
-        self.binding(children(root))
+        self.default_session = session
+        self.event_runner: EventRunner = EventRunner()
+        
+        self.binding(children(root), session)
             
     def binding(self, ins_type: dict[Widget, type]):
         setting_frame:      SettingFrame =  name_of(SettingFrame, ins_type)
