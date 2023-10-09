@@ -8,6 +8,7 @@ from itertools import groupby
 
 
 def higher_order(func):
+    """与えられた関数をlambdaで包み、返す"""
     @wraps(func)
     def _inner(*args, **kwargs):
         return lambda: func(*args, **kwargs)
