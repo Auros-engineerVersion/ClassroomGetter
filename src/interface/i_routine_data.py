@@ -21,7 +21,3 @@ class IRoutineData(metaclass=ABCMeta):
     @abstractmethod
     def is_current(self):
         raise NotImplementedError
-    
-    @abstractmethod
-    def is_valid(self):
-        raise NotImplementedError
