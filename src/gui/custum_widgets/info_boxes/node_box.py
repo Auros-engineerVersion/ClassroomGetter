@@ -4,7 +4,7 @@ import gc
 import tkinter as tk
 
 from ....literals import *
-from ....interface import INodeProperty, IHasEdges
+from ....interface import *
 from ....my_util import arrow, identity
 from ..base.switch import Switch
 
@@ -54,14 +54,12 @@ class NodeBox(tk.Frame):
         self.__node.include_this_to_path = bool(other)
     
     @property
-    def time(self):
+    def time(self) -> IRoutineData:
         return self.__node.next_init_time
     
-    def set_time(self, data):
+    @time.setter
+    def time(self, data):
         self.__node.next_init_time = data
-            
-    def time_reset(self):
-        self.__node.next_init_time.reset()
         
     def dispose(self):
         stack: list[NodeBox] = [self]
