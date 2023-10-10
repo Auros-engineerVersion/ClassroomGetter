@@ -104,9 +104,11 @@ class Timer(tk.Frame):
     def watching_box(self, box: NodeBox):
         self.__cancel_all()
         self.__node_box = box
-        self.__time_setters.set(box.time)
-        self.clock_event_publish(box.time)
         
+    @property
+    def time(self):
+        return self.__time_setters.value()
+
     def __cancel_all(self):
         #保持されたイベントを全てキャンセルする
         for id in self.__events:
@@ -133,11 +135,6 @@ class Timer(tk.Frame):
         self.__events.append(
             self.after(interval_ms, self.clock_event_publish, dead_line, interval_ms))
 
-    def clock_reset(self):
-        self.__node_box.time_reset()
-        self.__cancel_all()
-        self.clock_label[TEXT] = NO_DATA
-
     def on_time_set_btn_press(self, f, **kwargs):
         self.__time_set_btn.bind(BUTTON_PRESS, lambda _: f(**kwargs))
         
@@ -154,6 +151,7 @@ class TimeSetters(tk.Frame):
         
         for box in self.__boxes:
             box.pack()
+            box.set(0)
                     
     def value(self) -> RoutineData:
         return RoutineData(*[int(b.get()) for b in self.__boxes])
