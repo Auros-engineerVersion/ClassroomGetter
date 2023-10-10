@@ -7,7 +7,7 @@ import unittest
 from pathlib import Path
 
 from src.data import Node, SettingData
-from src.interface import INode
+from src.interface import INodeProperty
 
 
 class SettingDataTest(unittest.TestCase):
@@ -18,7 +18,7 @@ class SettingDataTest(unittest.TestCase):
     def test_constructor(self):
         data1 = SettingData()
         self.assertIsInstance(data1.nodes, list)
-        self.assertIsInstance(*data1.nodes.pop().values(), INode)
+        self.assertIsInstance(*data1.nodes.pop().values(), INodeProperty)
         self.assertEqual(data1.search_depth['value'], Node.SearchDepth)
         
         data2 = SettingData('test', 'test')

@@ -36,7 +36,16 @@ class SettingTest(unittest.TestCase):
         x = path.read_text()
         self.assertTrue(x) #空文字ではない
         
-    def test_try_load(self):
+    def test_load(self):
+        self.assertRaises(FileNotFoundError, load, Path('HogeHoge'))
+        self.assertRaises(FileNotFoundError, load, Path('HogeHoge.json'))
+        
         path = self.path.joinpath('setting.json')
-        path.touch()
-        self.assertTrue(try_load(path))
+        target = SettingData()
+        try_save(path, target)
+        
+        result = load(path)
+        self.assertIsInstance(result, target.__class__)
+        
+    def test_try_load(self):
+        self.assertEqual(try_load(Path('NotExists')), SettingData())
