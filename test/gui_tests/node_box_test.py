@@ -20,4 +20,4 @@ class NodeBoxTest(unittest.TestCase):
         node = Node('key', 'url', 0)
         box = NodeBox(tk.Tk(), node)
         box.initialize((call_mock := MagicMock()))
-        self.assertEqual(call_mock.call_count, 0)
+        self.assertEqual(call_mock.call_count, 1)
