@@ -10,9 +10,10 @@ from ..my_util import public_vars, identity
 @dataclass
 class RoutineData(IRoutineData):
     @classmethod
-    def factory(cls, week, day, hour, minute, pre_time):
+    def factory(cls, week, day, hour, minute, pre_time, thread_stop):
         ins = cls(week, day, hour, minute)
         ins.__pre_time = pre_time
+        ins.__thread_stop = thread_stop
         return ins
     
     week: SupportsInt = 0
@@ -53,7 +54,7 @@ class RoutineData(IRoutineData):
         self.hour = 0
         self.minute = 0
         
-        self.observe_stop()
+        self.stop_observe()
         return self
         
     def interval(self) -> timedelta:
@@ -117,5 +118,5 @@ class RoutineData(IRoutineData):
     def allow_observe(self):
         self.__thread_stop = False
             
-    def observe_stop(self):
+    def stop_observe(self):
         self.__thread_stop = True
