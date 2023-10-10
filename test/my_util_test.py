@@ -22,9 +22,10 @@ class MyUtilTest(unittest.TestCase):
         @higher_order
         def mutable_add(arr, x):
             arr.append(x)
+            return arr
         
-        mutable |pipe| mutable_add(mutable, 4) |pipe| mutable_add(mutable, 5)
-        self.assertListEqual(list(range(len(mutable))), mutable)
+        g = lambda m: m |pipe| mutable_add(m, 4) |pipe| mutable_add(m, 5)
+        self.assertListEqual(list(range(6)), g(mutable))
             
     def test_left(self):
         x = 0

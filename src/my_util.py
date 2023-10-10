@@ -14,7 +14,9 @@ def higher_order(func):
     """
     @wraps(func)
     def _wrapper(*args, **kwargs):
-        return lambda *_, kwargs=kwargs: func(*args, **kwargs)
+        def _inner(*_):
+            return func(*args, **kwargs)
+        return _inner
     return _wrapper
     
 def text_filter(value: str) -> str:
