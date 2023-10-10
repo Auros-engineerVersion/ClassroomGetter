@@ -24,3 +24,25 @@ def saving(data):
     try_save(
         file_path=ISettingData.SETTINGFOLDER_PATH.joinpath('setting.json'),
         data=data)
+
+@higher_order
+def time_set(node_box, timer, when_reach: Callable):
+    """この関数はtime_observe_startを呼び出すため、スレッドが生成される"""
+    node_box.time = timer.time
+    node_box.time.allow_observe()
+    node_box.time.time_observe_start(when_reach)
+    
+@higher_order
+def time_reset(node_box, timer):
+    timer.clock_label[TEXT] = NO_DATA
+    timer.cancel_all()
+    
+    node_box.time.reset()
+    node_box.time.reject_observe()
+    
+@higher_order
+def time_restart(node_box, timer, when_reach: Callable):
+    """この関数はtime_observe_startを呼び出すため、スレッドが生成される"""
+    time_reset(node_box, timer)()
+    time_set(node_box, timer, when_reach)()
+    timer.clock_event_publish(node_box.time)
