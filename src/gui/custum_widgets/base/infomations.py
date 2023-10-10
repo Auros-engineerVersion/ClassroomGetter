@@ -11,6 +11,7 @@ class NodeInfoFrame(tk.Frame):
     def __init__(self, master: tk.Misc, node_box: NodeBox = None):
         tk.Frame.__init__(self, master, background='green')
         self.__node_box = node_box
+        self.__node_box_on_change = identity
         
         #keyの表示
         self.__key_label = tk.Label(self, text=is_none(node_box.text, NO_DATA))\
@@ -29,19 +30,12 @@ class NodeInfoFrame(tk.Frame):
         tk.Checkbutton(self,
             text=INCLUDE_THIS_IN_PATH,
             variable=self.__check_var,
-            command=lambda: self.on_change_check_value(self.__check_var))\
+            command=lambda: self.__on_change_check_value(self.__check_var))\
             |arrow| (lambda c: c.pack(side=tk.BOTTOM, fill=tk.X))
                         
         #次回の更新までの時間を表示する
         self.__timer: Timer = Timer(self, node_box=self.__node_box)\
             |arrow| (lambda t: t.pack(side=tk.TOP))
-        
-        #全てのNodeに対して、時計を動かす
-        #dead_lineが既定の時間の場合、この関数は何もしない
-        Node.root().serach()(
-            func=lambda n: self.__timer.clock_event_publish(
-                dead_line=n.next_init_time,
-                interval_ms=10))
     
     @property    
     def node_box(self) -> NodeBox:
@@ -49,22 +43,27 @@ class NodeInfoFrame(tk.Frame):
     
     @node_box.setter
     def node_box(self, box: NodeBox):
+        self.__node_box = box
         self.__key_label[TEXT] = box.text
         self.__url_label[TEXT] = box.url
         self.__check_var.set(box.include_this_to_path)
-        self.__node_box = box
+        
         self.__timer.watching_box = box
+        self.__node_box_on_change()
         
     def change_state(self, state: str, text: str):
         self.__init_btn[STATE] = state
         self.__init_btn[TEXT] = text
         self.__init_btn.update()
         
-    def on_change_check_value(self, boolean_var: tk.BooleanVar):
+    def __on_change_check_value(self, boolean_var: tk.BooleanVar):
         self.__node_box.include_this_to_path = boolean_var.get()
         
     def on_node_init_btn_press(self, f, **kwargs):
         self.__init_btn.bind(BUTTON_PRESS, lambda _: f(**kwargs))
+        
+    def on_node_change(self, f, **kwargs):
+        self.__node_box_on_change = lambda: f(**kwargs)
         
 class Timer(tk.Frame):
     def __init__(self, master: tk.Misc, node_box: NodeBox):
