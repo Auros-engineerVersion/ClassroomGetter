@@ -13,6 +13,7 @@ from src.data import Node, EmptyRecode, MinimalistID
 
 class NodeTest(unittest.TestCase):
     def setUp(self) -> None:
+        Node.Nodes.clear()
         self.n_gen = lambda i: Node(f'key_{i}', f'url_{i}', i)
     
     def tearDown(self) -> None:
