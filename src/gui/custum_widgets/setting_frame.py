@@ -57,9 +57,8 @@ class SettingFrame(tk.Frame):
             |arrow| (lambda b: b.pack(side=tk.BOTTOM, anchor=tk.E, padx=5, pady=5))
                     #self.__save_cfg(cfg.SETTINGFOLDER_PATH.joinpath('setting.json'))))
     
-    def save_cfg(self, file_path: Path):
-        values = [box.get() for box in self.groups.boxes]
-        try_save(file_path, SettingData(*values, nodes=Node.Nodes))
+    def current_cfg(self) -> ISettingData:
+        return SettingData(*[box.get() for box in self.groups.boxes], nodes=Node.Nodes)
     
     def on_save(self, f, **kwargs):
         self.__save_btn.bind(BUTTON_PRESS, lambda _: f(**kwargs))
