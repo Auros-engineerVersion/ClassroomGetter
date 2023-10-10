@@ -28,6 +28,16 @@ class JSONEncoderTest(unittest.TestCase):
         Node.Nodes.clear()
         return super().tearDown()
     
+    def test_encode_routine_data(self):
+        data = RoutineData()
+        json_data = json.dumps(data, cls=MyClassEncoder)
+        
+        vars = public_vars(data)
+        excepted = trim_dict(dict([(k, try_cast(v)) for k, v in zip(vars.keys(), vars.values())]))
+        
+        for v in excepted:
+            self.assertIn(v, json_data)
+    
     def test_encode_node(self):
         key, url, tree_height, date = 'key', 'url', 0, RoutineData()
         node = Node(key, url, tree_height, date)
