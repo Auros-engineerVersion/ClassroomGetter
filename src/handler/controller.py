@@ -38,8 +38,11 @@ class Controller:
         
         self.binding(children(root), session)
             
+    def binding(self, ins_type: dict[Widget, type], session: DriverSession):        
+        self.about_node(ins_type, session)
         self.about_app_root(ins_type, session)
         
+    def about_node(self, ins_type: dict[Widget, type], session: DriverSession):
         node_info_frame:    NodeInfoFrame =   name_of(NodeInfoFrame, ins_type)
         timer:              Timer =           name_of(Timer, ins_type)
         time_setters:       TimeSetters =     name_of(TimeSetters, ins_type)

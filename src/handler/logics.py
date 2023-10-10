@@ -13,13 +13,18 @@ def root_stop(root, session):
     for thread in [t for t in threading.enumerate() if t not in (threading.main_thread(), close_thread)]:
         thread.join()
 
-        root.destroy()
-        close_thread.join()
-
+@higher_order
 def e_runner_add_with_thread(event_runner, func):
     thread = threading.Thread(target=func)
     event_runner.add(thread.start)
     
+@higher_order
+def node_initalize_event(event_runner, node_box, session):
+    e_runner_add_with_thread(
+        event_runner, 
+        func=lambda:node_box.initialize(session.next_key_url))()
+
+@higher_order
 def saving(data):
     try_save(
         file_path=ISettingData.SETTINGFOLDER_PATH.joinpath('setting.json'),
