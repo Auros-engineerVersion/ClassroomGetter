@@ -54,7 +54,7 @@ class RoutineData(IRoutineData):
         self.hour = 0
         self.minute = 0
         
-        self.stop_observe()
+        self.reject_observe()
         return self
         
     def interval(self) -> timedelta:
@@ -102,21 +102,25 @@ class RoutineData(IRoutineData):
         生成されたスレッドは再帰的に呼び出しを行い、その間隔はself.interval()の10分の1の間隔である\n
         self.intervalの値が0.1よりも小さい場合は0.1秒の間隔で呼び出しを行う
         """
-        if not self.is_current() or self.__thread_stop:
-            return
+                
+        def run():
+            if self.__thread_stop or not self.is_current():
+                return
+            else:
+                if self.should_init():
+                    when_reach()
+
+                timer_thread = threading.Timer(
+                    #最小値は0.1秒。間隔が長すぎるとその分無駄となるため、最大値はintervalの10分の1とする
+                    interval=max(0.1, self.interval().total_seconds() / 10),
+                    function=self.time_observe_start,
+                    args=(when_reach,))
+                timer_thread.start()
         
-        if self.should_init():
-            when_reach()
-        else:
-            threading.Timer(
-                #最小値は0.1秒。間隔が長すぎるとその分無駄となるため、最大値はintervalの10分の1とする
-                interval=max(0.1, self.interval().total_seconds() / 10),
-                function=self.time_observe_start,
-                args=(when_reach,)
-            ).start()
-            
+        run()
+
     def allow_observe(self):
         self.__thread_stop = False
             
-    def stop_observe(self):
+    def reject_observe(self):
         self.__thread_stop = True

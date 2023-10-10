@@ -14,14 +14,7 @@ from src.my_util import identity
 from src.data.routine_data import RoutineData
 
 
-class Routine_data_Test(unittest.TestCase):
-    def tearDown(self) -> None:
-        for thread in threading.enumerate():
-            if thread not in (threading.main_thread(),):
-                thread.join()
-                
-        return super().tearDown()
-    
+class Routine_data_Test(unittest.TestCase):    
     def test_reset(self):
         data = RoutineData(0,0,0,1)
         self.assertEqual(data.reset(), RoutineData())
@@ -60,6 +53,18 @@ class Routine_data_Test(unittest.TestCase):
         sub_one = RoutineData(minute=-1)
         self.assertTrue(sub_one.should_init)
         
+    def test_time_observe_start_can_stop(self):
+        timeout_mock = MagicMock()
+        timeout_mock.side_effect = [*range(3), TimeoutError]
+        
+        not_raise = RoutineData()
+        not_raise.time_observe_start(timeout_mock)
+        
+        thread_stop = RoutineData(1/60)
+        thread_stop.reject_observe()
+        thread_stop.time_observe_start((call_mock := MagicMock()))
+        self.assertEqual(call_mock.call_count, 0)
+        
     def test_time_observe_start(self):
         test_cls = lambda target, wait_time=1, except_count=0, scrambler=identity:\
             type('test', (object,), {
@@ -71,20 +76,29 @@ class Routine_data_Test(unittest.TestCase):
         test_case = [
             ('one_sec', test_cls(
                 target=RoutineData(minute=1/60),
-                wait_time=1.2,
+                wait_time=1,
                 except_count=1)),
             
             ('zero_sec', test_cls(
                 target=RoutineData(),
-                except_count=0))]
+                except_count=0)),
+            
+            ('call_twice', test_cls(
+                target=RoutineData(minute=1/60),
+                wait_time=1.5, #最後の呼び出しは重いため、実際に待機される時間はさらに長い
+                except_count=2))
+            ]
         
         for title, case in test_case:
             with self.subTest(subtest=title, params=case):
-                call_mock = MagicMock()
-                case.target.time_observe_start(call_mock)
-                sleep(case.wait_time)
-                case.scrambler()
-                self.assertEqual(call_mock.call_count, case.except_count)
+                try:
+                    call_mock = MagicMock()
+                    case.target.time_observe_start(call_mock)
+                    sleep(case.wait_time)
+                    case.scrambler()
+                    self.assertEqual(call_mock.call_count, case.except_count)
+                finally:
+                    case.target.reject_observe()
                                         
 if __name__ == '__main__':
     unittest.main()
