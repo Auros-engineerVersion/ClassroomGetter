@@ -20,10 +20,8 @@ def setup_profile(cfg: ISettingData, warning = identity):
             lambda: messagebox.showwarning(title=WARNING, message=PROFILE_WARNING))
 
 def set_env(cfg: ISettingData) -> tuple[ISettingData, DriverSession]:
-    default_session = DriverSession(
-        bc=(bc := bc_data(cfg)),
-        save_dir=cfg.save_folder_path[VALUE],
-    )
+    bc = bc_data(cfg)
+    default_session = DriverSession(bc, cfg.save_folder_path[VALUE])
     
     if not cfg.is_guest():
         classroom_login(bc, *cfg.profile)
@@ -40,12 +38,13 @@ def main():
     root = ApplicationRoot(cfg, (400, 300))
     try:
         Controller(root, default_session).run_applicaiton()
-        
+
     except ChildProcessError or NoSuchWindowException as e:
             print('\nProcess has finished by Hand')
             
     finally:
-        default_session.close()
+        if default_session is not None:
+            default_session.close()
         print('Process has finished')
 
 try:

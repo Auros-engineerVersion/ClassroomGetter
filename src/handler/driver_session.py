@@ -76,7 +76,8 @@ class DriverSession:
         return parameters[max(0, node.tree_height)].key_url_pair(self.bc, node)
 
     def close(self):
-        del self.bc
+        if self.bc is not None:
+            del self.bc
 
 def __move_and_click(bc: IBCD, url: str):
     move(bc, url)

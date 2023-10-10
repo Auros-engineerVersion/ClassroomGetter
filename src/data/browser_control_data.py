@@ -18,9 +18,7 @@ class BrowserControlData(IBrowserControlData):
         self.download_path_change(cfg.save_folder_path[VALUE], self.__driver)
     
     def __del__(self):
-        del self.__wait
         self.__driver.quit()
-        del self.__driver
     
     @property
     def driver(self) -> webdriver:
