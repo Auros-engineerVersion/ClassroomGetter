@@ -4,7 +4,7 @@ from pydrive2.auth import GoogleAuth
 from selenium.common.exceptions import NoSuchWindowException
 
 from src.gui.application_root import *
-from src.data import BrowserControlData as bc_data
+from src.data import BrowserControlData as bc_data, Node
 from src.my_io import *
 from src.handler import *
 
@@ -45,6 +45,7 @@ def main():
             print('\nProcess has finished by Hand')
             
     finally:
+        default_session.close()
         print('Process has finished')
 
 try:
