@@ -8,11 +8,14 @@ from itertools import groupby
 
 
 def higher_order(func):
-    """与えられた関数をlambdaで包み、返す"""
+    """
+        与えられた関数をlambdaで包み、返す。このラムダ関数は可変長引数を受け取るが、それらは実際には使われずに捨てられるため注意すること。\n
+        これはpipeなどの演算子と共に使う際に必要である。\n        
+    """
     @wraps(func)
-    def _inner(*args, **kwargs):
-        return lambda: func(*args, **kwargs)
-    return _inner
+    def _wrapper(*args, **kwargs):
+        return lambda *_, kwargs=kwargs: func(*args, **kwargs)
+    return _wrapper
     
 def text_filter(value: str) -> str:
     def __remove(value: str, patterns: list[str], pattern_count: int = 0) -> str:

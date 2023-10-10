@@ -17,7 +17,15 @@ class MyUtilTest(unittest.TestCase):
         
         self.assertIsInstance(f(1), Callable)
         self.assertEqual(f(1)(), 2)
-    
+        
+        mutable = [0, 1, 2, 3]
+        @higher_order
+        def mutable_add(arr, x):
+            arr.append(x)
+        
+        mutable |pipe| mutable_add(mutable, 4) |pipe| mutable_add(mutable, 5)
+        self.assertListEqual(list(range(len(mutable))), mutable)
+            
     def test_left(self):
         x = 0
         y = left(x)(identity)
