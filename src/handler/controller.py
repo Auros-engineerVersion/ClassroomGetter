@@ -38,9 +38,8 @@ class Controller:
         
         self.binding(children(root), session)
             
-    def binding(self, ins_type: dict[Widget, type], session: DriverSession):
-        app_root:           ApplicationRoot = name_of(ApplicationRoot, ins_type)
-        setting_frame:      SettingFrame =    name_of(SettingFrame, ins_type)
+        self.about_app_root(ins_type, session)
+        
         node_info_frame:    NodeInfoFrame =   name_of(NodeInfoFrame, ins_type)
         timer:              Timer =           name_of(Timer, ins_type)
         time_setters:       TimeSetters =     name_of(TimeSetters, ins_type)
@@ -75,13 +74,16 @@ class Controller:
         #最初に表示されるNodeBoxのeventを設定する
         node_box.on_click_this(lambda:__set_box_to_info_frame(node_box))
         node_box.on_expand(
-            lambda n: n.on_click_this(lambda: __set_box_to_info_frame(n)))
-#endregion
+    def about_app_root(self, ins_type: dict[Widget, type], session: DriverSession):
+        app_root:           ApplicationRoot = name_of(ApplicationRoot, ins_type)
+        setting_frame:      SettingFrame =    name_of(SettingFrame, ins_type)
+        
+        setting_frame.on_save(lambda:lg.saving(setting_frame.current_cfg()))
             
         app_root.on_loop_end(self.event_runner.run_all)
         app_root.on_stop(lambda:
-            lg.root_stop(app_root, session)\
-                |pipe| (lambda _: lg.saving(setting_frame.current_cfg())))
-        
+            lg.root_stop(app_root, session)
+                |pipe| lg.saving(setting_frame.current_cfg()))
+
     def run_applicaiton(self):
         self.root.run()
