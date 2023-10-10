@@ -23,9 +23,5 @@ class IRoutineData(metaclass=ABCMeta):
         raise NotImplementedError
     
     @abstractmethod
-    def on_reach_next(self, f, **kwargs):
-        raise NotImplementedError
-    
-    @abstractmethod
-    def time_observe_start(self):
+    def time_observe_start(self, when_reach):
         raise NotImplementedError
