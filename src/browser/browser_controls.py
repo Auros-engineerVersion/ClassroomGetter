@@ -36,10 +36,8 @@ def wait(bc: IBrowserControlData, url: str):
 def search_element(bc: IBrowserControlData, xpath: str) -> WebElement:
     try:
         return bc.wait.until(EC.presence_of_element_located((By.XPATH, xpath)))
-    except TimeoutException:
-        raise ValueError(f'Not found xpath: {xpath}')
-    except InvalidSelectorException:
-        raise ValueError(f'Invalid xpath: {xpath}')
+    except TimeoutException or InvalidSelectorException:
+        raise ValueError(f'Not found or invalid xpath: {xpath}')
 
 def search_element_all(bc: IBrowserControlData, xpath: str) -> list[WebElement]:
     try:
@@ -56,7 +54,8 @@ def elems_sifter(target, sifter: Callable, reg: str = ''):
     return result
 
 def click_all_sections(bc: IBrowserControlData):
-    def __check_loaded(xpath) -> bool:
+    #カスタムしたEC
+    def __check_is_loaded(xpath) -> bool:
         def __predictate(driver):
             sample_buttons = search_element_all(bc, "//div[@jsmodel='RH7Ihb']")
             if all([x.get_attribute('data-controller-loaded') == 'true' for x in sample_buttons]):
@@ -67,7 +66,7 @@ def click_all_sections(bc: IBrowserControlData):
         
     try:
         xpath = "//div[@jsname='rQC7Ie' and @role='button']"
-        buttons = bc.wait.until(__check_loaded(xpath))
+        buttons = bc.wait.until(__check_is_loaded(xpath))
         
         action = ActionChains(bc.driver)
         for button in buttons:
