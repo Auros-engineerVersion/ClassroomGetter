@@ -1,4 +1,4 @@
-from abc import ABCMeta, abstractmethod, abstractproperty
+from abc import ABCMeta, abstractmethod
 
 
 class IRoutineData(metaclass=ABCMeta):
@@ -20,4 +20,12 @@ class IRoutineData(metaclass=ABCMeta):
     
     @abstractmethod
     def is_current(self):
+        raise NotImplementedError
+    
+    @abstractmethod
+    def on_reach_next(self, f, **kwargs):
+        raise NotImplementedError
+    
+    @abstractmethod
+    def time_observe_start(self):
         raise NotImplementedError
