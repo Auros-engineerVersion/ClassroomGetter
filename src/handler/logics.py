@@ -7,10 +7,11 @@ from ..my_io import *
 
 @higher_order
 def root_stop(root, session):
-    close_thread = threading.Thread(target=session.close)\
-        |pipe|  (lambda t: t.start())
-
-    for thread in [t for t in threading.enumerate() if t not in (threading.main_thread(), close_thread)]:
+    root.destroy()
+    cloase_thread = threading.Thread(target=session.close)
+    cloase_thread.start()
+    
+    for thread in [t for t in threading.enumerate() if t not in (threading.main_thread(), cloase_thread)]:
         thread.join()
 
 @higher_order

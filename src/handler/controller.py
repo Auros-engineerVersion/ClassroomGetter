@@ -45,48 +45,59 @@ class Controller:
     def about_node(self, ins_type: dict[Widget, type], session: DriverSession):
         node_info_frame:    NodeInfoFrame =   name_of(NodeInfoFrame, ins_type)
         timer:              Timer =           name_of(Timer, ins_type)
-        time_setters:       TimeSetters =     name_of(TimeSetters, ins_type)
         node_box:           NodeBox =         name_of(NodeBox, ins_type)
+
+        node_info_frame.on_node_init_btn_press(
+            lg.node_initalize_event(self.event_runner, node_info_frame.node_box, session))
         
-#region IO
-        setting_frame.on_save(lambda: lg.saving(setting_frame.current_cfg()))
-#endregion
-        
-#region Node管理系
-        node_info_frame.on_node_init_btn_press(lambda:
-            lg.e_runner_add_with_thread(
-                event_runner=self.event_runner,
-                func=lambda:
-                    node_info_frame.node_box.initialize(
-                        aqcuire=session.next_key_url)))
+        node_info_frame.on_node_change(
+            lg.time_restart(
+                node_box=node_info_frame.node_box,
+                timer=timer,
+                when_reach= #時間が来たら実行する関数
+                    lg.node_initalize_event(
+                        event_runner=self.event_runner,
+                        node_box=node_info_frame.node_box,
+                        session=session)))
         
         #監視しているNodeBoxを更新する
-        timer.on_time_set_btn_press(lambda:
-            timer.clock_event_publish(
-                dead_line=time_setters.value(),
-                interval_ms=10))
+        timer.on_time_set_btn_press(
+            lg.time_restart(
+                node_box=(box := node_info_frame.node_box),
+                timer=timer,
+                when_reach= #時間が来たら実行する関数
+                    lg.node_initalize_event(
+                        event_runner=self.event_runner,
+                        node_box=box,
+                        session=session)))
+                
+        timer.on_time_reset_btn_press(
+            lg.time_reset(
+                node_box=node_info_frame.node_box,
+                timer=timer))
         
-        timer.on_time_reset_btn_press(f=timer.clock_reset)
-        
-        #この関数はなくし、できれば無名関数で書きたい
-        #しかしながら無名関数内での代入はできなかった
-        #これは妥協である
+        @higher_order
         def __set_box_to_info_frame(other: NodeBox):
             node_info_frame.node_box = other
         
         #最初に表示されるNodeBoxのeventを設定する
-        node_box.on_click_this(lambda:__set_box_to_info_frame(node_box))
+        node_box.on_click_this(__set_box_to_info_frame(node_box))
         node_box.on_expand(
+            lambda n: n.on_click_this(__set_box_to_info_frame(n)))
+        
     def about_app_root(self, ins_type: dict[Widget, type], session: DriverSession):
         app_root:           ApplicationRoot = name_of(ApplicationRoot, ins_type)
         setting_frame:      SettingFrame =    name_of(SettingFrame, ins_type)
+        node_info_frame:    NodeInfoFrame =   name_of(NodeInfoFrame, ins_type)
+        timer:              Timer =           name_of(Timer, ins_type)
         
         setting_frame.on_save(lambda:lg.saving(setting_frame.current_cfg()))
             
         app_root.on_loop_end(self.event_runner.run_all)
         app_root.on_stop(lambda:
-            lg.root_stop(app_root, session)
-                |pipe| lg.saving(setting_frame.current_cfg()))
+            lg.time_reset(node_box=node_info_frame.node_box, timer=timer)
+            |pipe| lg.saving(setting_frame.current_cfg())
+            |pipe| lg.root_stop(app_root, session))
 
     def run_applicaiton(self):
         self.root.run()
