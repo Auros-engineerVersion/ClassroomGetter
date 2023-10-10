@@ -51,11 +51,6 @@ class NodeInfoFrame(tk.Frame):
         self.__timer.watching_box = box
         self.__node_box_on_change()
         
-    def change_state(self, state: str, text: str):
-        self.__init_btn[STATE] = state
-        self.__init_btn[TEXT] = text
-        self.__init_btn.update()
-        
     def __on_change_check_value(self, boolean_var: tk.BooleanVar):
         self.__node_box.include_this_to_path = boolean_var.get()
         
@@ -102,14 +97,14 @@ class Timer(tk.Frame):
     
     @watching_box.setter
     def watching_box(self, box: NodeBox):
-        self.__cancel_all()
+        self.cancel_all()
         self.__node_box = box
         
     @property
     def time(self):
         return self.__time_setters.value()
 
-    def __cancel_all(self):
+    def cancel_all(self):
         #保持されたイベントを全てキャンセルする
         for id in self.__events:
             self.after_cancel(id)
