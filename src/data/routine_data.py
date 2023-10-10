@@ -1,9 +1,10 @@
+import threading
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-from typing import ClassVar, SupportsInt
+from typing import ClassVar, SupportsInt, Callable
 
 from ..interface import IRoutineData
-from ..my_util import public_vars
+from ..my_util import public_vars, identity
 
 
 @dataclass
@@ -12,7 +13,7 @@ class RoutineData(IRoutineData):
     day: SupportsInt = 0
     hour: SupportsInt = 0
     minute: SupportsInt = 0
-    
+        
     #週、日、時、分の最大の時間
     week_range:  ClassVar[tuple[SupportsInt, SupportsInt]] = (0, 6)
     day_range:   ClassVar[tuple[SupportsInt, SupportsInt]] = (0, 31)
@@ -84,3 +85,19 @@ class RoutineData(IRoutineData):
             return True
         else:
             return False
+        
+    def on_reach_next(self, f, **kwargs):
+        self.__on_reach_next = lambda: f(**kwargs)
+        
+    def time_observe_start(self):
+        if not self.is_current():
+            return
+        
+        if self.should_init():
+            self.__on_reach_next()
+        else:
+            threading.Timer(
+                #最小値は0.1秒。間隔が長すぎるとその分無駄となるため、最大値はintervalの10分の1とする
+                interval=max(0.1, self.interval().total_seconds() / 10),
+                function=self.time_observe_start
+            ).start()
