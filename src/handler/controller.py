@@ -47,33 +47,34 @@ class Controller:
         timer:              Timer =           name_of(Timer, ins_type)
         node_box:           NodeBox =         name_of(NodeBox, ins_type)
 
-        node_info_frame.on_node_init_btn_press(
+        node_info_frame.on_node_init_btn_press(lambda:
             lg.initialize_event_add(
                 self.event_runner,
                 node_info_frame.node_box,
                 session))
         
-        node_info_frame.on_node_change(
+        node_info_frame.on_node_change(lambda:
             lg.time_restart(
                 node_box=node_info_frame.node_box,
                 timer=timer,
-                when_reach=lg.initialize_event_add(
-                    event_runner=self.event_runner,
-                    node_box=node_info_frame.node_box,
-                    session=session)))
+                when_reach=lambda:
+                    lg.initialize_event_add(
+                        event_runner=self.event_runner,
+                        node_box=node_info_frame.node_box,
+                        session=session)))
         
         #監視しているNodeBoxを更新する
-        timer.on_time_set_btn_press(
+        timer.on_time_set_btn_press(lambda:
             lg.time_restart(
                 node_box=(box := node_info_frame.node_box),
                 timer=timer,
-                when_reach= #時間が来たら実行する関数
+                when_reach=lambda: #時間が来たら実行する関数
                     lg.initialize_event_add(
                         event_runner=self.event_runner,
                         node_box=box,
                         session=session)))
                 
-        timer.on_time_reset_btn_press(
+        timer.on_time_reset_btn_press(lambda:
             lg.time_reset(
                 node_box=node_info_frame.node_box,
                 timer=timer))
