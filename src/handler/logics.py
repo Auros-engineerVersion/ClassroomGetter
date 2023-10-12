@@ -8,10 +8,10 @@ from ..my_io import *
 @higher_order
 def root_stop(root, session):
     root.destroy()
-    cloase_thread = threading.Thread(target=session.close)
-    cloase_thread.start()
+    close_thread = threading.Thread(target=session.close)
+    close_thread.start()
     
-    for thread in [t for t in threading.enumerate() if t not in (threading.main_thread(), cloase_thread)]:
+    for thread in [t for t in threading.enumerate() if t not in (threading.main_thread(), close_thread)]:
         thread.join()
 
 @higher_order
@@ -20,7 +20,7 @@ def e_runner_add_with_thread(event_runner, func):
     event_runner.add(thread.start)
     
 @higher_order
-def node_initalize_event(event_runner, node_box, session):
+def node_initialize_event(event_runner, node_box, session):
     e_runner_add_with_thread(
         event_runner, 
         func=lambda:node_box.initialize(session.next_key_url))()
@@ -28,7 +28,7 @@ def node_initalize_event(event_runner, node_box, session):
 @higher_order
 def saving(data):
     try_save(
-        file_path=ISettingData.SETTINGFOLDER_PATH.joinpath('setting.json'),
+        file_path=ISettingData.SETTING_FOLDER_PATH.joinpath('setting.json'),
         data=data)
 
 @higher_order

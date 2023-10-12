@@ -84,7 +84,7 @@ class SettingData(ISettingData):
     
     @property
     def profile_path(self):
-        return ISettingData.SETTINGFOLDER_PATH.absolute().joinpath('./ProfileData/Profile 1')
+        return ISettingData.SETTING_FOLDER_PATH.absolute().joinpath('./ProfileData/Profile 1')
         
     def is_current_data(self):
         return\

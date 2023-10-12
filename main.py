@@ -33,7 +33,7 @@ def main():
     #gauth = GoogleAuth()
     #gauth.LocalWebserverAuth()
     
-    path = SettingData.SETTINGFOLDER_PATH.joinpath('setting.json').absolute()
+    path = SettingData.SETTING_FOLDER_PATH.joinpath('setting.json').absolute()
     cfg, default_session = set_env(setup_profile(try_load(path)))
     root = ApplicationRoot(cfg, (400, 300))
     try:
