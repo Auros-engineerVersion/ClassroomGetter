@@ -8,7 +8,7 @@ from ..info_boxes import *
 
 class NodeInfoFrame(tk.Frame):
     def __init__(self, master: tk.Misc, node_box: NodeBox = None):
-        tk.Frame.__init__(self, master, background='green')
+        tk.Frame.__init__(self, master, background=master.cget(BACKGROUND))
         self.__node_box = node_box
         self.__node_box_on_change = identity
         
@@ -61,7 +61,7 @@ class NodeInfoFrame(tk.Frame):
         
 class Timer(tk.Frame):
     def __init__(self, master: tk.Misc, node_box: NodeBox):
-        tk.Frame.__init__(self, master, background='yellow')
+        tk.Frame.__init__(self, master, background=master.cget(BACKGROUND))
         self.__node_box: NodeBox = node_box
         self.__events: list[int] = []
         

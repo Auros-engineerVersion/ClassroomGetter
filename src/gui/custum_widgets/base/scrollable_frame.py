@@ -1,11 +1,11 @@
 import tkinter as tk
 
-from ....literals import CONFIGURE
+from ....literals import CONFIGURE, BACKGROUND
 
 
 class ScrollableFrame(tk.Frame):
     def __init__(self, master: tk.Misc, relief: str = tk.SUNKEN, padx: int = 1, pady: int = 1, bar_x = True, bar_y = True):
-        tk.Frame.__init__(self, master, padx=padx, pady=pady, background='red')
+        tk.Frame.__init__(self, master, padx=padx, pady=pady, background=master.cget(BACKGROUND))
         self.canvas = tk.Canvas(self, relief=relief, borderwidth=1)
         self.scrollable_frame = tk.Frame(self.canvas)
         self.scrollable_frame.bind(
