@@ -48,17 +48,19 @@ class Controller:
         node_box:           NodeBox =         name_of(NodeBox, ins_type)
 
         node_info_frame.on_node_init_btn_press(
-            lg.node_initialize_event(self.event_runner, node_info_frame.node_box, session))
+            lg.initialize_event_add(
+                self.event_runner,
+                node_info_frame.node_box,
+                session))
         
         node_info_frame.on_node_change(
             lg.time_restart(
                 node_box=node_info_frame.node_box,
                 timer=timer,
-                when_reach= #時間が来たら実行する関数
-                    lg.node_initialize_event(
-                        event_runner=self.event_runner,
-                        node_box=node_info_frame.node_box,
-                        session=session)))
+                when_reach=lg.initialize_event_add(
+                    event_runner=self.event_runner,
+                    node_box=node_info_frame.node_box,
+                    session=session)))
         
         #監視しているNodeBoxを更新する
         timer.on_time_set_btn_press(
@@ -66,7 +68,7 @@ class Controller:
                 node_box=(box := node_info_frame.node_box),
                 timer=timer,
                 when_reach= #時間が来たら実行する関数
-                    lg.node_initialize_event(
+                    lg.initialize_event_add(
                         event_runner=self.event_runner,
                         node_box=box,
                         session=session)))

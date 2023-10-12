@@ -72,9 +72,9 @@ class NodeBox(tk.Frame):
             value.destroy()
         
     def initialize(self, aqcuire):
+        
         self.__node.edges.clear() #子を初期化する
         self.__node.initialize_tree(aqcuire)
-        self.close()
                     
     def expand(self):
         self.pack(anchor=tk.W)
