@@ -1,4 +1,3 @@
-import asyncio
 import tkinter as tk
 
 from ....data import *
@@ -21,7 +20,7 @@ class NodeInfoFrame(tk.Frame):
         self.__url_label = tk.Label(self, text=is_none(node_box.url, NO_DATA))\
             |arrow| (lambda l: l.pack(side=tk.TOP))
             
-        #ボタンが押されたら、監視中のNodeBoxからinitialize_treeを実行する
+
         self.__init_btn = tk.Button(self, text=RUN)\
             |arrow| (lambda b: b.pack(side=tk.BOTTOM, fill=tk.X))
                         
