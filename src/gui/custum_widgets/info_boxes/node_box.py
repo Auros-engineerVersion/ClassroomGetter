@@ -11,15 +11,20 @@ from ..base.switch import Switch
 class NodeBox(tk.Frame):
     node_info_frame = None
     
+    @classmethod
+    def on_click_box(cls, f, **kwargs):
+        """
+        生成されるインスタンスに対して登録する関数を指定する
+        渡される関数の第一引数にはNodeBoxのインスタンスが渡される
+        """
+        cls.__on_click_box = lambda box: f(box, **kwargs)
+    
     def __init__(self, master: tk.Misc, node: lambda: type('INode', (INodeProperty, IHasEdges)), parent: NodeBox = None):
         tk.Frame.__init__(self, master)
         self.__master = master
         self.__parent_box: NodeBox = parent
         self.__node: INodeProperty = node
         self.__nextboxes: list[NodeBox] = []
-        
-        self.__on_expand = identity
-        self.__on_close = identity
         
         #dropdown
         Switch(master=self, default_state=False, width=self.winfo_height())\
@@ -29,11 +34,13 @@ class NodeBox(tk.Frame):
 
         #tree_height
         tk.Label(self, text=str(node.tree_height) + ':')\
-            |arrow| (lambda b: b.pack(side=tk.LEFT))
+            |arrow| (lambda b: b.pack(side=tk.LEFT))\
+            |arrow| (lambda l: l.bind(BUTTON_PRESS, lambda _: NodeBox.__on_click_box(self)))
         
         #node_key
         tk.Label(self, text=str(node.key))\
-            |arrow| (lambda l: l.pack(side=tk.LEFT))
+            |arrow| (lambda l: l.pack(side=tk.LEFT))\
+            |arrow| (lambda l: l.bind(BUTTON_PRESS, lambda _: NodeBox.__on_click_box(self)))
         
         self.pack(anchor=tk.W, padx=(node.tree_height*20, 1), after=self.__parent_box)
     
@@ -80,25 +87,11 @@ class NodeBox(tk.Frame):
         self.pack(anchor=tk.W)
         for node in self.__node.raw_edges:
             new_box = NodeBox(self.__master, node, self)
-            self.__on_expand(new_box)
             self.__nextboxes.append(new_box)
                 
     def close(self):
         #子を初期化する
         for next in self.__nextboxes:
-            self.__on_close(next)
             next.dispose()
         self.__nextboxes.clear()
         gc.collect()
-        
-    def on_click_this(self, f, **kwargs):
-        for label in [w for w in self.winfo_children() if isinstance(w, tk.Label)]:
-            label.bind(BUTTON_PRESS, lambda _: f(**kwargs))
-            
-    def on_expand(self, f, **kwargs):
-        """渡される関数は新しく生成されたNodeBoxを引数として受け取る"""
-        self.__on_expand = lambda n: f(n, **kwargs)
-        
-    def on_close(self, f, **kwargs):
-        """渡される関数は新しく生成されたNodeBoxを引数として受け取る"""
-        self.__on_close = lambda: f(**kwargs)

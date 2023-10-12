@@ -45,7 +45,12 @@ class Controller:
     def about_node(self, ins_type: dict[Widget, type], session: DriverSession):
         node_info_frame:    NodeInfoFrame =   name_of(NodeInfoFrame, ins_type)
         timer:              Timer =           name_of(Timer, ins_type)
-        node_box:           NodeBox =         name_of(NodeBox, ins_type)
+        
+        
+        def __set_box_to_info_frame(other: NodeBox):
+            node_info_frame.node_box = other
+            
+        NodeBox.on_click_box(__set_box_to_info_frame)
 
         node_info_frame.on_node_init_btn_press(lambda:
             lg.initialize_event_add(
@@ -78,15 +83,6 @@ class Controller:
             lg.time_reset(
                 node_box=node_info_frame.node_box,
                 timer=timer))
-        
-        @higher_order
-        def __set_box_to_info_frame(other: NodeBox):
-            node_info_frame.node_box = other
-        
-        #最初に表示されるNodeBoxのeventを設定する
-        node_box.on_click_this(__set_box_to_info_frame(node_box))
-        node_box.on_expand(
-            lambda n: n.on_click_this(__set_box_to_info_frame(n)))
         
     def about_app_root(self, ins_type: dict[Widget, type], session: DriverSession):
         app_root:           ApplicationRoot = name_of(ApplicationRoot, ins_type)
