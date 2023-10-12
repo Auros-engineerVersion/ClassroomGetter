@@ -158,9 +158,9 @@ parameters: list[SearchParameterPattern] = [
                 |pipe| (lambda url: donwload(
                     bc=bc, 
                     url=url,
-                    file_path=n.to_path()
-                        |pipe| (lambda p: DriverSession.save_dir.joinpath(p))
-                        |pipe| (lambda p: bc.download_path_change(p))
-                        |pipe| (lambda p: p if p.exists() else p\
-                            |arrow| (lambda p: p.parent.mkdir(parents=True, exist_ok=True))))))) #ダウンロード先のフォルダが存在しない場合は作成する
+                    file_path=
+                        DriverSession.save_dir.joinpath(n.to_path())
+                            |pipe| (lambda p: None if p.exists() else p\
+                                |arrow| (lambda p: p.parent.mkdir(parents=True, exist_ok=True)) #ダウンロード先のフォルダが存在しない場合は作成する
+                                |arrow| (lambda p: bc.download_path_change(p)))))))
 ]
