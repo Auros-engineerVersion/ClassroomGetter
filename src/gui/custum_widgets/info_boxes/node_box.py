@@ -76,10 +76,10 @@ class NodeBox(tk.Frame):
             for box in value.__nextboxes:
                 stack.append(box)
 
+            value.time.reject_observe()
             value.destroy()
         
     def initialize(self, aqcuire):
-        
         self.__node.edges.clear() #子を初期化する
         self.__node.initialize_tree(aqcuire)
                     
