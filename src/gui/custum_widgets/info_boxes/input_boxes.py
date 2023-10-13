@@ -61,10 +61,9 @@ class DialogInput(InputBox):
         
     def folder_dialog(self):
         folder_name = filedialog.askdirectory()
+        #キャンセルされなければ
         if len(folder_name) > 0:
-            self.__box().set(folder_name)
-        else:
-            self.__box().set(self.__default_path.absolute())
+            self.set(folder_name)
     
 class ProfileForm(tk.Frame, InputBase):
     def __init__(self, master: tk.Misc = None):
