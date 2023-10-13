@@ -90,11 +90,7 @@ class RoutineData(IRoutineData):
         return sum(x) > 0
     
     def should_init(self):
-        if self.remaine().total_seconds() <= 0:
-            self.__pre_time = datetime.now().replace(microsecond=0)
-            return True
-        else:
-            return False
+        return self.remaine().total_seconds() <= 0
         
     def time_observe_start(self, when_reach=identity):
         """
@@ -108,6 +104,7 @@ class RoutineData(IRoutineData):
                 return
             else:
                 if self.should_init():
+                    self.__pre_time = datetime.now().replace(microsecond=0)
                     when_reach()
 
                 timer_thread = threading.Timer(
