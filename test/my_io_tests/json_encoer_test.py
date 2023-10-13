@@ -83,4 +83,4 @@ class JSONEncoderTest(unittest.TestCase):
         self.assertIsInstance(after.user_password[VALUE], str)
         self.assertIsInstance(after.save_folder_path[VALUE], Path)
         self.assertIsInstance(after.loading_wait_time[VALUE], int)
-        self.assertIsInstance(after.web_driver_options_data[VALUE], str)
+        self.assertIsInstance(after.web_driver_options[VALUE], str)

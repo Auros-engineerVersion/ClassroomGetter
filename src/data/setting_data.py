@@ -23,7 +23,7 @@ class SettingData(ISettingData):
     #ページの読み込みを待つ時間
     loading_wait_time: dict = 5
 
-    web_driver_options_data: dict = '--headless=new, --window-size=1280,720'
+    web_driver_options: dict = '--headless=new, --window-size=1280,720'
     
     #----------------保存されたデータ--------------------
     nodes: MinimalistDB = field(default_factory=MinimalistDB)
@@ -44,8 +44,8 @@ class SettingData(ISettingData):
         if not isinstance(self.loading_wait_time, dict):
             self.loading_wait_time = {VALUE:int(self.loading_wait_time), DESCRIPTION: LOADING_WAIT_TIME_DESC}
             
-        if not isinstance(self.web_driver_options_data, dict):
-            self.web_driver_options_data = {VALUE:self.web_driver_options_data, DESCRIPTION: WEB_DRIVER_OPTIONS_DESC}
+        if not isinstance(self.web_driver_options, dict):
+            self.web_driver_options = {VALUE:self.web_driver_options, DESCRIPTION: WEB_DRIVER_OPTIONS_DESC}
             
         #深度を設定する
         Node.SearchDepth = self.search_depth[VALUE]
@@ -65,12 +65,6 @@ class SettingData(ISettingData):
     def profile(self, other: tuple[str, str]):
         self.user_email[VALUE] = other[0]
         self.user_password[VALUE] = other[1]
-        
-    @property
-    def web_driver_options(self):
-        return {
-            VALUE: self.web_driver_options_data[VALUE].replace(' ', '').replace('\n', '').split(','), 
-            DESCRIPTION: WEB_DRIVER_OPTIONS_DESC}
     
     @property
     def normal(self):

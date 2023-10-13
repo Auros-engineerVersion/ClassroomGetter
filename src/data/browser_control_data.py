@@ -48,7 +48,7 @@ class BrowserControlData(IBrowserControlData):
         
 def create_driver(cfg: ISettingData) -> webdriver.Chrome:
     options = webdriver.ChromeOptions()
-    optional_args = cfg.web_driver_options[VALUE]
+    optional_args = cfg.web_driver_options[VALUE].replace(' ', '').replace('\n', '').split(',')
     if not cfg.is_guest():
         optional_args.extend([f'--user-data-dir={cfg.profile_path.parent}', 
                               f'--profile-directory={cfg.profile_path.name}'])
