@@ -73,14 +73,25 @@ class SettingData(ISettingData):
             DESCRIPTION: WEB_DRIVER_OPTIONS_DESC}
     
     @property
-    def editable_data(self):
+    def normal(self):
+        """
+        通常の設定と思われるものをまとめて返す
+        """
         return {
-            'user_email': self.user_email,
-            'user_password': self.user_password,
-            'save_folder_path': self.save_folder_path,
-            'loading_wait_time': self.loading_wait_time,
-            'web_driver_options': self.web_driver_options_data,
-            'search_depth': self.search_depth}
+            USER_EMAIL: self.user_email,
+            USER_PASSWORD: self.user_password,
+            SAVE_FOLDER_PATH: self.save_folder_path,
+            SEARCH_DEPTH: self.search_depth}
+    
+    @property 
+    def advanced(self):
+        """
+        通常であればさわらないような設定をまとめて返す
+        """
+        return {
+            LOADING_WAIT_TIME: self.loading_wait_time,
+            WEB_DRIVER_OPTIONS: self.web_driver_options
+        }
     
     @property
     def profile_path(self):

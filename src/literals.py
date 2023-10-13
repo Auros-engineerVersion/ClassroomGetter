@@ -27,6 +27,13 @@ TITLE = 'title'
 GUEST_MODE = 'ゲストモード'
 DESCRIPTION = 'description'
 
+USER_EMAIL = 'ユーザーのメールアドレス'
+USER_PASSWORD = 'ユーザーのパスワード'
+SAVE_FOLDER_PATH = '保存先のフォルダ'
+LOADING_WAIT_TIME = 'ページの読み込みを待つ時間'
+WEB_DRIVER_OPTIONS = 'Web Driverのオプション'
+SEARCH_DEPTH = '探索の深度'
+
 #文章
 STOP_OR_CONTINUE = '入力の途中で閉じようとしています。'
 SETTING_RESET_MESSAGE = '設定を適用するには再起動が必要です。'
@@ -35,12 +42,17 @@ WEB_DRIVER_QUIT = 'Web Driverを終了しています。'
 
 INCLUDE_THIS_IN_PATH = '保存の際、自身をパスに含める'
 
-USER_EMAIL_DESC = 'ユーザーのメールアドレス'
-USER_PASSWORD_DESC = 'ユーザーのパスワード'
-SAVE_FOLDER_PATH_DESC = '入手したファイルを保存する場所'
-LOADING_WAIT_TIME_DESC = 'ページの読み込みを待つ時間'
-WEB_DRIVER_OPTIONS_DESC = 'Web Driverが起動する際のオプション'
-SEARCH_DEPTH_DESC = '探索を行う際の深度\n例: 1 -> 1階層のみ探索, 2 -> 2階層まで探索'
+USER_EMAIL_DESC = 'googleアカウントのメールアドレスを入力してください。このアカウントはclassroomへのログイン、ファイルのダウンロードの際に必要となります。'
+USER_PASSWORD_DESC = 'googleアカウントのパスワードを入力してください。このアカウントはclassroomへのログイン、ファイルのダウンロードの際に必要となります。'
+SAVE_FOLDER_PATH_DESC = '入手したファイルを保存する場所です。'
+LOADING_WAIT_TIME_DESC = 'ページの読み込みを待つ時間です。これがあまりにも短い場合、正常に動作しない可能性があります。ご自身のインターネット環境に合わせて設定してください。'
+WEB_DRIVER_OPTIONS_DESC = 'Web Driverが起動する際のオプションです。詳細はhttps://peter.sh/experiments/chromium-command-line-switches/を参照してください。'
+SEARCH_DEPTH_DESC = '''
+探索を行う際の深度です。深度により、以下のように探索する範囲が変わります。
+深度0の場合: なんちゃら学（ここで終了）
+深度1の場合: なんちゃら学 -> 第1回（ここで終了） 
+深度2の場合: なんちゃら学 -> 第1回 -> Hoge.pdf（ここで終了）
+'''
 
 #json dictionary keys
 VALUE = 'value'

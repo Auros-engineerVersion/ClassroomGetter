@@ -62,5 +62,5 @@ class SettingDataTest(unittest.TestCase):
         
     def test_editable_data(self):
         data = SettingData()
-        for v in data.editable_data.values():
+        for v in data.normal.values():
             self.assertIsInstance(v, dict)
