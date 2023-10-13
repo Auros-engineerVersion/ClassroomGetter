@@ -62,7 +62,7 @@ class SettingFrame(tk.Frame):
             |arrow| (lambda b: b.pack(side=tk.BOTTOM, anchor=tk.E, padx=5, pady=5))
     
     def current_cfg(self) -> ISettingData:
-        args = [group.values for group in self.__groups]
+        args = sum([group.values for group in self.__groups], []) #畳み込む
         return SettingData(*args, nodes=Node.Nodes)
     
     def on_save(self, f, **kwargs):
