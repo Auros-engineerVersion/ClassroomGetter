@@ -17,13 +17,13 @@ class SettingData(ISettingData):
     #セーブフォルダの場所
     save_folder_path: dict = field(default_factory=Path('./Save').absolute)
     
+    #探索を行う際の深度
+    search_depth: int = field(default=1)
+    
     #ページの読み込みを待つ時間
     loading_wait_time: dict = 5
 
     web_driver_options_data: dict = '--headless=new, --window-size=1280,720'
-    
-    #探索を行う際の深度
-    search_depth: int = field(default=1)
     
     #----------------保存されたデータ--------------------
     nodes: MinimalistDB = field(default_factory=MinimalistDB)
@@ -38,14 +38,14 @@ class SettingData(ISettingData):
         if not isinstance(self.save_folder_path, dict):
             self.save_folder_path = {VALUE:Path(self.save_folder_path), DESCRIPTION: SAVE_FOLDER_PATH_DESC}
             
+        if not isinstance(self.search_depth, dict):
+            self.search_depth = {VALUE:int(self.search_depth), DESCRIPTION: SEARCH_DEPTH_DESC}
+            
         if not isinstance(self.loading_wait_time, dict):
             self.loading_wait_time = {VALUE:int(self.loading_wait_time), DESCRIPTION: LOADING_WAIT_TIME_DESC}
             
         if not isinstance(self.web_driver_options_data, dict):
             self.web_driver_options_data = {VALUE:self.web_driver_options_data, DESCRIPTION: WEB_DRIVER_OPTIONS_DESC}
-            
-        if not isinstance(self.search_depth, dict):
-            self.search_depth = {VALUE:int(self.search_depth), DESCRIPTION: SEARCH_DEPTH_DESC}
             
         #深度を設定する
         Node.SearchDepth = self.search_depth[VALUE]
@@ -75,9 +75,11 @@ class SettingData(ISettingData):
     @property
     def normal(self):
         """
-        通常の設定と思われるものをまとめて返す
+        通常の設定と思われるものをヘッダ付きで返す
+        
+        return: (str, dict)
         """
-        return {
+        return NORMAL_DATA, {
             USER_EMAIL: self.user_email,
             USER_PASSWORD: self.user_password,
             SAVE_FOLDER_PATH: self.save_folder_path,
@@ -86,9 +88,11 @@ class SettingData(ISettingData):
     @property 
     def advanced(self):
         """
-        通常であればさわらないような設定をまとめて返す
+        通常であればさわらないような設定をヘッダ付きで返す
+        
+        return: (str, dict)
         """
-        return {
+        return ADVANCED_DATA, {
             LOADING_WAIT_TIME: self.loading_wait_time,
             WEB_DRIVER_OPTIONS: self.web_driver_options
         }
