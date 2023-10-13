@@ -33,11 +33,15 @@ def time_reset(node_box, timer):
     node_box.time.reset()
     node_box.time.reject_observe()
     
+def time_start(node_box, timer, when_reach: Callable):
+    """この関数はtime_observe_startを呼び出すため、スレッドが生成される"""
+    time_set(node_box, timer, when_reach)
+    timer.clock_event_publish(node_box.time)
+    
 def time_restart(node_box, timer, when_reach: Callable):
     """この関数はtime_observe_startを呼び出すため、スレッドが生成される"""
     time_reset(node_box, timer)
-    time_set(node_box, timer, when_reach)
-    timer.clock_event_publish(node_box.time)
+    time_start(node_box, timer, when_reach)
     
 def initialize_event_add(event_runner, node_box, session):
     node_box.close()
