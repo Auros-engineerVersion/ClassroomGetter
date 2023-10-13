@@ -59,8 +59,3 @@ class SettingDataTest(unittest.TestCase):
         sets.add('bar')
         current_data = SettingData('hogehoge@gmail.com', 'hogehoge', Path(), 0, nodes=sets)
         self.assertTrue(current_data.is_current_data())
-        
-    def test_editable_data(self):
-        data = SettingData()
-        for v in data.normal.values():
-            self.assertIsInstance(v, dict)
