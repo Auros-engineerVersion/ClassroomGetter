@@ -42,7 +42,7 @@ class BrowserControlData(IBrowserControlData):
                 'cmd': 'Page.setDownloadBehavior',
                 'params': {
                     'behavior': 'allow',
-                    'downloadPath': str(path)}})
+                    'downloadPath': str(path.absolute())}})
         
         return path
         
