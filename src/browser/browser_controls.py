@@ -1,5 +1,5 @@
 from re import search
-from typing import Callable, Iterable
+from typing import Callable
 from time import sleep
 
 from selenium.common.exceptions import (InvalidSelectorException,
@@ -23,7 +23,6 @@ GOOGLE_EDU_URL = 'https://edu.google.com/intl/ALL_jp/workspace-for-education/cla
 GOOGLE_IDENTIFIER = 'accounts.google.com'
 GOOGLE_IDENTIFIER_URL = 'https://accounts.google.com/ServiceLogin?continue=https%3A%2F%2Fclassroom.google.com&passive=true'
 GOOGLE_EMAIL_FORM = "//input[@type='email']"
-GOOGLE_SUBMIT_BUTTON = "//div[@id='identifierNext']"
 GOOGLE_ASK_DO_LOGIN_URL = 'https://accounts.google.com/speedbump/samlconfirmaccount'
 GOOGLE_ASK_DO_LOGIN_BUTTON = "//div[@jsname='Njthtb']"
 
@@ -91,7 +90,9 @@ def google_login(bc: IBrowserControlData, email: str, password: str):
     move(bc, GOOGLE_IDENTIFIER_URL)
     wait(bc, GOOGLE_IDENTIFIER)
     search_element(bc, GOOGLE_EMAIL_FORM).send_keys(email) #1:emailを入力する
-    search_element(bc, GOOGLE_SUBMIT_BUTTON).click()#2:続行を押す
+    
+    #これだけxpathだとなぜか成功しない
+    bc.driver.find_element(By.ID, 'identifierNext').click() #2:次へボタンを押す
 
     college_login(bc, email, password)
     search_element(bc, GOOGLE_ASK_DO_LOGIN_BUTTON).click()
