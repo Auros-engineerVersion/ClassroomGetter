@@ -40,9 +40,11 @@ class SettingGroup(tk.LabelFrame):
                 |arrow| (lambda d: d.pack(side=tk.TOP, anchor=tk.W, pady=10))
             
     @property
-    def boxes(self) -> list[InputBox]:
-        for w in [b for b in self.winfo_children() if isinstance(b, DescBox)]:
-            yield w.box
+    def values(self) -> list:
+        v = []
+        for input_box in [w.box for w in [b for b in self.winfo_children() if isinstance(b, DescBox)]]:
+           v.append(input_box.get())
+        return v
 
 class SettingFrame(tk.Frame):
     def __init__(self, master: tk.Misc, cfg: ISettingData):
@@ -58,10 +60,9 @@ class SettingFrame(tk.Frame):
         #セーブボタン
         self.__save_btn = tk.Button(self, text=SAVE)\
             |arrow| (lambda b: b.pack(side=tk.BOTTOM, anchor=tk.E, padx=5, pady=5))
-                    #self.__save_cfg(cfg.SETTINGFOLDER_PATH.joinpath('setting.json'))))
     
     def current_cfg(self) -> ISettingData:
-        args = [box.get() for box in [group for group in self.__groups]]
+        args = [group.values for group in self.__groups]
         return SettingData(*args, nodes=Node.Nodes)
     
     def on_save(self, f, **kwargs):
