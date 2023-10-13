@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+from time import sleep
 
 from ..interface import ISettingData
 from ..literals import *
@@ -21,14 +22,15 @@ class ApplicationRoot(tk.Tk):
         ttk.Notebook(self, width=size[0], height=size[1])\
             |arrow| (lambda n: n.pack(fill=tk.BOTH, expand=True))\
             |arrow| (lambda n: n.add(text=MAIN,    child=FrontFrame(n, Node.root())))\
-            |arrow| (lambda n: n.add(text=SETTING, child=SettingFrame(n, cfg)))
+            |arrow| (lambda n: n.add(text=SETTING_WINDOW, child=SettingFrame(n, cfg)))
                     
-    def run(self):
+    def run(self, fps: int = 12):
         while self.__allow_run:
             self.__on_loop_start()
             self.update()
             self.update_idletasks()
             self.__on_loop_end()
+            sleep(1/fps)
         
     def on_loop_start(self, f, **kwargs):
         """ApplicationRootの一ループの始まりに実行される"""
