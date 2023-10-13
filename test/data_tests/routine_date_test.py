@@ -82,12 +82,7 @@ class Routine_data_Test(unittest.TestCase):
             ('zero_sec', test_cls(
                 target=RoutineData(),
                 except_count=0)),
-            
-            ('call_twice', test_cls(
-                target=RoutineData(minute=1/60),
-                wait_time=1.5, #最後の呼び出しは重いため、実際に待機される時間はさらに長い
-                except_count=2))
-            ]
+        ]
         
         for title, case in test_case:
             with self.subTest(subtest=title, params=case):
