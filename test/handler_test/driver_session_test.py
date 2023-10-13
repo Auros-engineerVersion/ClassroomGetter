@@ -31,13 +31,21 @@ class ParameterPatternTest(unittest.TestCase):
         self.assertIsInstance(result, zip)
                 
     def test_level_3(self):
-        node = MagicMock()
-        node.url = 'https://drive.google.com/file/d/AAAAAAAAAAAAAAAA/view?usp=drive_web&authuser=1'
-        node.key = 'test'
-        node.tree_height = 3
+        not_exist_node = MagicMock()
+        not_exist_node.url = 'https://drive.google.com/file/d/AAAAAAAAAAAAAAAA/view?usp=drive_web&authuser=1'
+        not_exist_node.key = 'test'
+        not_exist_node.tree_height = 3
         
-        result = self.session.next_key_url(node)
-        self.assertListEqual(result, [(None, None)])
+        self.assertListEqual(self.session.next_key_url(not_exist_node), [(None, None)])
+        
+        path = Path(__file__)
+        exist_node = MagicMock()
+        exist_node.url = 'https://drive.google.com/file/d/AAAAAAAAAAAAAAAA/view?usp=drive_web&authuser=1'
+        exist_node.key = path.name
+        exist_node.tree_height = 3
+        exist_node.to_path.return_value = path.parent
+        
+        self.session.next_key_url(exist_node)
         
 class DriverSessionTest(unittest.TestCase):
     def test_close(self):

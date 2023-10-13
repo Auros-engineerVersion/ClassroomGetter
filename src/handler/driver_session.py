@@ -124,6 +124,16 @@ def __url_to_drive(x: ParseResult | str) -> str:
     file_id = url.split('/')[-2]
     return f'https://drive.google.com/u/1/uc?id={file_id}&export=download'
 
+def __donwload_with_path_change(bc: IBCD, node: INodeProperty):
+    path = DriverSession.save_dir.joinpath(node.to_path())
+    if not path.exists():
+        return
+    
+    if node.key not in path.iterdir():
+        path.mkdir(parents=True, exist_ok=True)
+        bc.download_path_change(path)
+    move(bc, __url_to_drive(node.url))
+
 parameters: list[SearchParameterPattern] = [
     #添字とtree_heightを一致させる
     #root -> 授業一覧
@@ -153,14 +163,5 @@ parameters: list[SearchParameterPattern] = [
     
     #urlにアクセスし、ファイルを取得
     SearchParameterPattern(
-        pre_proc=lambda bc, n:(None,
-            __url_to_drive(n.url)
-                |pipe| (lambda url: donwload(
-                    bc=bc, 
-                    url=url,
-                    file_path=
-                        DriverSession.save_dir.joinpath(n.to_path())
-                            |pipe| (lambda p: None if p.exists() else p\
-                                |arrow| (lambda p: p.parent.mkdir(parents=True, exist_ok=True)) #ダウンロード先のフォルダが存在しない場合は作成する
-                                |arrow| (lambda p: bc.download_path_change(p)))))))
+        pre_proc=lambda bc, n:(None, __donwload_with_path_change(bc, n)))
 ]
