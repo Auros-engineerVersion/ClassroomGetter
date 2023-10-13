@@ -54,19 +54,12 @@ class Controller:
 
         node_info_frame.on_node_init_btn_press(lambda:
             lg.initialize_event_add(
-                self.event_runner,
-                node_info_frame.node_box,
-                session))
-        
-        node_info_frame.on_node_change(lambda:
-            lg.time_restart(
+                event_runner=self.event_runner,
                 node_box=node_info_frame.node_box,
-                timer=timer,
-                when_reach=lambda:
-                    lg.initialize_event_add(
-                        event_runner=self.event_runner,
-                        node_box=node_info_frame.node_box,
-                        session=session)))
+                session=session))
+            
+        node_info_frame.on_node_change(lambda:
+            timer.clock_event_publish(node_info_frame.node_box.time))
         
         #監視しているNodeBoxを更新する
         timer.on_time_set_btn_press(lambda:
