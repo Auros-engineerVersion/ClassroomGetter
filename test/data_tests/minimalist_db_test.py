@@ -55,7 +55,13 @@ class MinimalistDBTest(unittest.TestCase):
         self.assertIsNone(self.db.get_fromID(self.id1))
         self.assertEqual(self.db.get_fromID(self.id2), self.recode2)
         
+    def test_remove(self):
+        self.assertRaises(TypeError, self.db.remove, 100)
+        
+        self.assertEqual(len(self.db), 3)
+        self.db.remove(self.id0)
+        self.assertEqual(len(self.db), 2)
         
         self.db.remove(self.id1)
-        self.assertIsNone(self.db.get(self.id1))
-        self.assertEqual(self.db.get(self.id2), self.recode2)
+        self.db.remove(self.id2)
+        self.assertEqual(len(self.db), 0)

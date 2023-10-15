@@ -42,7 +42,7 @@ class MinimalistDB(list[MinimalistRecode], IMinimalistDB):
         このメソッドは、recodeのvalueが既に存在する場合は、そのレコードを返す。
         そのため、同値のレコードが複数存在することはない。
         """
-        if recode['value'] not in [r['value'] for r in self]:
+        if recode not in self:
             return self.add(recode)
         else:
             return self.index(recode)
@@ -55,3 +55,9 @@ class MinimalistDB(list[MinimalistRecode], IMinimalistDB):
     def clear(self) -> None:
         self.__front_line = 0
         return super().clear()
+    
+    def remove(self, id: MinimalistID, id_get: Callable[[MinimalistID], MinimalistID]=lambda recode: recode['value']):
+        if isinstance(id, MinimalistID):
+            return super().remove(self.get_fromID(id, id_get))
+        else:
+            raise TypeError(f'id must be MinimalistID, but {type(id)}')
