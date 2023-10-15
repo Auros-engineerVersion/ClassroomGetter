@@ -3,11 +3,7 @@ from __future__ import annotations
 from abc import ABCMeta, abstractmethod, abstractproperty
 from typing import Callable, Coroutine
 
-class IMinimalistID(metaclass=ABCMeta):
-    @abstractmethod
-    def value(self, db):
-        raise NotImplementedError
-    
+
 class IMinimalistRecode(metaclass=ABCMeta):
     @abstractmethod
     def __lt__(self, other):
@@ -27,7 +23,7 @@ class IMinimalistDB(metaclass=ABCMeta):
         raise NotImplementedError
         
     @abstractmethod
-    def add(self, recode: IMinimalistRecode) -> IMinimalistID:
+    def add(self, recode: IMinimalistRecode) -> int:
         raise NotImplementedError
     
     @abstractmethod

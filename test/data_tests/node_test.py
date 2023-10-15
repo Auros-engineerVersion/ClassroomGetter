@@ -8,7 +8,7 @@ from pathlib import Path
 from unittest.mock import MagicMock
 
 from src.my_util import splitparN
-from src.data import Node, EmptyRecode, MinimalistID
+from src.data import Node
 
 
 class NodeTest(unittest.TestCase):
@@ -55,7 +55,7 @@ class NodeTest(unittest.TestCase):
         n_1 = self.n_gen(1)
         n_1.add_edge(n_0)
         
-        self.assertIsInstance(n_1.edges[0], MinimalistID)
+        self.assertIsInstance(n_1.edges[0], int)
         self.assertIsInstance(n_1.raw_edges[0], Node)
         
     def test_parent(self):

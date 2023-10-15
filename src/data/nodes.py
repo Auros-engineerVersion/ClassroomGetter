@@ -38,8 +38,10 @@ class Node(INodeProperty, IHasEdges, IDisposable):
         self.__include_this_to_path: bool = include_this_to_path
         self.__next_init_time: RoutineData = is_none(next_init_time, RoutineData)
         
-        self.__parent: MinimalistID = None
+        self.__parent: int = None
         self.__edges: list[IHasEdges] = []
+        
+        self.__id = Node.Nodes.add_with_unique(MinimalistRecode(value=self))
 
     def __str__(self) -> str:
         return str.format(self.__dict__)
@@ -109,15 +111,15 @@ class Node(INodeProperty, IHasEdges, IDisposable):
     
 #region IHasEdges
     @property
-    def parent(self) -> MinimalistID:
+    def parent(self) -> int:
         return self.__parent
     
     @parent.setter
-    def parent(self, id: MinimalistID):
+    def parent(self, id: int):
         self.__parent = id
     
     @property
-    def edges(self) -> list[IMinimalistID]:
+    def edges(self) -> list[int]:
         return self.__edges
     
     @edges.setter
@@ -142,7 +144,7 @@ class Node(INodeProperty, IHasEdges, IDisposable):
                         
         self.serach(search_depth=100)(__remove_edges)
                     
-    def add_edge(self, other: IHasEdges | IMinimalistID) -> list[IMinimalistID]:
+    def add_edge(self, other_id: IHasEdges) -> list[int]:
         #idにINodeを入れてしまった場合
         if isinstance(other, IHasEdges):
             return self.add_edge(other.id)
@@ -163,8 +165,7 @@ class Node(INodeProperty, IHasEdges, IDisposable):
         zero_to_neg = lambda x: -1 if x == False else 0
         popping = lambda list, bfs: Node.Nodes.get(list.pop(bfs))['value']
         
-        def __do_serch(func, search_depth=search_depth):
-            list: list[MinimalistID] = [self.id]
+            list: list[int] = [self.id]
             
             while(len(list) > 0):
                 #出す場所が0なら深さ優先探索, queueの振る舞いをする
@@ -194,7 +195,7 @@ class Node(INodeProperty, IHasEdges, IDisposable):
         if len(Node.Nodes) == 0:
             raise ValueError('ノードが存在しません')
 
-        def loop(id: MinimalistID) -> Path:
+        def loop(id: int) -> Path:
             if id is None:
                 return Path()
             else:

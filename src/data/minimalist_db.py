@@ -3,10 +3,6 @@ from __future__ import annotations
 from ..interface import *
 from ..my_util import identity
 
-class MinimalistID(int, IMinimalistID):
-    def value(self, db):
-        return db.get(self)
-
 class MinimalistRecode(dict, IComparable, IMinimalistRecode):
     def __init__(self, value):
         super().__init__(value=value)
@@ -28,15 +24,15 @@ class MinimalistDB(list[MinimalistRecode], IMinimalistDB):
         super().__init__()
         
         #idの役割を果たす。現在どこまでレコードが追加されたか
-        self.__front_line: MinimalistID = 0 + initial_line
+        self.__front_line = 0 + initial_line
         
-    def add(self, recode: MinimalistRecode) -> MinimalistID:
+    def add(self, recode: MinimalistRecode) -> int:
         """レコードを追加する。追加したレコードのidを返す"""
         if not isinstance(recode, MinimalistRecode):
             recode = MinimalistRecode(value=recode)
         
         self.append(recode)
-        id = MinimalistID(self.__front_line)
+        id = self.__front_line
         self.__front_line += 1
         return id
     
@@ -50,7 +46,7 @@ class MinimalistDB(list[MinimalistRecode], IMinimalistDB):
         else:
             return self.index(recode)
         
-    def get_fromID(self, id: MinimalistID, id_get: Callable[[MinimalistID], MinimalistID]=lambda recode: recode['value']) -> MinimalistRecode | None:
+    def get_fromID(self, id:int, id_get: Callable[[int], int]=lambda recode: recode['value']) -> MinimalistRecode | None:
         for recode in self:
             if id_get(recode) == id:
                 return recode
@@ -59,8 +55,8 @@ class MinimalistDB(list[MinimalistRecode], IMinimalistDB):
         self.__front_line = 0
         return super().clear()
     
-    def remove(self, id: MinimalistID, id_get: Callable[[MinimalistID], MinimalistID]=lambda recode: recode['value']):
-        if isinstance(id, MinimalistID):
+    def remove(self, id: int, id_get: Callable[[int], int]=lambda recode: recode['value']):
+        if isinstance(id, int):
             return super().remove(self.get_fromID(id, id_get))
         else:
-            raise TypeError(f'id must be MinimalistID, but {type(id)}')
+            raise TypeError('id must be int')
