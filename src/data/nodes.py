@@ -146,16 +146,16 @@ class Node(INodeProperty, IHasEdges, IDisposable):
                     
     def add_edge(self, other_id: IHasEdges) -> list[int]:
         #idにINodeを入れてしまった場合
-        if isinstance(other, IHasEdges):
-            return self.add_edge(other.id)
+        if isinstance(other_id, IHasEdges):
+            return self.add_edge(other_id.id)
         
-        if self.__class__.Nodes.get(other) is EmptyRecode:
-            raise ValueError('ノードが存在しません')
-        else:
-            self.edges.append(other)
-            Node.Nodes.get(other)['value'].parent = self.id
+        self.edges.append(other_id)
+        
+        other_node = Node.Nodes.get_fromID(other_id, lambda r: r['value'].id)['value']
+        if other_node is not None:
+            other_node.parent = self.id
             
-            return self.edges
+        return self.edges
     
     def serach(self, search_depth = 100, bfs = True) -> Callable[[Callable], None]:
         """
