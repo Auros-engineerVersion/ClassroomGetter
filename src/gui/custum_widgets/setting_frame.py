@@ -15,11 +15,11 @@ class DescBox(tk.Frame):
         self.update_idletasks()
         
         box_factory(self, key, value)\
-            |arrow| (lambda b: b.pack(side=tk.TOP, anchor=tk.W, fill=tk.X, expand=True))
+            |arrow| (lambda b: b.pack(side=tk.TOP, anchor=tk.W, fill=tk.X))
             
         #説明文
-        tk.Text(self, width=font_size * 4, height=5, relief=tk.FLAT, font=(font.nametofont(TK_DEFAULT_FONT), font_size), background=master[BACKGROUND])\
-            |arrow| (lambda t: t.pack(side=tk.TOP, anchor=tk.W, fill=tk.X, expand=True))\
+        tk.Text(self, height=description.count('\n')+2, relief=tk.FLAT, font=(font.nametofont(TK_DEFAULT_FONT), font_size), background=master[BACKGROUND])\
+            |arrow| (lambda t: t.pack(side=tk.TOP, anchor=tk.W))\
             |arrow| (lambda t: t.insert(tk.END, description))\
             |arrow| (lambda t: t.configure(state='disabled'))
             
@@ -37,7 +37,7 @@ class SettingGroup(tk.LabelFrame):
         for key, value_desc in key_values.items():
             value, desc = value_desc.values()
             DescBox(self, key, value, desc)\
-                |arrow| (lambda d: d.pack(side=tk.TOP, anchor=tk.W, pady=10))
+                |arrow| (lambda d: d.pack(side=tk.TOP, anchor=tk.W))
             
     @property
     def values(self) -> list:
