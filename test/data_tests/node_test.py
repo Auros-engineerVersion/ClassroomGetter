@@ -21,12 +21,25 @@ class NodeTest(unittest.TestCase):
         return super().tearDown()
     
     def test_constructor(self):
-        id_1 = Node('key', 'url', 0)
-        self.assertIsNotNone(id_1)
-        self.assertEqual(id_1.id, 0)
+        id_0 = self.n_gen(0)
+        self.assertIsNotNone(id_0)
+        self.assertEqual(id_0.id, 0)
         
-        id_2 = Node('key', 'url', 0)
-        self.assertEqual(id_2.id, 1)
+        id_1 = self.n_gen(1)
+        self.assertIsNotNone(id_1)
+        self.assertEqual(id_1.id, 1)
+        
+        before_len = len(Node.Nodes)
+        #同じ値を持つノードを作成した場合、同じidが発行される
+        same_value = self.n_gen(0)
+        self.assertEqual(same_value, id_0)
+        self.assertEqual(len(Node.Nodes), before_len)
+        
+        Node.Nodes.clear()
+        self.assertEqual(len(Node.Nodes), 0)
+        
+        [self.n_gen(i) for i in range(10)]
+        self.assertEqual(len(Node.Nodes), 10)
             
     def test_eq(self):
         x = Node('key', 'url', 0)

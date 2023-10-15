@@ -30,13 +30,12 @@ class Node(INodeProperty, IHasEdges, IDisposable):
         return min(Node.Nodes, key=lambda x: x['value'].tree_height)['value']
 
     def __init__(self, key: str, url: str, tree_height: int, include_this_to_path: bool = False, next_init_time: RoutineData = None) -> None:
-        self.__id: MinimalistID = self.Nodes.add(self)
-        
         self.__key: str = key
         self.__url: str = url
         self.__tree_height: int = abs(int(tree_height))
         self.__include_this_to_path: bool = include_this_to_path
         self.__next_init_time: RoutineData = is_none(next_init_time, RoutineData)
+        self.__next_init_time.time_observe_start()
         
         self.__parent: int = None
         self.__edges: list[IHasEdges] = []
