@@ -47,7 +47,7 @@ class MinimalistDB(list[MinimalistRecode], IMinimalistDB):
         else:
             return self.index(recode)
         
-    def get(self, id: MinimalistID, id_get: Callable[[MinimalistID], MinimalistID]=identity) -> MinimalistRecode | None:
+    def get_fromID(self, id: MinimalistID, id_get: Callable[[MinimalistID], MinimalistID]=lambda recode: recode['value']) -> MinimalistRecode | None:
         for recode in self:
             if id_get(recode) == id:
                 return recode

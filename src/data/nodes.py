@@ -126,7 +126,7 @@ class Node(INodeProperty, IHasEdges, IDisposable):
     
     @property
     def raw_edges(self) -> list[IHasEdges]:
-        return [self.Nodes.get(id)['value'] for id in self.__edges]
+        return [self.Nodes.get_fromID(id, lambda r: r[VALUE].id)[VALUE] for id in self.__edges]
 #endregion
     
     def dispose(self) -> None:
@@ -193,14 +193,12 @@ class Node(INodeProperty, IHasEdges, IDisposable):
     def to_path(self) -> Path:
         if len(Node.Nodes) == 0:
             raise ValueError('ノードが存在しません')
-        
-        getting: IHasEdges = lambda id: Node.Nodes.get(id)['value']
-        
+
         def loop(id: MinimalistID) -> Path:
             if id is None:
                 return Path()
             else:
-                node = getting(id)
+                node = Node.Nodes.get_fromID(id, lambda r: r['value'].id)['value']
                 return loop(node.parent).joinpath(
                     node.key if node.include_this_to_path else '') #自身を飛ばすかどうか
             

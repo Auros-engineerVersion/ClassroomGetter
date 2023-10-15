@@ -46,10 +46,15 @@ class MinimalistDBTest(unittest.TestCase):
         self.assertEqual(id, self.id1)
         self.assertEqual(len(self.db), before_len)
 
-    def test_get(self):
-        self.assertEqual(self.db.get(self.id0), self.recode0)
-        self.assertEqual(self.db.get(self.id1), self.recode1)
-        self.assertEqual(self.db.get(self.id2), self.recode2)
+    def test_get_fromID(self):
+        self.assertEqual(self.db.get_fromID(self.id0), self.recode0)
+        self.assertEqual(self.db.get_fromID(self.id1), self.recode1)
+        self.assertEqual(self.db.get_fromID(self.id2), self.recode2)
+        
+        self.db.remove(self.id1)
+        self.assertIsNone(self.db.get_fromID(self.id1))
+        self.assertEqual(self.db.get_fromID(self.id2), self.recode2)
+        
         
         self.db.remove(self.id1)
         self.assertIsNone(self.db.get(self.id1))

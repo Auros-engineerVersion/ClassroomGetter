@@ -31,5 +31,5 @@ class IMinimalistDB(metaclass=ABCMeta):
         raise NotImplementedError
     
     @abstractmethod
-    def get(self, id) -> IMinimalistRecode:
+    def get_fromID(self, id) -> IMinimalistRecode:
         raise NotImplementedError
