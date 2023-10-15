@@ -7,6 +7,18 @@ import unittest
 
 from src.data.minimalist_db import *
 
+
+class MinimalistRecodeTest(unittest.TestCase):
+    def test_eq(self):
+        zero = MinimalistRecode(value=0)
+        self.assertEqual(zero, zero)
+        
+        one = MinimalistRecode(value=1)
+        self.assertNotEqual(zero, one)
+        
+        self.assertEqual(zero, 0)
+        self.assertNotEqual(one, 0)
+
 class MinimalistDBTest(unittest.TestCase):
     def setUp(self):
         self.db = MinimalistDB()
