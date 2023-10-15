@@ -23,7 +23,7 @@ class NodeBox(tk.Frame):
         tk.Frame.__init__(self, master)
         self.__master = master
         self.__parent_box: NodeBox = parent
-        self.__node: INodeProperty = node
+        self.__node: IHasEdges = node
         self.__nextboxes: list[NodeBox] = []
         
         #dropdown
@@ -80,7 +80,11 @@ class NodeBox(tk.Frame):
             value.destroy()
         
     def initialize(self, aqcuire):
-        self.__node.edges.clear() #子を初期化する
+        #子を初期化する
+        for node in self.__node.raw_edges:
+            node.dispose()
+        self.__node.edges.clear()
+        
         self.__node.initialize_tree(aqcuire)
                     
     def expand(self):
