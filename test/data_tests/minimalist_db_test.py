@@ -16,8 +16,8 @@ class MinimalistRecodeTest(unittest.TestCase):
         one = MinimalistRecode(value=1)
         self.assertNotEqual(zero, one)
         
-        self.assertEqual(zero, 0)
-        self.assertNotEqual(one, 0)
+        self.assertNotEqual(zero, 0)
+        self.assertNotEqual(one, 1)
 
 class MinimalistDBTest(unittest.TestCase):
     def setUp(self):
@@ -41,7 +41,7 @@ class MinimalistDBTest(unittest.TestCase):
     def test_add_with_unique(self):
         before_len = len(self.db)
         
-        same_value_recode = MinimalistRecode(value=10)
+        same_value_recode = MinimalistRecode(value=1)
         id = self.db.add_with_unique(same_value_recode)
         self.assertEqual(id, self.id1)
         self.assertEqual(len(self.db), before_len)

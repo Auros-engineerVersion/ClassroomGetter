@@ -14,8 +14,11 @@ class MinimalistRecode(dict, IComparable, IMinimalistRecode):
     def __lt__(self, other):
         return self['value'] < other['value']
     
-    def __eq__(self, __value: MinimalistRecode) -> bool:
-        return self['value'] == __value
+    def __eq__(self, other: MinimalistRecode) -> bool:
+        if not isinstance(other, MinimalistRecode):
+            return False
+        else:
+            return self['value'] == other['value']
     
     def __hash__(self) -> int:
         return hash(self['value'])
