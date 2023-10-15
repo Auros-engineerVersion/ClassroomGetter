@@ -22,9 +22,9 @@ class MinimalistRecodeTest(unittest.TestCase):
 class MinimalistDBTest(unittest.TestCase):
     def setUp(self):
         self.db = MinimalistDB()
-        self.recode0 = MinimalistRecode(value=00)
-        self.recode1 = MinimalistRecode(value=10)
-        self.recode2 = MinimalistRecode(value=20)
+        self.recode0 = MinimalistRecode(value=0)
+        self.recode1 = MinimalistRecode(value=1)
+        self.recode2 = MinimalistRecode(value=2)
         self.id0 = self.db.add(self.recode0)
         self.id1 = self.db.add(self.recode1)
         self.id2 = self.db.add(self.recode2)
@@ -36,21 +36,21 @@ class MinimalistDBTest(unittest.TestCase):
         recode3 = MinimalistRecode(value=30)
         id3 = self.db.add(recode3)
         self.assertEqual(id3, 3)
-        self.assertEqual(self.db.get(id3), recode3)
+        self.assertEqual(len(self.db), 4)
+        
+    def test_add_with_unique(self):
+        before_len = len(self.db)
+        
+        same_value_recode = MinimalistRecode(value=10)
+        id = self.db.add_with_unique(same_value_recode)
+        self.assertEqual(id, self.id1)
+        self.assertEqual(len(self.db), before_len)
 
     def test_get(self):
         self.assertEqual(self.db.get(self.id0), self.recode0)
         self.assertEqual(self.db.get(self.id1), self.recode1)
         self.assertEqual(self.db.get(self.id2), self.recode2)
-
-    def test_remove(self):
-        self.db.remove(self.id1)
-        self.assertIsInstance(self.db.get(self.id1), EmptyRecode)
-        self.assertEqual(len(self.db) , 2)
-
-    def test_remove_target(self):
-        self.db.remove_target(self.recode1)
-        self.assertIsInstance(self.db.get(self.id1), EmptyRecode)
         
-    def test_min(self):
-        self.assertEqual(min(self.db), self.recode0)
+        self.db.remove(self.id1)
+        self.assertIsNone(self.db.get(self.id1))
+        self.assertEqual(self.db.get(self.id2), self.recode2)

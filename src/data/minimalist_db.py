@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from ..interface import *
+from ..my_util import identity
 
 class MinimalistID(int, IMinimalistID):
     def value(self, db):
@@ -18,13 +19,6 @@ class MinimalistRecode(dict, IComparable, IMinimalistRecode):
     
     def __hash__(self) -> int:
         return hash(self['value'])
-    
-class EmptyRecode(MinimalistRecode):
-    def __init__(self) -> None:
-        super().__init__(value=None)
-        
-    def __lt__(self, other):
-        return False
 
 class MinimalistDB(list[MinimalistRecode], IMinimalistDB):
     def __init__(self, initial_line = 0) -> None:
@@ -32,15 +26,6 @@ class MinimalistDB(list[MinimalistRecode], IMinimalistDB):
         
         #idの役割を果たす。現在どこまでレコードが追加されたか
         self.__front_line: MinimalistID = 0 + initial_line
-        
-    def __len__(self) -> int:
-        length = 0
-        for recode in self:
-            if isinstance(recode, EmptyRecode):
-                continue
-            else:
-                length += 1
-        return length
         
     def add(self, recode: MinimalistRecode) -> MinimalistID:
         """レコードを追加する。追加したレコードのidを返す"""
@@ -52,18 +37,21 @@ class MinimalistDB(list[MinimalistRecode], IMinimalistDB):
         self.__front_line += 1
         return id
     
-    def get(self, id) -> MinimalistRecode:
-        return self[max(id, 0)]
+    def add_with_unique(self, recode: MinimalistRecode):
+        """
+        このメソッドは、recodeのvalueが既に存在する場合は、そのレコードを返す。
+        そのため、同値のレコードが複数存在することはない。
+        """
+        if recode['value'] not in [r['value'] for r in self]:
+            return self.add(recode)
+        else:
+            return self.index(recode)
         
-    def remove(self, id):
-        self[max(id, 0)] = EmptyRecode()
-        
-    def remove_target(self, target: MinimalistRecode) -> None:
-        for i, recode in enumerate(self):
-            if recode == target:
-                self[i] = EmptyRecode()
-                break
-            
+    def get(self, id: MinimalistID, id_get: Callable[[MinimalistID], MinimalistID]=identity) -> MinimalistRecode | None:
+        for recode in self:
+            if id_get(recode) == id:
+                return recode
+
     def clear(self) -> None:
         self.__front_line = 0
         return super().clear()
