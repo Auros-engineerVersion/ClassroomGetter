@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Callable
 
 from ..interface import *
+from ..literals import VALUE
 from ..my_util import is_none
 from .routine_data import RoutineData
 from .minimalist_db import *
@@ -13,8 +14,6 @@ class Node(INodeProperty, IHasEdges, IDisposable):
     Nodes: MinimalistDB = MinimalistDB()
     SearchDepth: int = 0
     
-    #これらの引数の並びは、__init__で定義されている変数群の並びと同じである必要がある
-    #これはjsonから読み込んだデータを元にノードを作成する際に同じでないとうまくインスタンスの生成ができないため
     @classmethod
     def factory(cls, id, key, url, tree_height, include_this_to_path, next_init_time, parent, edges):
         """Jsonから読み込んだデータを元にノードを作成するためのfactory"""
@@ -27,7 +26,7 @@ class Node(INodeProperty, IHasEdges, IDisposable):
     
     @classmethod
     def root(cls) -> Node:
-        return min(Node.Nodes, key=lambda x: x['value'].tree_height)['value']
+        return min(Node.Nodes, key=lambda x: x[VALUE].tree_height)[VALUE]
 
     def __init__(self, key: str, url: str, tree_height: int, include_this_to_path: bool = False, next_init_time: RoutineData = None) -> None:
         self.__key: str = key
@@ -65,9 +64,6 @@ class Node(INodeProperty, IHasEdges, IDisposable):
 
     def __hash__(self) -> int:
         return hash(vars(self).values())
-    
-    def __del__(self) -> None:
-        self.dispose()
 
     @property
     def id(self):
@@ -138,7 +134,7 @@ class Node(INodeProperty, IHasEdges, IDisposable):
             if node.parent == self.id:
                 node.parent = None
                 
-            Node.Nodes.remove(node.id)
+            Node.Nodes.remove(node.id, lambda r: r[VALUE].id)
             del node
                         
         self.search(search_depth=100)(__remove_edges)
@@ -150,7 +146,7 @@ class Node(INodeProperty, IHasEdges, IDisposable):
         
         self.edges.append(other_id)
         
-        other_node = Node.Nodes.get_fromID(other_id, lambda r: r['value'].id)['value']
+        other_node = Node.Nodes.get_fromID(other_id, lambda r: r[VALUE].id)[VALUE]
         if other_node is not None:
             other_node.parent = self.id
             
@@ -162,7 +158,6 @@ class Node(INodeProperty, IHasEdges, IDisposable):
             bfs (bool, optional): Trueなら幅優先探索、Falseなら深さ優先探索を行う
         """
         zero_to_neg = lambda x: -1 if x == False else 0
-        popping = lambda list, bfs: Node.Nodes.get(list.pop(bfs))['value']
         
         def __do_search(func: Callable[[INodeProperty], None]):
             nonlocal search_depth
@@ -171,7 +166,7 @@ class Node(INodeProperty, IHasEdges, IDisposable):
             while(len(list) > 0):
 
                 x =  zero_to_neg(bfs)
-                node = Node.Nodes.get_fromID(list.pop(x), lambda r: r['value'].id)['value']
+                node = Node.Nodes.get_fromID(list.pop(x), lambda r: r[VALUE].id)[VALUE]
 
                 if search_depth > 0:
                     search_depth -= 1
@@ -199,7 +194,7 @@ class Node(INodeProperty, IHasEdges, IDisposable):
             if id is None:
                 return Path()
             else:
-                node = Node.Nodes.get_fromID(id, lambda r: r['value'].id)['value']
+                node = Node.Nodes.get_fromID(id, lambda r: r[VALUE].id)[VALUE]
                 return loop(node.parent).joinpath(
                     node.key if node.include_this_to_path else '') #自身を飛ばすかどうか
             

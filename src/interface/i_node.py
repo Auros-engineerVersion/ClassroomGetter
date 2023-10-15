@@ -4,7 +4,6 @@ from abc import ABCMeta, abstractmethod, abstractproperty
 from typing import Callable, Coroutine
 
 from .i_routine_data import IRoutineData
-from .i_minimalist_db import IMinimalistID
 
 
 class ISearchable(metaclass=ABCMeta):
@@ -23,11 +22,11 @@ class IDisposable(metaclass=ABCMeta):
     
 class IHasEdges(metaclass=ABCMeta):
     @abstractproperty
-    def parent(self) -> IMinimalistID:
+    def parent(self) -> int:
         raise NotImplementedError
     
     @abstractproperty
-    def edges(self) -> list[IMinimalistID]:
+    def edges(self) -> list[int]:
         raise NotImplementedError
     
     @abstractproperty

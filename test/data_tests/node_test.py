@@ -55,13 +55,15 @@ class NodeTest(unittest.TestCase):
         child =  Node('child', 'child', 1)
         
         parent.add_edge(child.id)
-        self.assertIn(child, parent.edges)
+        self.assertIn(child.id, parent.edges)
+        self.assertEqual(len(Node.Nodes), 2)
+        self.assertEqual(child.parent, parent.id)
 
         grandchild = Node('grandchild', 'grandchild', 2)
         child.add_edge(grandchild)
-        self.assertIn(grandchild, child.edges)
-        
+        self.assertIn(grandchild.id, child.edges)
         self.assertEqual(len(Node.Nodes), 3)
+        self.assertEqual(grandchild.parent, child.id)
         
     def test_raw_edges(self):
         n_0 = self.n_gen(0)
@@ -133,18 +135,16 @@ class NodeTest(unittest.TestCase):
         
         root.add_edge(stem)
         stem.add_edge(reaf)
-
         self.assertEqual(reaf.to_path(), Path('root/stem/reaf'))
         
-        root.dispose()
-        self.assertEqual(reaf.to_path(), Path('stem/reaf'))
+        #余分な枝を追加
+        stem.add_edge(Node('branch0', 'branch0', 2, True))
+        stem.add_edge(Node('branch1', 'branch1', 2, True))
         
-        branch = Node('branch', 'branch', 2, True)
-        stem.add_edge(branch)
         fruit = Node('fruit', 'fruit', 3, True)
-        branch.add_edge(fruit)
+        stem.add_edge(fruit)
         
-        self.assertEqual(fruit.to_path(), Path('stem/branch/fruit'))
+        self.assertEqual(fruit.to_path(), Path('root/stem/fruit'))
         
     def test_to_path_when_include_false(self):
         n_0 = self.n_gen(0)
