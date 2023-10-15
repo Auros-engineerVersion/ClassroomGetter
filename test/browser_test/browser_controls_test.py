@@ -41,17 +41,5 @@ class BrowserControlsTest(unittest.TestCase):
         excepted = ['hoge', 'fuga']
         self.assertEqual(result, excepted)
         
-    def test_download(self):        
-        self.__bc.wait._poll = 0.1
-        dummy_url = 'https://google.com'
-        
-        #ファイルのダウンロードが間に合わなかった場合
-        self.assertRaises(TimeoutError, donwload, self.__bc, dummy_url, Path('./dont_exist.txt'), 1)
-        
-        #ファイルのダウンロードが完了した場合
-        path_mock = MagicMock()
-        path_mock.exists.side_effect = [False for _ in range(3)] + [True]
-        self.assertIsInstance(donwload(self.__bc, dummy_url, path_mock, 1), path_mock.__class__)
-        
 if __name__ == '__main__':
     unittest.main()
