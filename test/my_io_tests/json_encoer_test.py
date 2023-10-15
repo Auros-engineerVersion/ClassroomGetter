@@ -53,14 +53,17 @@ class JSONEncoderTest(unittest.TestCase):
             else:
                 self.assertIn(v, json_data)
             
-    def test_decode_node(self):
+    def test_decode_node(self):        
         n_0 = Node('n_0_key', 'n_0_url', 0, True, RoutineData())
+        before_len = len(Node.Nodes)
         
         json_data = json.dumps(n_0, cls=MyClassEncoder, indent=4)
         after = json.loads(json_data, cls=MyClassDecoder)
         
+        self.assertEqual(len(Node.Nodes), before_len)
+        self.assertIsInstance(after, Node)
         self.assertEqual(n_0, after)
-        self.assertIn(n_0, after.Nodes)
+        self.assertEqual(n_0.id, after.id)
         
     def test_encode_setting_data(self):
         data = SettingData()
