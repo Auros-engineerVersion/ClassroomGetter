@@ -66,33 +66,32 @@ class NodeTest(unittest.TestCase):
         parent.add_edge(child)
         self.assertEqual(child.parent, parent.id)
         
-    def test_destructor(self):
-        def node_env_set():
-            Node.Nodes.clear()
-            n_1 = self.n_gen(0)
-            n_1.add_edge(n_2 := self.n_gen(1))
-            n_2.add_edge(n_3 := self.n_gen(2))
-            n_3.add_edge(n_4 := self.n_gen(3))
+    def test_root_dispose(self):
+        Node.Nodes.clear()
+        n_0 = self.n_gen(0)
+        n_1 = self.n_gen(1)
+        n_2 = self.n_gen(2)
         
-        #n_0を削除
-        node_env_set()
-        Node.Nodes[0]['value'].dispose()
-        self.assertIsInstance(Node.Nodes[0], EmptyRecode)
-        self.assertIsNone(Node.Nodes[1]['value'].parent)
+        n_0.add_edge(n_1)
+        n_1.add_edge(n_2)
         
-        #中間を削除
-        node_env_set()
-        Node.Nodes[1]['value'].dispose()
-        self.assertIsInstance(Node.Nodes[1], EmptyRecode)
-        self.assertCountEqual(Node.Nodes[0]['value'].edges, [])
-        self.assertIsNone(Node.Nodes[2]['value'].parent)
+        self.assertEqual(len(Node.Nodes), 3)
+        n_0.dispose()
+        self.assertEqual(len(Node.Nodes), 0)
         
-        #末端を削除
-        node_env_set()
-        Node.Nodes[3]['value'].dispose()
-        self.assertIsInstance(Node.Nodes[3], EmptyRecode)
-        self.assertCountEqual(Node.Nodes[2]['value'].edges, [])
-    
+    def test_stem_dispose(self):
+        Node.Nodes.clear()
+        n_0 = self.n_gen(0)
+        n_1 = self.n_gen(1)
+        n_2 = self.n_gen(2)
+        
+        n_0.add_edge(n_1)
+        n_1.add_edge(n_2)
+        
+        self.assertEqual(len(Node.Nodes), 3)
+        n_1.dispose()
+        self.assertEqual(len(Node.Nodes), 1)
+        
     def test_search(self):
         n_0 = self.n_gen(0)
         n_0.add_edge(n_1 := self.n_gen(1))

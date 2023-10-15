@@ -130,22 +130,17 @@ class Node(INodeProperty, IHasEdges, IDisposable):
 #endregion
     
     def dispose(self) -> None:
-        self.Nodes.remove(self.id)
-            
-        #それぞれのedgeから削除
-        for recodes in self.Nodes:
-            if isinstance(recodes, EmptyRecode):
-                continue
-            else:
-                node: IHasEdges = recodes['value']
-                if self is node:
-                    continue
-
-                if node.parent is not None and node.parent == self.id:
-                    node.parent = None
-
-                if self.id in node.edges:
-                    node.edges.remove(self.id)
+        def __remove_edges(node: IHasEdges):
+            if self.id in node.edges:
+                node.edges.remove(self.id)
+                
+            if node.parent == self.id:
+                node.parent = None
+                
+            Node.Nodes.remove(node.id)
+            del node
+                        
+        self.serach(search_depth=100)(__remove_edges)
                     
     def add_edge(self, other: IHasEdges | IMinimalistID) -> list[IMinimalistID]:
         #idにINodeを入れてしまった場合
