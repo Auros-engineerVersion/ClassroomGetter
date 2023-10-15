@@ -102,7 +102,7 @@ class NodeTest(unittest.TestCase):
         for depth in search_depthes:
             with self.subTest(depth=depth):
                 call_mock = MagicMock()
-                n_0.serach(search_depth=depth)(call_mock)
+                n_0.search(search_depth=depth)(call_mock)
                 
                 if len(Node.Nodes) > depth:
                     self.assertEqual(call_mock.call_count, depth)

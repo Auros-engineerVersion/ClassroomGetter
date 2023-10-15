@@ -142,7 +142,7 @@ class Node(INodeProperty, IHasEdges, IDisposable):
             Node.Nodes.remove(node.id)
             del node
                         
-        self.serach(search_depth=100)(__remove_edges)
+        self.search(search_depth=100)(__remove_edges)
                     
     def add_edge(self, other_id: IHasEdges) -> list[int]:
         #idにINodeを入れてしまった場合
@@ -157,7 +157,7 @@ class Node(INodeProperty, IHasEdges, IDisposable):
             
         return self.edges
     
-    def serach(self, search_depth = 100, bfs = True) -> Callable[[Callable], None]:
+    def search(self, search_depth = 100, bfs = True) -> Callable[[Callable], None]:
         """
         Args:
             bfs (bool, optional): Trueなら幅優先探索、Falseなら深さ優先探索を行う
@@ -165,20 +165,21 @@ class Node(INodeProperty, IHasEdges, IDisposable):
         zero_to_neg = lambda x: -1 if x == False else 0
         popping = lambda list, bfs: Node.Nodes.get(list.pop(bfs))['value']
         
+        def __do_search(func: Callable[[INodeProperty], None]):
+            nonlocal search_depth
             list: list[int] = [self.id]
             
             while(len(list) > 0):
-                #出す場所が0なら深さ優先探索, queueの振る舞いをする
-                #何もないのであれば幅優先探索, stackの振る舞いをする
+
                 x =  zero_to_neg(bfs)
-                node = popping(list, x)
+                node = Node.Nodes.get_fromID(list.pop(x), lambda r: r['value'].id)['value']
 
                 if search_depth > 0:
                     search_depth -= 1
                     func(node)
                     list.extend(node.edges)
                     
-        return __do_serch
+        return __do_search
                 
     #幅優先探索
     def initialize_tree(self, acquire: Callable[[INodeProperty], tuple[str, str]]) -> None:
@@ -189,7 +190,7 @@ class Node(INodeProperty, IHasEdges, IDisposable):
                 else:
                     node.add_edge(Node(key, url, node.tree_height + 1))
         
-        self.serach(search_depth=Node.SearchDepth)(__next)
+        self.search(search_depth=Node.SearchDepth)(__next)
         
     def to_path(self) -> Path:
         if len(Node.Nodes) == 0:
