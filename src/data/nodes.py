@@ -48,10 +48,19 @@ class Node(INodeProperty, IHasEdges, IDisposable):
         return self.__tree_height < other.tree_height
     
     def __eq__(self, other: object) -> bool:
-        if (other == None):
+        if other is None:
+            return False
+        elif not isinstance(other, Node):
             return False
         else:
-            return all([x[0] == x[1] for x in zip(vars(self).values(), vars(other).values())])
+            argument_eq = []
+            for key, x, y in zip(vars(self).keys(), vars(self).values(), vars(other).values()):
+                if '_Node__id' in key:
+                    continue
+                else:
+                    argument_eq.append(x == y)
+            
+            return all(argument_eq)
 
     def __hash__(self) -> int:
         return hash(vars(self).values())

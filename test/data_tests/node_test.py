@@ -35,9 +35,7 @@ class NodeTest(unittest.TestCase):
         y = Node('hoge', 'hoge', 1)
         self.assertNotEqual(x, y)
         
-        #idが異なるため
-        z = Node('key', 'url', 0)
-        self.assertNotEqual(x, z)
+        self.assertNotEqual(x, 0)
     
     def test_edges(self):
         parent = Node('parent', 'parent', 0)
