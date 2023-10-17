@@ -1,6 +1,6 @@
 import tkinter as tk
 
-from ....literals import CONFIGURE, BACKGROUND
+from ....literals import *
 
 
 class ScrollableFrame(tk.Frame):
@@ -10,10 +10,8 @@ class ScrollableFrame(tk.Frame):
         self.scrollable_frame = tk.Frame(self.canvas)
         self.scrollable_frame.bind(
             CONFIGURE,
-            lambda e: self.canvas.configure(
-                scrollregion=self.canvas.bbox(tk.ALL)
-            )
-        )
+            lambda _: self.canvas.configure(
+                scrollregion=self.canvas.bbox(tk.ALL)))
                 
         self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor=tk.NW)
         if bar_y:
@@ -24,5 +22,5 @@ class ScrollableFrame(tk.Frame):
             self.scrollbar_x = tk.Scrollbar(self, orient=tk.HORIZONTAL, command=self.canvas.xview)
             self.scrollbar_x.pack(side=tk.BOTTOM, fill=tk.X)
             self.canvas.configure(xscrollcommand=self.scrollbar_x.set)
-            
+
         self.canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
