@@ -1,6 +1,8 @@
 #region イベント
 WM_DELETE_WINDOW = 'WM_DELETE_WINDOW'
 BUTTON_PRESS = '<ButtonPress>'
+MOUSE_WHEEL_UP = '<ButtonPress-4>'
+MOUSE_WHEEL_DOWN = '<ButtonPress-5>'
 NOTEBOOK_TAB_CHANGED = '<<NotebookTabChanged>>'
 CONFIGURE = '<Configure>'
 TEXT = "text"
