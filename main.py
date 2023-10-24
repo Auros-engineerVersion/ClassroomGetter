@@ -1,10 +1,9 @@
 import traceback
 
-from pydrive2.auth import GoogleAuth
 from selenium.common.exceptions import NoSuchWindowException
 
 from src.gui.application_root import *
-from src.data import BrowserControlData as bc_data, Node
+from src.data import BrowserControlData as bc_data
 from src.my_io import *
 from src.handler import *
 
