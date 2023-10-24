@@ -21,7 +21,7 @@ You can set a periodic execution. You can set a interval in a right side's week,
 
 ## 使い方
 ![Application Top Image](FrontFrame.png)<br>
-これはこのアプリのGUIです。サイドウィンドウに注目。ツリービューのように授業の項目が表示されます。
+これはこのアプリのGUIです。ここにツリービューのように授業の項目が表示されます。
 キーの左にあるボタンを押すと、サブ項目がその下に展開されます。
 
 各セクションはそれぞれのURLを持っています。ウィンドウの右下にあるボタンを押すと、内部のウェブドライバーがそのURLにアクセスし、次のセクションのURLとキーを取得します。それをサイドウィンドウに表示します。
