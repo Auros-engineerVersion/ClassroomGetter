@@ -3,7 +3,7 @@ This application's objective is downloading files from google classroom to local
 Here is a way to use this app manual.
 
 ## How?
-![Application Top Image](test/gui_tests/image/FrontFrame.png)<br>
+![Application Top Image](FrontFrame.png)<br>
 This is a gui of this app. You pay attention side window. It shows a lesson sections like the tree view.
 Side window is a tree view. If you press a button which on the left of key, its expand and you can see the sub sections.<br>
 
